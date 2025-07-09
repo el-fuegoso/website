@@ -88,14 +88,18 @@ class ClaudeClient {
         };
 
         try {
+            console.log('Starting streaming request...');
             const response = await fetch(this.streamUrl, {
                 method: 'POST',
                 headers: this.headers,
                 body: JSON.stringify(payload)
             });
 
+            console.log('Response received:', response.status, response.statusText);
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
+                console.error('Stream response error:', errorData);
                 throw new Error(`API request failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
             }
 
@@ -103,8 +107,10 @@ class ClaudeClient {
             const decoder = new TextDecoder();
             let buffer = '';
 
+            console.log('Starting to read stream...');
             while (true) {
                 const { done, value } = await reader.read();
+                console.log('Stream chunk:', done, value?.length);
                 if (done) break;
 
                 buffer += decoder.decode(value, { stream: true });
@@ -112,17 +118,21 @@ class ClaudeClient {
                 buffer = lines.pop() || '';
 
                 for (const line of lines) {
+                    console.log('Processing line:', line);
                     if (line.startsWith('data: ')) {
                         const data = line.slice(6);
+                        console.log('Data:', data);
                         if (data === '[DONE]') return;
                         
                         try {
                             const parsed = JSON.parse(data);
+                            console.log('Parsed:', parsed);
                             if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                                console.log('Calling onChunk with:', parsed.delta.text);
                                 onChunk(parsed.delta.text);
                             }
                         } catch (e) {
-                            // Skip invalid JSON
+                            console.log('JSON parse error:', e);
                         }
                     }
                 }

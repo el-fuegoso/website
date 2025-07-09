@@ -58,13 +58,24 @@ class ConversationManager {
 
         try {
             let fullResponse = '';
+            let streamingStarted = false;
+            
             const onChunk = (chunk) => {
+                console.log('ConversationManager: Received chunk:', chunk);
                 fullResponse += chunk;
+                
+                if (!streamingStarted && this.ui) {
+                    console.log('ConversationManager: Starting streaming message');
+                    this.ui.startStreamingMessage();
+                    streamingStarted = true;
+                }
+                
                 if (this.ui) {
                     this.ui.updateStreamingMessage(fullResponse);
                 }
             };
 
+            console.log('ConversationManager: Starting stream message...');
             await this.client.streamMessage(message, this.conversationHistory, onChunk);
             
             this.addMessageToHistory('assistant', fullResponse);

@@ -2,8 +2,12 @@ class MainConversation {
     constructor() {
         this.chatUI = null;
         this.conversationManager = null;
+        this.welcomeBot = null;
+        this.welcomeUI = null;
+        this.personalityAnalyzer = null;
         this.isInitialized = false;
         this.chatTrigger = null;
+        this.userProfile = null;
     }
 
     initialize() {
@@ -19,9 +23,20 @@ class MainConversation {
     }
 
     setupComponents() {
+        // Initialize welcome bot components
+        this.welcomeUI = new WelcomeUI();
+        this.personalityAnalyzer = new PersonalityAnalyzer();
+        this.welcomeBot = new WelcomeBot();
+        
+        // Initialize chat components
         this.chatUI = new ChatUI();
         this.conversationManager = new ConversationManager();
         
+        // Setup welcome bot
+        this.welcomeBot.initialize(this.welcomeUI, this.personalityAnalyzer);
+        this.welcomeBot.onComplete = (profile) => this.handleWelcomeComplete(profile);
+        
+        // Setup conversation manager
         this.conversationManager.initialize(this.chatUI);
         
         this.conversationManager.onMessage((message) => {
@@ -32,6 +47,9 @@ class MainConversation {
             console.error('Conversation error:', error);
             this.handleConversationError(error);
         });
+        
+        // Check if user has completed welcome flow
+        this.userProfile = WelcomeBot.getUserData();
     }
 
     setupEventListeners() {
@@ -93,8 +111,30 @@ class MainConversation {
         }
     }
 
+    handleWelcomeComplete(profile) {
+        console.log('Welcome bot completed:', profile);
+        this.userProfile = profile;
+        
+        // Show chat after welcome completion
+        setTimeout(() => {
+            this.showChat();
+            
+            // Send a personalized greeting to the chat
+            if (profile && profile.name) {
+                const greeting = `Hey ${profile.name}! Thanks for sharing a bit about yourself. I'm Claude, and I'm here to help you learn more about El's work and projects. What would you like to know?`;
+                this.chatUI.addMessage(greeting, 'assistant');
+            }
+        }, 1000);
+    }
+
     showChat() {
         if (!this.chatUI) return;
+        
+        // Check if user has completed welcome flow
+        if (!this.userProfile && !WelcomeBot.hasCompletedWelcome()) {
+            this.startWelcomeFlow();
+            return;
+        }
         
         this.chatUI.show();
         this.updateTriggerButton(true);
@@ -105,6 +145,16 @@ class MainConversation {
                 this.promptForApiKey();
             }, 500);
         }
+    }
+
+    startWelcomeFlow() {
+        if (!this.welcomeBot) {
+            console.error('Welcome bot not initialized');
+            return;
+        }
+        
+        this.welcomeBot.start();
+        this.updateTriggerButton(true);
     }
 
     hideChat() {
@@ -229,7 +279,10 @@ function initializeConversation() {
 }
 
 function waitForDependencies() {
-    const dependencies = ['ClaudeClient', 'ChatUI', 'ConversationManager', 'AvatarGenerator'];
+    const dependencies = [
+        'ClaudeClient', 'ChatUI', 'ConversationManager', 'AvatarGenerator',
+        'WelcomeBot', 'WelcomeUI', 'PersonalityAnalyzer'
+    ];
     const checkInterval = 100;
     const maxWait = 5000;
     let waited = 0;

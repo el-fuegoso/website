@@ -1,10 +1,11 @@
 class ClaudeClient {
     constructor() {
         this.apiKey = null;
-        this.baseUrl = 'https://api.anthropic.com/v1/messages';
+        // Use our Vercel proxy instead of direct API
+        this.baseUrl = '/api/claude';
+        this.streamUrl = '/api/claude-stream';
         this.headers = {
-            'Content-Type': 'application/json',
-            'anthropic-version': '2023-06-01'
+            'Content-Type': 'application/json'
         };
     }
 
@@ -17,7 +18,6 @@ class ClaudeClient {
         if (!this.apiKey) {
             throw new Error('API key not set');
         }
-
         const messages = [
             ...conversationHistory,
             {
@@ -75,7 +75,7 @@ class ClaudeClient {
         };
 
         try {
-            const response = await fetch(this.baseUrl, {
+            const response = await fetch(this.streamUrl, {
                 method: 'POST',
                 headers: this.headers,
                 body: JSON.stringify(payload)

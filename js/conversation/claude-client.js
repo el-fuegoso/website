@@ -34,7 +34,7 @@ class ClaudeClient {
         ];
 
         const payload = {
-            model: 'claude-3-sonnet-20240229',
+            model: 'claude-3-5-sonnet-20241022',
             max_tokens: 1024,
             messages: messages,
             system: "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website."
@@ -80,7 +80,7 @@ class ClaudeClient {
         ];
 
         const payload = {
-            model: 'claude-3-sonnet-20240229',
+            model: 'claude-3-5-sonnet-20241022',
             max_tokens: 1024,
             messages: messages,
             system: "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website.",

@@ -94,6 +94,12 @@ class MainConversation {
                 e.preventDefault();
                 this.showChatSettings();
             }
+            
+            // Reset welcome bot flow (Ctrl+Shift+R)
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                e.preventDefault();
+                this.resetWelcomeFlow();
+            }
         });
     }
 
@@ -228,12 +234,88 @@ class MainConversation {
         console.log('Conversation system destroyed');
     }
 
+    resetWelcomeFlow() {
+        // Clear welcome bot data
+        WelcomeBot.clearUserData();
+        
+        // Reset user profile
+        this.userProfile = null;
+        
+        // Hide any open interfaces
+        if (this.chatUI && this.chatUI.isVisible) {
+            this.chatUI.hide();
+        }
+        
+        if (this.welcomeUI && this.welcomeUI.isVisible) {
+            this.welcomeUI.hide();
+        }
+        
+        // Reset button state
+        this.updateTriggerButton(false);
+        
+        // Show confirmation
+        this.showResetConfirmation();
+        
+        console.log('Welcome flow reset! Click CHAT to start over.');
+    }
+
+    showResetConfirmation() {
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.className = 'reset-notification';
+        notification.textContent = '🔄 Welcome flow reset! Click CHAT to start over.';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #004225;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            z-index: 25000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        // Add animation keyframes
+        if (!document.querySelector('#reset-notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'reset-notification-styles';
+            style.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
     getStatus() {
         return {
             initialized: this.isInitialized,
             chatVisible: this.chatUI ? this.chatUI.isVisible : false,
             hasApiKey: this.hasApiKey(),
-            conversationActive: this.conversationManager ? this.conversationManager.isActive : false
+            conversationActive: this.conversationManager ? this.conversationManager.isActive : false,
+            welcomeCompleted: WelcomeBot.hasCompletedWelcome()
         };
     }
 }
@@ -271,6 +353,7 @@ function initializeConversation() {
         console.log('Keyboard shortcuts:');
         console.log('- Ctrl+K: Toggle chat');
         console.log('- Ctrl+Shift+C: Open chat settings');
+        console.log('- Ctrl+Shift+R: Reset welcome flow');
         console.log('- Escape: Close chat (when open)');
         
     } catch (error) {

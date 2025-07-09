@@ -200,7 +200,7 @@ class WelcomeUI {
         
         const typeNextChar = () => {
             if (index < text.length) {
-                this.questionText.textContent += text[index];
+                this.questionText.textContent += text.charAt(index);
                 index++;
                 this.currentTypingAnimation = setTimeout(typeNextChar, 30);
             }
@@ -288,7 +288,7 @@ class WelcomeUI {
 
     autoResizeTextarea() {
         this.responseInput.style.height = 'auto';
-        this.responseInput.style.height = Math.min(this.responseInput.scrollHeight, 120) + 'px';
+        this.responseInput.style.height = Math.min(this.responseInput.scrollHeight, 150) + 'px';
     }
 
     isOpen() {

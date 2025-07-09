@@ -18,8 +18,15 @@ class ClaudeClient {
         if (!this.apiKey) {
             throw new Error('API key not set');
         }
+
+        // Filter conversation history to only include role and content
+        const cleanHistory = conversationHistory.map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+
         const messages = [
-            ...conversationHistory,
+            ...cleanHistory,
             {
                 role: 'user',
                 content: message
@@ -58,8 +65,14 @@ class ClaudeClient {
             throw new Error('API key not set');
         }
 
+        // Filter conversation history to only include role and content
+        const cleanHistory = conversationHistory.map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+
         const messages = [
-            ...conversationHistory,
+            ...cleanHistory,
             {
                 role: 'user',
                 content: message

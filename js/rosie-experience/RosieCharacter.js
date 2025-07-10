@@ -344,7 +344,7 @@ class RosieCharacter {
         
         // Label text
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 12px Roboto Mono';
+        this.ctx.font = 'bold 12px "Roboto Mono", monospace';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('ROSIE', labelX, labelY);
         

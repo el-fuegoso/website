@@ -317,25 +317,18 @@ class RosieExperience {
         // Update robot phase
         this.robotConstruction.setPhase(question.robotPhase);
         
-        // Focus input after animation
+        // Focus input immediately since there's no typing animation
         setTimeout(() => {
             this.answerInput.focus();
-        }, 2000);
+        }, 500);
     }
     
     typeQuestionText(text) {
-        this.questionText.textContent = '';
-        let index = 0;
+        // Disable typing animation for now - just show the text directly
+        this.questionText.textContent = text;
         
-        const typeChar = () => {
-            if (index < text.length) {
-                this.questionText.textContent += text.charAt(index);
-                index++;
-                setTimeout(typeChar, 50);
-            }
-        };
-        
-        typeChar();
+        // TODO: Fix typing animation character doubling issue later
+        // For now, instant text display is more reliable
     }
     
     updateProgress(current, total) {

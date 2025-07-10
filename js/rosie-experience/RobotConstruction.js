@@ -499,7 +499,7 @@ class RobotConstruction {
         
         // Label text
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = 'bold 10px Roboto Mono';
+        this.ctx.font = 'bold 10px "Roboto Mono", monospace';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(phaseName, labelX, labelY);
         

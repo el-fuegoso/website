@@ -23,18 +23,16 @@ class MainConversation {
     }
 
     setupComponents() {
-        // Initialize welcome bot components
-        this.welcomeUI = new WelcomeUI();
+        // Initialize Rosie experience
+        this.rosieExperience = new RosieExperience();
         this.personalityAnalyzer = new PersonalityAnalyzer();
-        this.welcomeBot = new WelcomeBot();
         
         // Initialize chat components
         this.chatUI = new ChatUI();
         this.conversationManager = new ConversationManager();
         
-        // Setup welcome bot
-        this.welcomeBot.initialize(this.welcomeUI, this.personalityAnalyzer);
-        this.welcomeBot.onComplete = (profile) => this.handleWelcomeComplete(profile);
+        // Setup Rosie experience
+        this.rosieExperience.onComplete = (profile) => this.handleWelcomeComplete(profile);
         
         // Setup conversation manager
         this.conversationManager.initialize(this.chatUI);
@@ -49,7 +47,7 @@ class MainConversation {
         });
         
         // Check if user has completed welcome flow
-        this.userProfile = WelcomeBot.getUserData();
+        this.userProfile = this.getUserData();
     }
 
     setupEventListeners() {
@@ -95,10 +93,11 @@ class MainConversation {
                 this.showChatSettings();
             }
             
-            // Reset welcome bot flow (Ctrl+Shift+R)
-            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+            // Reset welcome bot flow (Ctrl+Shift+X - changed from R to avoid browser refresh)
+            if (e.ctrlKey && e.shiftKey && e.key === 'X') {
                 e.preventDefault();
                 this.resetWelcomeFlow();
+                console.log('Reset shortcut triggered!');
             }
         });
     }
@@ -137,8 +136,8 @@ class MainConversation {
         if (!this.chatUI) return;
         
         // Check if user has completed welcome flow
-        if (!this.userProfile && !WelcomeBot.hasCompletedWelcome()) {
-            this.startWelcomeFlow();
+        if (!this.userProfile && !this.hasCompletedWelcome()) {
+            this.startRosieExperience();
             return;
         }
         
@@ -153,13 +152,13 @@ class MainConversation {
         }
     }
 
-    startWelcomeFlow() {
-        if (!this.welcomeBot) {
-            console.error('Welcome bot not initialized');
+    startRosieExperience() {
+        if (!this.rosieExperience) {
+            console.error('Rosie experience not initialized');
             return;
         }
         
-        this.welcomeBot.start();
+        this.rosieExperience.show();
         this.updateTriggerButton(true);
     }
 
@@ -235,8 +234,8 @@ class MainConversation {
     }
 
     resetWelcomeFlow() {
-        // Clear welcome bot data
-        WelcomeBot.clearUserData();
+        // Clear Rosie experience data
+        this.clearUserData();
         
         // Reset user profile
         this.userProfile = null;
@@ -246,8 +245,8 @@ class MainConversation {
             this.chatUI.hide();
         }
         
-        if (this.welcomeUI && this.welcomeUI.isVisible) {
-            this.welcomeUI.hide();
+        if (this.rosieExperience && this.rosieExperience.isVisible) {
+            this.rosieExperience.hide();
         }
         
         // Reset button state
@@ -256,14 +255,14 @@ class MainConversation {
         // Show confirmation
         this.showResetConfirmation();
         
-        console.log('Welcome flow reset! Click CHAT to start over.');
+        console.log('Rosie experience reset! Click CHAT to start over.');
     }
 
     showResetConfirmation() {
         // Create a temporary notification
         const notification = document.createElement('div');
         notification.className = 'reset-notification';
-        notification.textContent = '🔄 Welcome flow reset! Click CHAT to start over.';
+        notification.textContent = '🔄 Rosie experience reset! Click CHAT to start over.';
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -309,13 +308,45 @@ class MainConversation {
         }, 3000);
     }
 
+    // Data management methods
+    getUserData() {
+        try {
+            const data = localStorage.getItem('rosie_user_data');
+            return data ? JSON.parse(data) : null;
+        } catch (error) {
+            console.error('Error reading user data:', error);
+            return null;
+        }
+    }
+    
+    saveUserData(data) {
+        try {
+            localStorage.setItem('rosie_user_data', JSON.stringify(data));
+        } catch (error) {
+            console.error('Error saving user data:', error);
+        }
+    }
+    
+    clearUserData() {
+        try {
+            localStorage.removeItem('rosie_user_data');
+        } catch (error) {
+            console.error('Error clearing user data:', error);
+        }
+    }
+    
+    hasCompletedWelcome() {
+        const userData = this.getUserData();
+        return userData && userData.completedAt;
+    }
+
     getStatus() {
         return {
             initialized: this.isInitialized,
             chatVisible: this.chatUI ? this.chatUI.isVisible : false,
             hasApiKey: this.hasApiKey(),
             conversationActive: this.conversationManager ? this.conversationManager.isActive : false,
-            welcomeCompleted: WelcomeBot.hasCompletedWelcome()
+            welcomeCompleted: this.hasCompletedWelcome()
         };
     }
 }
@@ -339,8 +370,8 @@ function initializeConversation() {
             return;
         }
         
-        if (typeof AvatarGenerator === 'undefined') {
-            console.error('AvatarGenerator not found. Please ensure all conversation scripts are loaded.');
+        if (typeof RosieExperience === 'undefined') {
+            console.error('RosieExperience not found. Please ensure all conversation scripts are loaded.');
             return;
         }
         
@@ -353,7 +384,7 @@ function initializeConversation() {
         console.log('Keyboard shortcuts:');
         console.log('- Ctrl+K: Toggle chat');
         console.log('- Ctrl+Shift+C: Open chat settings');
-        console.log('- Ctrl+Shift+R: Reset welcome flow');
+        console.log('- Ctrl+Shift+X: Reset Rosie experience');
         console.log('- Escape: Close chat (when open)');
         
     } catch (error) {
@@ -364,7 +395,7 @@ function initializeConversation() {
 function waitForDependencies() {
     const dependencies = [
         'ClaudeClient', 'ChatUI', 'ConversationManager', 'AvatarGenerator',
-        'WelcomeBot', 'WelcomeUI', 'PersonalityAnalyzer'
+        'RosieExperience', 'RosieCharacter', 'RobotConstruction', 'ParticleSystem', 'PersonalityAnalyzer'
     ];
     const checkInterval = 100;
     const maxWait = 5000;

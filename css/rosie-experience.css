@@ -17,7 +17,7 @@
     pointer-events: none;
 }
 
-.modern-layout-container {
+.rosie-layout-container {
     position: relative;
     width: 100vw;
     height: 100vh;
@@ -200,7 +200,7 @@
 }
 
 /* Question Interface - Modern Design */
-.modern-question-container {
+.question-container {
     position: absolute;
     bottom: 80px;
     left: 50%;
@@ -215,7 +215,7 @@
     backdrop-filter: blur(20px);
 }
 
-.modern-question-text {
+.question-text {
     font-family: 'Roboto Mono', monospace;
     font-size: 1.3rem;
     line-height: 1.7;
@@ -225,11 +225,11 @@
     font-weight: 500;
 }
 
-.modern-input-container {
+.input-container {
     margin-bottom: 20px;
 }
 
-.modern-textarea {
+.question-textarea {
     width: 100%;
     min-height: 120px;
     max-height: 200px;
@@ -247,25 +247,25 @@
     box-sizing: border-box;
 }
 
-.modern-textarea:focus {
+.question-textarea:focus {
     border-color: #4A90E2;
     background: #FFFFFF;
     box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
 }
 
-.modern-textarea::placeholder {
+.question-textarea::placeholder {
     color: #888;
     font-style: italic;
 }
 
-.modern-actions {
+.question-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
 }
 
-.modern-skip-btn {
+.skip-btn {
     background: transparent;
     border: 2px solid #E5E5E5;
     color: #666;
@@ -278,13 +278,13 @@
     transition: all 0.3s ease;
 }
 
-.modern-skip-btn:hover {
+.skip-btn:hover {
     border-color: #4A90E2;
     color: #4A90E2;
     transform: translateY(-2px);
 }
 
-.modern-submit-btn {
+.submit-btn {
     background: linear-gradient(135deg, #4A90E2, #357ABD);
     color: white;
     border: none;
@@ -299,20 +299,20 @@
     overflow: hidden;
 }
 
-.modern-submit-btn:hover:not(:disabled) {
+.submit-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #357ABD, #2E6DA4);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
 }
 
-.modern-submit-btn:disabled {
+.submit-btn:disabled {
     background: #CCC;
     cursor: not-allowed;
     transform: none;
 }
 
 /* Progress Indicator - Modern */
-.modern-progress-container {
+.progress-container {
     position: absolute;
     top: 40px;
     left: 50%;
@@ -352,7 +352,7 @@
 }
 
 /* Character Count */
-.modern-char-count {
+.char-count {
     font-size: 0.85rem;
     color: #888;
     text-align: right;
@@ -360,17 +360,17 @@
     font-weight: 500;
 }
 
-.modern-char-count.warning {
+.char-count.warning {
     color: #FF6B35;
     font-weight: 600;
 }
 
 /* Animations */
-.modern-fade-in {
-    animation: modernFadeIn 0.6s ease-out;
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
 }
 
-@keyframes modernFadeIn {
+@keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(30px);
@@ -381,11 +381,11 @@
     }
 }
 
-.modern-slide-up {
-    animation: modernSlideUp 0.4s ease-out;
+.slide-up {
+    animation: slideUp 0.4s ease-out;
 }
 
-@keyframes modernSlideUp {
+@keyframes slideUp {
     from {
         opacity: 0;
         transform: translateY(50px);
@@ -454,23 +454,23 @@
 }
 
 @media (max-width: 768px) {
-    .modern-question-container {
+    .question-container {
         width: 95vw;
         bottom: 40px;
         padding: 24px;
     }
     
-    .modern-question-text {
+    .question-text {
         font-size: 1.1rem;
     }
     
-    .modern-actions {
+    .question-actions {
         flex-direction: column;
         gap: 12px;
     }
     
-    .modern-skip-btn,
-    .modern-submit-btn {
+    .skip-btn,
+    .submit-btn {
         width: 100%;
         padding: 16px;
     }
@@ -505,14 +505,14 @@
 }
 
 @media (max-width: 480px) {
-    .modern-question-container {
+    .question-container {
         width: 100vw;
         bottom: 0;
         border-radius: 20px 20px 0 0;
         padding: 20px;
     }
     
-    .modern-progress-container {
+    .progress-container {
         top: 20px;
     }
     
@@ -531,37 +531,37 @@
     background: #1a1a1a;
 }
 
-:root.dark .modern-layout-container {
+:root.dark .rosie-layout-container {
     background: #1a1a1a;
 }
 
-:root.dark .modern-question-container {
+:root.dark .question-container {
     background: rgba(26, 26, 26, 0.98);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-:root.dark .modern-question-text {
+:root.dark .question-text {
     color: #fff;
 }
 
-:root.dark .modern-textarea {
+:root.dark .question-textarea {
     background: rgba(51, 51, 51, 0.8);
     border-color: rgba(255, 255, 255, 0.2);
     color: #fff;
 }
 
-:root.dark .modern-textarea:focus {
+:root.dark .question-textarea:focus {
     background: rgba(51, 51, 51, 0.9);
     border-color: #4A90E2;
     box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
 }
 
-:root.dark .modern-skip-btn {
+:root.dark .skip-btn {
     border-color: rgba(255, 255, 255, 0.3);
     color: #fff;
 }
 
-:root.dark .modern-skip-btn:hover {
+:root.dark .skip-btn:hover {
     border-color: #4A90E2;
     color: #4A90E2;
 }
@@ -570,21 +570,21 @@
     color: #ccc;
 }
 
-:root.dark .modern-char-count {
+:root.dark .char-count {
     color: #aaa;
 }
 
 /* High Contrast Mode */
 @media (prefers-contrast: high) {
-    .modern-question-container {
+    .question-container {
         border-width: 3px;
     }
     
-    .modern-textarea {
+    .question-textarea {
         border-width: 3px;
     }
     
-    .modern-skip-btn {
+    .skip-btn {
         border-width: 3px;
     }
 }
@@ -593,8 +593,8 @@
 @media (prefers-reduced-motion: reduce) {
     .floating-element,
     .rosie-main-character,
-    .modern-submit-btn,
-    .modern-skip-btn {
+    .submit-btn,
+    .skip-btn {
         animation: none;
         transition: none;
     }

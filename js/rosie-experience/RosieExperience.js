@@ -86,7 +86,7 @@ class RosieExperience {
     initialize() {
         if (this.isInitialized) return;
         
-        this.createModernInterface();
+        this.createInterface();
         this.setupEventListeners();
         this.startAnimationLoop();
         this.preloadAssets();
@@ -95,13 +95,13 @@ class RosieExperience {
         console.log('Rosie Experience initialized');
     }
     
-    createModernInterface() {
+    createInterface() {
         this.container = document.createElement('div');
         this.container.id = 'rosie-experience';
         this.container.className = 'rosie-experience hidden';
         
         this.container.innerHTML = `
-            <div class="modern-layout-container">
+            <div class="rosie-layout-container">
                 <!-- Hero Character Section -->
                 <div class="rosie-hero-section">
                     <div class="rosie-character-container" id="rosie-container">
@@ -176,27 +176,27 @@ class RosieExperience {
                 </div>
                 
                 <!-- Progress Indicator -->
-                <div class="modern-progress-container">
+                <div class="progress-container">
                     <div class="progress-dots" id="progress-dots"></div>
                     <span class="progress-label" id="progress-label">Getting to know you...</span>
                 </div>
                 
                 <!-- Question Interface -->
-                <div class="modern-question-container modern-fade-in" id="question-container">
-                    <div class="modern-question-text" id="question-text"></div>
-                    <div class="modern-input-container">
+                <div class="question-container fade-in" id="question-container">
+                    <div class="question-text" id="question-text"></div>
+                    <div class="input-container">
                         <textarea 
                             id="answer-input" 
-                            class="modern-textarea"
+                            class="question-textarea"
                             placeholder="Type your answer here..."
                             rows="4"
                             maxlength="500"
                         ></textarea>
-                        <div class="modern-char-count" id="char-count">0/500</div>
+                        <div class="char-count" id="char-count">0/500</div>
                     </div>
-                    <div class="modern-actions">
-                        <button id="skip-btn" class="modern-skip-btn">Skip Question</button>
-                        <button id="submit-btn" class="modern-submit-btn">Continue</button>
+                    <div class="question-actions">
+                        <button id="skip-btn" class="skip-btn">Skip Question</button>
+                        <button id="submit-btn" class="submit-btn">Continue</button>
                     </div>
                 </div>
             </div>

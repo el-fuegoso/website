@@ -395,7 +395,7 @@ function initializeConversation() {
 function waitForDependencies() {
     const dependencies = [
         'ClaudeClient', 'ChatUI', 'ConversationManager', 'AvatarGenerator',
-        'RosieExperience', 'RosieCharacter', 'RobotConstruction', 'ParticleSystem', 'PersonalityAnalyzer'
+        'RosieExperience', 'PersonalityAnalyzer'
     ];
     const checkInterval = 100;
     const maxWait = 5000;

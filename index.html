@@ -10,14 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Flip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
     <link rel="stylesheet" href="css/conversation.css">
-    <link rel="stylesheet" href="css/rosie-experience.css">
     <script src="js/conversation/claude-client.js"></script>
     <script src="js/conversation/avatar-generator.js"></script>
     <script src="js/conversation/chat-ui.js"></script>
     <script src="js/conversation/conversation-manager.js"></script>
-    <script src="js/rosie-experience/RosieExperience.js"></script>
-    <script src="js/rosie-experience/PersonalityAnalyzer.js"></script>
-    <script src="js/main-conversation.js"></script>
+    <script src="js/terminal-experience/DataCollector.js"></script>
+    <script src="js/terminal-experience/TerminalQuestionnaire.js"></script>
     <style>
         :root {
             --bg-color: #F0EEE6;
@@ -2086,6 +2084,67 @@
             navigator.serviceWorker.register('/sw.js').catch(console.error);
         }
         */
+
+        // Terminal Experience Integration
+        let terminalQuestionnaire = null;
+
+        function initializeTerminalExperience() {
+            if (TerminalQuestionnaire.hasCompletedExperience()) {
+                // User has already completed the experience, go directly to chat
+                initializeConversation();
+            } else {
+                // Show terminal questionnaire
+                terminalQuestionnaire = new TerminalQuestionnaire();
+                terminalQuestionnaire.show();
+            }
+        }
+
+        function initializeConversation() {
+            // Initialize the chat system using existing conversation components
+            if (window.ConversationManager && window.ChatUI) {
+                const chatUI = new ChatUI();
+                const conversationManager = new ConversationManager();
+                
+                // Initialize the UI first
+                chatUI.initialize();
+                conversationManager.initialize(chatUI);
+                
+                // Load stored API key if available
+                conversationManager.loadStoredApiKey();
+                
+                // Get user data for personalized greeting
+                const userData = TerminalQuestionnaire.getUserData();
+                if (userData && userData.userName) {
+                    // Add a personalized welcome message
+                    const welcomeMessage = `Welcome back, ${userData.userName}! 🌟 Based on our chat, I know you're ${userData.analysis.dominantTrait}. What would you like to explore today?`;
+                    chatUI.addMessage(welcomeMessage, true);
+                }
+                
+                // Show the chat interface
+                chatUI.show();
+            }
+        }
+
+        // Chat trigger handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatTrigger = document.getElementById('chatTrigger');
+            if (chatTrigger) {
+                chatTrigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    initializeTerminalExperience();
+                });
+            }
+        });
+
+        // Development helper: Reset user data (Ctrl+Shift+R)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                if (confirm('Reset terminal experience data? This will clear all stored user information.')) {
+                    TerminalQuestionnaire.clearUserData();
+                    location.reload();
+                }
+            }
+        });
     </script>
 </body>
 </html>

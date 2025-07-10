@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Experience Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        
+        button {
+            background: #2a2a2a;
+            color: #00ff00;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background: #3a3a3a;
+        }
+        
+        .info {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        pre {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Terminal Experience Test</h1>
+    
+    <div class="controls">
+        <h2>Controls</h2>
+        <button onclick="startTerminal()">Start Terminal Experience</button>
+        <button onclick="showUserData()">Show User Data</button>
+        <button onclick="clearData()">Clear Data</button>
+        <button onclick="showAnalytics()">Show Analytics</button>
+        <button onclick="testKeywordExtraction()">Test Keyword Extraction</button>
+    </div>
+    
+    <div class="info" id="output">
+        <h3>Output</h3>
+        <p>Click the buttons above to test the terminal experience functionality.</p>
+    </div>
+
+    <!-- Include the terminal experience scripts -->
+    <script src="js/terminal-experience/DataCollector.js"></script>
+    <script src="js/terminal-experience/TerminalQuestionnaire.js"></script>
+
+    <script>
+        let terminal = null;
+        const output = document.getElementById('output');
+
+        function log(message) {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function startTerminal() {
+            if (terminal) {
+                log('Terminal already active. Close it first.');
+                return;
+            }
+            
+            log('Starting terminal experience...');
+            terminal = new TerminalQuestionnaire();
+            terminal.show();
+            
+            // Listen for completion
+            const originalClose = terminal.close.bind(terminal);
+            terminal.close = function() {
+                log('Terminal experience closed');
+                terminal = null;
+                originalClose();
+            };
+        }
+
+        function showUserData() {
+            const userData = TerminalQuestionnaire.getUserData();
+            if (userData) {
+                log('<pre>' + JSON.stringify(userData, null, 2) + '</pre>');
+            } else {
+                log('No user data found. Complete the terminal experience first.');
+            }
+        }
+
+        function clearData() {
+            TerminalQuestionnaire.clearUserData();
+            log('User data cleared.');
+        }
+
+        function showAnalytics() {
+            const dataCollector = new DataCollector();
+            const analytics = dataCollector.getAnalytics();
+            if (analytics.length > 0) {
+                log('<pre>' + JSON.stringify(analytics, null, 2) + '</pre>');
+            } else {
+                log('No analytics data found.');
+            }
+        }
+
+        function testKeywordExtraction() {
+            const dataCollector = new DataCollector();
+            const testResponse = "Hi, I'm Sarah and I work as a frontend developer at a startup. I'm really passionate about creating innovative user interfaces using React and JavaScript. I love collaborating with my team to build amazing products that make a real impact.";
+            
+            const keywords = dataCollector.extractKeywords(testResponse);
+            const name = dataCollector.extractUserName(testResponse);
+            
+            log('<h4>Test Response:</h4><p>' + testResponse + '</p>');
+            log('<h4>Extracted Name:</h4><p>' + (name || 'None found') + '</p>');
+            log('<h4>Extracted Keywords:</h4><pre>' + JSON.stringify(keywords, null, 2) + '</pre>');
+        }
+
+        // Check if user has completed experience on load
+        window.addEventListener('load', function() {
+            if (TerminalQuestionnaire.hasCompletedExperience()) {
+                log('✅ User has completed the terminal experience');
+                showUserData();
+            } else {
+                log('❌ User has not completed the terminal experience');
+            }
+        });
+    </script>
+</body>
+</html>

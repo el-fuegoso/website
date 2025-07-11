@@ -2140,15 +2140,227 @@
             }
         });
 
-        // Development helper: Reset user data (Ctrl+Shift+R)
+        // Development helpers and shortcuts
         document.addEventListener('keydown', function(e) {
+            // Reset user data (Ctrl+Shift+R)
             if (e.ctrlKey && e.shiftKey && e.key === 'R') {
                 if (confirm('Reset terminal experience data? This will clear all stored user information.')) {
                     TerminalQuestionnaire.clearUserData();
                     location.reload();
                 }
             }
+            
+            // Quick avatar test (Ctrl+Shift+T)
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                showQuickAvatarTest();
+            }
+            
+            // Quick chat reset (Ctrl+Shift+C) 
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                if (confirm('Reset chat and start fresh conversation?')) {
+                    resetChatExperience();
+                }
+            }
         });
+
+        function showQuickAvatarTest() {
+            const testKeywords = prompt(`Quick Avatar Test - Enter keywords separated by commas:
+            
+Examples:
+• technical, leadership, startup
+• creative, innovation, design  
+• collaborative, team, communication
+• adventure, risk, exploration
+
+Your keywords:`);
+            
+            if (!testKeywords) return;
+            
+            generateQuickAvatar(testKeywords);
+        }
+
+        async function generateQuickAvatar(keywords) {
+            try {
+                // Create mock responses based on keywords
+                const mockResponses = generateMockResponses(keywords);
+                
+                // Initialize components if needed
+                if (!window.testAnalyzer) {
+                    window.testAnalyzer = new AdvancedPersonalityAnalyzer();
+                    window.testAvatarService = new ClaudeAvatarService();
+                    window.testAvatarDisplay = new AvatarDisplay();
+                    
+                    // Try to load stored API key
+                    window.testAvatarService.loadStoredApiKey();
+                }
+                
+                // Generate personality analysis
+                const personalityData = window.testAnalyzer.generatePersonalityInsights(mockResponses, 'QuickTest');
+                
+                // Check if we have API key
+                if (!window.testAvatarService.hasValidApiKey()) {
+                    // Show personality results without Claude generation
+                    showQuickPersonalityResults(personalityData, keywords);
+                    return;
+                }
+                
+                // Show loading indicator
+                showQuickLoadingIndicator();
+                
+                // Generate avatar with Claude
+                const avatarData = await window.testAvatarService.generateAvatar(
+                    personalityData,
+                    { responses: mockResponses },
+                    personalityData.archetype
+                );
+                
+                // Hide loading indicator
+                hideQuickLoadingIndicator();
+                
+                // Show avatar results
+                window.testAvatarDisplay.show(avatarData, personalityData, () => {
+                    console.log('Quick test avatar closed');
+                });
+                
+            } catch (error) {
+                hideQuickLoadingIndicator();
+                console.error('Quick avatar test failed:', error);
+                alert(`Avatar generation failed: ${error.message}`);
+            }
+        }
+
+        function generateMockResponses(keywords) {
+            const keywordList = keywords.toLowerCase().split(',').map(k => k.trim());
+            
+            // Generate responses that include the keywords naturally
+            const responses = {
+                question_0: `I'm a professional who works with ${keywordList.slice(0, 2).join(' and ')} in my daily role`,
+                question_1: `I'm passionate about ${keywordList.slice(0, 3).join(', ')} and building solutions that incorporate these elements`,
+                question_2: `I'd love to meet someone who revolutionized ${keywordList[0] || 'technology'} and discuss ${keywordList.slice(1, 3).join(' and ')}`,
+                question_3: `I want to make an impact through ${keywordList.join(', ')} and help others succeed in these areas`
+            };
+            
+            return responses;
+        }
+
+        function showQuickPersonalityResults(personalityData, keywords) {
+            const archetype = personalityData.archetype.archetype;
+            const message = `Quick Test Results for keywords: "${keywords}"
+
+🎭 Archetype: ${archetype.name}
+🎯 Confidence: ${Math.round(archetype.confidence * 100)}%
+📊 Top Traits: ${personalityData.dominantTraits.map(t => t.trait).join(', ')}
+
+${personalityData.personalityOverview}
+
+To generate full Claude avatar, set up API key in the terminal experience or test suite.`;
+
+            alert(message);
+        }
+
+        function showQuickLoadingIndicator() {
+            if (document.getElementById('quickTestLoader')) return;
+            
+            const loader = document.createElement('div');
+            loader.id = 'quickTestLoader';
+            loader.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #1a1a1a;
+                color: #00ff88;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+                z-index: 10001;
+                border: 2px solid #00ff88;
+                box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+            `;
+            loader.innerHTML = `
+                🤖 Generating Avatar...
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Quick Test Mode (Ctrl+Shift+T)
+                </div>
+            `;
+            
+            document.body.appendChild(loader);
+        }
+
+        function hideQuickLoadingIndicator() {
+            const loader = document.getElementById('quickTestLoader');
+            if (loader) {
+                loader.remove();
+            }
+        }
+
+        function resetChatExperience() {
+            // Clear all stored data
+            localStorage.removeItem('terminal_user_data');
+            sessionStorage.removeItem('terminal_session');
+            localStorage.removeItem('terminal_analytics');
+            
+            // Close any open terminals or avatars
+            const existingTerminal = document.querySelector('.terminal-questionnaire');
+            if (existingTerminal) {
+                existingTerminal.remove();
+            }
+            
+            const existingAvatar = document.querySelector('.avatar-display-overlay');
+            if (existingAvatar) {
+                existingAvatar.remove();
+            }
+            
+            // Close any chat interfaces
+            if (window.chatUI && typeof window.chatUI.hide === 'function') {
+                window.chatUI.hide();
+            }
+            
+            // Show success message
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #00ff88;
+                color: #1a1a1a;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                z-index: 10002;
+                box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+            `;
+            notification.textContent = '✅ Chat experience reset - Ready for fresh start!';
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+            
+            console.log('Chat experience reset completed');
+        }
+
+        // Show keyboard shortcuts on load (development mode)
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1')) {
+            setTimeout(() => {
+                console.log(`
+🚀 Development Shortcuts Available:
+• Ctrl+Shift+R - Reset terminal experience data
+• Ctrl+Shift+C - Reset chat and start fresh
+• Ctrl+Shift+T - Quick avatar test with keywords
+
+Example quick test keywords:
+- technical, leadership, startup
+- creative, innovation, design
+- collaborative, team, communication
+- adventure, risk, exploration
+                `);
+            }, 2000);
+        }
     </script>
 </body>
 </html>

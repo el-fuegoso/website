@@ -298,28 +298,38 @@ class AdvancedPersonalityAnalyzer extends DataCollector {
         
         Object.entries(this.avatarArchetypes).forEach(([archetypeName, archetype]) => {
             let archetypeScore = 0;
-            let meetsRequirements = true;
+            let metRequirements = 0;
+            let totalRequirements = Object.keys(archetype.triggers).length;
             let currentReasons = [];
             
             Object.entries(archetype.triggers).forEach(([dimension, requirements]) => {
                 const userScore = dimensionScores[dimension]?.score || 0;
                 
                 if (userScore >= requirements.min) {
-                    const contributionScore = userScore * requirements.weight;
-                    archetypeScore += contributionScore;
+                    metRequirements++;
+                }
+                
+                // Always add contribution, but stronger if meets minimum
+                const contributionScore = userScore * requirements.weight;
+                archetypeScore += contributionScore;
+                
+                if (userScore > 0) {
                     currentReasons.push(`${dimension}: ${userScore} (weight: ${requirements.weight})`);
-                } else {
-                    meetsRequirements = false;
                 }
             });
             
-            if (meetsRequirements && archetypeScore > bestScore) {
-                bestScore = archetypeScore;
+            // Require at least 50% of triggers to be met, or use weighted score
+            const requirementRatio = metRequirements / totalRequirements;
+            const adjustedScore = archetypeScore * (0.5 + (requirementRatio * 0.5));
+            
+            if (adjustedScore > bestScore) {
+                bestScore = adjustedScore;
                 bestMatch = {
                     name: archetypeName,
                     ...archetype,
-                    matchScore: Math.round(archetypeScore),
-                    confidence: this.calculateConfidence(archetypeScore, dimensionScores)
+                    matchScore: Math.round(adjustedScore),
+                    confidence: this.calculateConfidence(adjustedScore, dimensionScores),
+                    requirementsMet: `${metRequirements}/${totalRequirements}`
                 };
                 matchReasons = currentReasons;
             }
@@ -331,7 +341,8 @@ class AdvancedPersonalityAnalyzer extends DataCollector {
                 name: "TheBuilder",
                 ...this.avatarArchetypes["TheBuilder"],
                 matchScore: 50,
-                confidence: 0.6
+                confidence: 0.6,
+                requirementsMet: "fallback"
             };
             matchReasons = ["Default fallback - Builder archetype"];
         }

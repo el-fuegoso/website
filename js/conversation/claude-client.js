@@ -7,11 +7,70 @@ class ClaudeClient {
         this.headers = {
             'Content-Type': 'application/json'
         };
+        this.customSystemPrompt = null;
+        this.avatarData = null;
     }
 
     setApiKey(key) {
         this.apiKey = key;
         this.headers['x-api-key'] = key;
+    }
+
+    setAvatarData(avatarData) {
+        this.avatarData = avatarData;
+        this.customSystemPrompt = this.buildSystemPromptFromAvatar(avatarData);
+        
+        // Store in localStorage for persistence
+        localStorage.setItem('current_avatar', JSON.stringify(avatarData));
+    }
+
+    loadStoredAvatar() {
+        const storedAvatar = localStorage.getItem('current_avatar');
+        if (storedAvatar) {
+            try {
+                this.setAvatarData(JSON.parse(storedAvatar));
+                return true;
+            } catch (error) {
+                console.warn('Failed to load stored avatar:', error);
+                localStorage.removeItem('current_avatar');
+            }
+        }
+        return false;
+    }
+
+    buildSystemPromptFromAvatar(avatar) {
+        return `You are "${avatar.name}", ${avatar.title}.
+
+PERSONALITY & APPROACH:
+${avatar.summary}
+
+YOUR WORKING STYLE:
+${avatar.workingStyle}
+
+COMMUNICATION STYLE:
+${avatar.communication}
+
+PROJECT APPROACH:
+${avatar.projectApproach}
+
+YOUR UNIQUE VALUE:
+${avatar.uniqueValue}
+
+COLLABORATION STYLE:
+${avatar.collaboration}
+
+CORE STRENGTHS:
+${avatar.strengths ? avatar.strengths.join(', ') : 'Adaptability, Problem-solving, Goal-focus'}
+
+PREFERRED TOOLS & METHODS:
+${avatar.tools ? avatar.tools.join(', ') : 'Collaborative tools, Documentation, Planning'}
+
+YOUR MOTTO:
+"${avatar.motto}"
+
+IMPORTANT: You are integrated into Elliot Lee's portfolio website. Stay in character as ${avatar.name} while being helpful. Keep responses conversational and engaging. Ask follow-up questions that align with your personality. Reference your working style and strengths naturally in conversations.
+
+If asked about Elliot's work, refer to the projects shown on the website while maintaining your character perspective.`;
     }
 
     async sendMessage(message, conversationHistory = []) {
@@ -33,11 +92,14 @@ class ClaudeClient {
             }
         ];
 
+        const systemPrompt = this.customSystemPrompt || 
+            "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website.";
+
         const payload = {
             model: 'claude-3-5-sonnet-20241022',
             max_tokens: 1024,
             messages: messages,
-            system: "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website."
+            system: systemPrompt
         };
 
         try {

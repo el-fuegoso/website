@@ -544,6 +544,12 @@ class TerminalQuestionnaire {
                 );
                 
                 this.avatarData = avatarData;
+                
+                // Set avatar for chat conversations
+                if (window.setGeneratedAvatarForChat) {
+                    window.setGeneratedAvatarForChat(avatarData);
+                }
+                
                 this.showAvatarResults(personalityData, avatarData);
                 
             } else {
@@ -758,6 +764,11 @@ class TerminalQuestionnaire {
             );
             
             this.avatarData = avatarData;
+            
+            // Set avatar for chat conversations
+            if (window.setGeneratedAvatarForChat) {
+                window.setGeneratedAvatarForChat(avatarData);
+            }
             
             if (this.avatarDisplay.isVisible) {
                 this.avatarDisplay.updateAvatar(avatarData);

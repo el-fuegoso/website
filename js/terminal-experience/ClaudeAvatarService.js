@@ -234,18 +234,40 @@ class ClaudeAvatarService {
         }
 
         try {
-            const testPrompt = "Respond with exactly: 'API connection successful'";
-            const response = await this.makeClaudeRequest(testPrompt);
+            // Use dedicated test endpoint for simpler debugging
+            const response = await fetch('/api/test-connection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    apiKey: this.apiKey
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return {
+                    success: false,
+                    message: data.error || 'Connection test failed',
+                    details: data.details || 'No additional details',
+                    debug: data.debug || {},
+                    canRetry: response.status !== 401 // Don't retry on auth errors
+                };
+            }
+
             return {
                 success: true,
-                message: 'Claude API connection successful via serverless function',
-                model: this.model
+                message: data.message || 'Claude API connection successful',
+                model: data.model || this.model,
+                response: data.response || 'Test response received'
             };
         } catch (error) {
             return {
                 success: false,
-                message: error.message,
-                canRetry: !error.message.includes('API key')
+                message: `Network error: ${error.message}`,
+                canRetry: true
             };
         }
     }

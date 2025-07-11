@@ -8,6 +8,9 @@
     },
     "api/generate-avatar.js": {
       "maxDuration": 30
+    },
+    "api/test-connection.js": {
+      "maxDuration": 10
     }
   },
   "headers": [

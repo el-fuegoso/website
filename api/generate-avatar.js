@@ -60,11 +60,20 @@ export default async function handler(req, res) {
         if (!claudeResponse.ok) {
             const errorData = await claudeResponse.json().catch(() => ({}));
             
+            // Enhanced logging for debugging (remove in production)
+            console.error('Claude API Error:', {
+                status: claudeResponse.status,
+                statusText: claudeResponse.statusText,
+                errorData,
+                apiKeyLength: apiKey ? apiKey.length : 0,
+                apiKeyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'none'
+            });
+            
             // Map common errors to user-friendly messages
             let errorMessage = 'Unknown error occurred';
             
             if (claudeResponse.status === 401) {
-                errorMessage = 'Invalid API key. Please check your Claude API key.';
+                errorMessage = 'Invalid API key. Please check your Claude API key is correct and has proper permissions.';
             } else if (claudeResponse.status === 429) {
                 errorMessage = 'Rate limit exceeded. Please try again in a moment.';
             } else if (claudeResponse.status === 400) {
@@ -76,7 +85,14 @@ export default async function handler(req, res) {
             return res.status(claudeResponse.status).json({
                 error: errorMessage,
                 details: errorData.error?.message || 'No additional details',
-                status: claudeResponse.status
+                status: claudeResponse.status,
+                // Add debug info for development
+                debug: process.env.NODE_ENV === 'development' ? {
+                    apiKeyProvided: !!apiKey,
+                    apiKeyLength: apiKey ? apiKey.length : 0,
+                    requestHeaders: Object.keys(claudeResponse.headers || {}),
+                    errorData
+                } : undefined
             });
         }
 

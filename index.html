@@ -2163,6 +2163,12 @@
                     resetChatExperience();
                 }
             }
+            
+            // Debug API connection (Ctrl+Shift+D)
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                e.preventDefault();
+                debugApiConnection();
+            }
         });
 
         function showQuickAvatarTest() {
@@ -2344,14 +2350,61 @@ To generate full Claude avatar, set up API key in the terminal experience or tes
             console.log('Chat experience reset completed');
         }
 
+        async function debugApiConnection() {
+            const apiKey = prompt(`Debug API Connection
+
+Enter your Claude API key to test the connection:
+(This will make a simple test request to verify everything works)`);
+            
+            if (!apiKey) return;
+            
+            try {
+                showQuickLoadingIndicator();
+                
+                const response = await fetch('/api/test-connection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ apiKey })
+                });
+                
+                const data = await response.json();
+                hideQuickLoadingIndicator();
+                
+                if (data.success) {
+                    alert(`✅ Connection Successful!
+
+Message: ${data.message}
+Model: ${data.model}
+Response: ${data.response}
+
+Your API key is working correctly!`);
+                } else {
+                    alert(`❌ Connection Failed
+
+Error: ${data.error}
+Details: ${data.details || 'No additional details'}
+
+Debug Info:
+${JSON.stringify(data.debug || {}, null, 2)}`);
+                }
+                
+            } catch (error) {
+                hideQuickLoadingIndicator();
+                alert(`❌ Network Error: ${error.message}`);
+            }
+        }
+
         // Show keyboard shortcuts on load (development mode)
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1')) {
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.hostname.includes('vercel.app')) {
             setTimeout(() => {
                 console.log(`
 🚀 Development Shortcuts Available:
 • Ctrl+Shift+R - Reset terminal experience data
 • Ctrl+Shift+C - Reset chat and start fresh
 • Ctrl+Shift+T - Quick avatar test with keywords
+• Ctrl+Shift+D - Debug API connection
 
 Example quick test keywords:
 - technical, leadership, startup

@@ -155,11 +155,9 @@ If asked about Elliot's work, refer to the projects shown on the website while m
             "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website.";
 
         const payload = {
-            model: 'claude-3-5-sonnet-20241022',
-            max_tokens: 1024,
             messages: messages,
-            system: systemPrompt,
-            stream: true
+            system: systemPrompt
+            // Model and other defaults are set server-side
         };
 
         console.log('Starting streaming request...');

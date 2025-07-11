@@ -26,6 +26,18 @@ export default async function handler(req, res) {
             });
         }
 
+        // Prepare request body with defaults
+        const requestBody = {
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 4000,
+            ...req.body
+        };
+
+        console.log('📤 Non-streaming request to Claude API...', {
+            model: requestBody.model,
+            messageCount: requestBody.messages?.length || 0
+        });
+
         // Forward request to Claude API
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
@@ -34,11 +46,22 @@ export default async function handler(req, res) {
                 'Authorization': `Bearer ${apiKey}`,
                 'anthropic-version': '2023-06-01'
             },
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(requestBody)
         });
+
+        console.log('📥 Claude API response status:', claudeResponse.status);
 
         // Get response data
         const responseData = await claudeResponse.json();
+
+        if (!claudeResponse.ok) {
+            console.error('❌ Claude API error:', responseData);
+        } else {
+            console.log('✅ Claude API success:', {
+                model: responseData.model,
+                usage: responseData.usage
+            });
+        }
 
         // Forward Claude's response status and data
         res.status(claudeResponse.status).json(responseData);

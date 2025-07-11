@@ -149,15 +149,14 @@ class ChatUI {
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="apiKeyInput">Claude API Key:</label>
-                        <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
-                        <small>Your API key is stored locally and never sent to any server except Anthropic's API.</small>
+                        <label for="apiKeyInput">API Configuration:</label>
+                        <input type="text" id="apiKeyInput" placeholder="Using server-side authentication" disabled>
+                        <small>API key is handled server-side automatically. No configuration needed.</small>
                     </div>
                     <div class="api-key-status" id="apiKeyStatus"></div>
                 </div>
                 <div class="modal-footer">
-                    <button id="saveApiKey" class="primary-btn">Save</button>
-                    <button id="cancelApiKey" class="secondary-btn">Cancel</button>
+                    <button id="cancelApiKey" class="primary-btn">Close</button>
                 </div>
             </div>
         `;
@@ -168,28 +167,12 @@ class ChatUI {
 
     setupApiKeyModalListeners() {
         const closeBtn = this.apiKeyModal.querySelector('#closeModal');
-        const saveBtn = this.apiKeyModal.querySelector('#saveApiKey');
         const cancelBtn = this.apiKeyModal.querySelector('#cancelApiKey');
-        const apiKeyInput = this.apiKeyModal.querySelector('#apiKeyInput');
         const overlay = this.apiKeyModal.querySelector('.modal-overlay');
         
         closeBtn.addEventListener('click', () => this.hideApiKeyModal());
         cancelBtn.addEventListener('click', () => this.hideApiKeyModal());
         overlay.addEventListener('click', () => this.hideApiKeyModal());
-        
-        saveBtn.addEventListener('click', () => {
-            const apiKey = apiKeyInput.value.trim();
-            if (apiKey) {
-                if (this.onApiKeySet) this.onApiKeySet(apiKey);
-                this.hideApiKeyModal();
-            }
-        });
-        
-        apiKeyInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                saveBtn.click();
-            }
-        });
     }
 
     show() {
@@ -295,14 +278,11 @@ class ChatUI {
     }
 
     showApiKeyModal() {
-        const storedKey = localStorage.getItem('claude_api_key');
-        if (storedKey) {
-            this.apiKeyModal.querySelector('#apiKeyInput').value = storedKey;
-        }
+        // Show that we're using server-side authentication
+        this.apiKeyModal.querySelector('#apiKeyInput').value = 'Server-side authentication active';
+        this.showApiKeyStatus(true, 'Using server-side API key configuration');
+        
         this.apiKeyModal.classList.remove('hidden');
-        setTimeout(() => {
-            this.apiKeyModal.querySelector('#apiKeyInput').focus();
-        }, 100);
     }
 
     hideApiKeyModal() {
@@ -314,10 +294,10 @@ class ChatUI {
     showApiKeyStatus(success, message = '') {
         const statusElement = this.apiKeyModal.querySelector('#apiKeyStatus');
         if (success) {
-            statusElement.textContent = 'API key saved successfully!';
+            statusElement.textContent = message || 'API configuration active!';
             statusElement.className = 'api-key-status success';
         } else {
-            statusElement.textContent = message || 'Invalid API key';
+            statusElement.textContent = message || 'API configuration issue';
             statusElement.className = 'api-key-status error';
         }
     }

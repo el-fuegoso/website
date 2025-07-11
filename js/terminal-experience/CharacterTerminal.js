@@ -32,7 +32,7 @@ class CharacterTerminal {
         // Animate in
         setTimeout(() => {
             this.container.style.opacity = '1';
-            this.container.style.transform = `translate(${this.position.x}px, ${this.position.y}px) scale(1)`;
+            this.container.style.transform = 'scale(1)';
         }, 10);
         
         console.log(`🖥️ Character terminal opened for ${avatarData.name}`);
@@ -41,12 +41,12 @@ class CharacterTerminal {
     hide() {
         if (this.container) {
             this.container.style.opacity = '0';
-            this.container.style.transform = `translate(${this.position.x}px, ${this.position.y}px) scale(0.95)`;
+            this.container.style.transform = 'scale(0.95)';
             
             setTimeout(() => {
                 this.container.style.display = 'none';
                 this.isVisible = false;
-            }, 300);
+            }, 200);
         }
     }
 
@@ -78,26 +78,25 @@ class CharacterTerminal {
             </div>
         `;
 
-        // Apply styles
+        // Apply styles to match TerminalQuestionnaire exactly
         Object.assign(this.container.style, {
             position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '480px',
-            height: 'auto',
-            maxHeight: '70vh',
-            backgroundColor: '#1a1a1a',
-            border: '1px solid #333',
+            left: `${this.position.x}px`,
+            top: `${this.position.y}px`,
+            width: '600px',
+            maxWidth: '90vw',
+            background: '#1a1a1a',
+            color: '#00ff00',
+            fontFamily: "'Courier New', monospace",
+            fontSize: '14px',
             borderRadius: '8px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
             zIndex: '10001',
-            fontFamily: 'monospace',
-            fontSize: '13px',
+            overflow: 'hidden',
+            transition: 'all 0.2s ease',
             display: 'none',
             opacity: '0',
-            transform: `translate(${this.position.x}px, ${this.position.y}px) scale(0.95)`,
-            transition: 'opacity 0.3s ease, transform 0.3s ease',
-            overflow: 'hidden'
+            transform: `translate(0, 0) scale(0.95)`
         });
 
         this.setupEventListeners();
@@ -154,7 +153,8 @@ class CharacterTerminal {
         this.position.x = Math.max(0, Math.min(this.position.x, maxX));
         this.position.y = Math.max(0, Math.min(this.position.y, maxY));
         
-        this.container.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
+        this.container.style.left = `${this.position.x}px`;
+        this.container.style.top = `${this.position.y}px`;
     }
 
     stopDrag() {
@@ -260,19 +260,20 @@ class CharacterTerminal {
             }
             
             .terminal-header {
-                background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-                padding: 8px 12px;
-                border-bottom: 1px solid #333;
+                background: #2a2a2a;
+                padding: 12px 16px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #444;
                 cursor: grab;
                 user-select: none;
             }
             
             .terminal-controls {
                 display: flex;
-                gap: 6px;
-                margin-right: 12px;
+                align-items: center;
+                gap: 8px;
             }
             
             .terminal-control {
@@ -281,6 +282,8 @@ class CharacterTerminal {
                 border-radius: 50%;
                 cursor: pointer;
                 transition: opacity 0.2s;
+                border: none;
+                outline: none;
             }
             
             .terminal-control:hover {
@@ -309,9 +312,10 @@ class CharacterTerminal {
             
             .terminal-content {
                 padding: 16px;
-                max-height: calc(70vh - 40px);
+                max-height: calc(70vh - 60px);
                 overflow-y: auto;
-                background: #0a0a0a;
+                background: #1a1a1a;
+                color: #00ff00;
             }
             
             .character-header {

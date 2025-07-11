@@ -18,7 +18,18 @@ class ClaudeAvatarService {
     async generateAvatar(personalityData, conversationData, archetypeMatch) {
         const startTime = Date.now();
         
+        console.log('🎭 ClaudeAvatarService: Starting LOCAL avatar generation (no API calls)');
+        
         try {
+            // Validate inputs
+            if (!this.templateGenerator) {
+                throw new Error('TemplateAvatarGenerator not initialized');
+            }
+            
+            if (!archetypeMatch || !archetypeMatch.archetype) {
+                throw new Error('Invalid archetype match provided');
+            }
+            
             // Track avatar generation start
             this.analytics.trackEvent('avatar_generation_started', {
                 archetype: archetypeMatch.archetype.name,
@@ -27,6 +38,7 @@ class ClaudeAvatarService {
             });
 
             // Generate avatar using template system (no API call needed)
+            console.log('🎭 Calling template generator for archetype:', archetypeMatch.archetype.name);
             const avatarData = this.templateGenerator.generateAvatar(
                 personalityData, 
                 conversationData, 
@@ -35,6 +47,8 @@ class ClaudeAvatarService {
             
             const endTime = Date.now();
             const generationTime = endTime - startTime;
+            
+            console.log('🎭 Avatar generated successfully in', generationTime, 'ms:', avatarData.name);
             
             // Track successful generation
             this.analytics.trackEvent('avatar_generation_completed', {
@@ -58,6 +72,8 @@ class ClaudeAvatarService {
             const endTime = Date.now();
             const generationTime = endTime - startTime;
             
+            console.error('🚨 Template avatar generation failed:', error);
+            
             // Track failed generation
             this.analytics.trackEvent('avatar_generation_failed', {
                 error: error.message,
@@ -67,6 +83,7 @@ class ClaudeAvatarService {
             });
 
             // Create a basic fallback avatar
+            console.log('🔄 Creating basic fallback avatar');
             return this.createBasicFallback(archetypeMatch, generationTime);
         }
     }

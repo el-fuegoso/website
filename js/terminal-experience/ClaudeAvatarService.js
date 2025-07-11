@@ -5,42 +5,33 @@
 
 class ClaudeAvatarService {
     constructor() {
-        this.baseURL = '/api/generate-avatar'; // Use our serverless function
-        this.model = 'claude-3-sonnet-20240229';
-        this.maxTokens = 1500;
-        this.temperature = 0.7;
-        this.promptGenerator = new AvatarPrompts();
+        this.templateGenerator = new TemplateAvatarGenerator();
         this.analytics = new DataCollector();
+        this.fallbackEnabled = true; // Always use local generation
     }
 
-    // API key is now handled server-side via environment variables
+    // Local generation doesn't need API key validation
     hasValidApiKey() {
-        return true; // Always true since we use server-side API key
+        return true; // Always true since we use local generation
     }
 
     async generateAvatar(personalityData, conversationData, archetypeMatch) {
-
         const startTime = Date.now();
         
         try {
             // Track avatar generation start
             this.analytics.trackEvent('avatar_generation_started', {
                 archetype: archetypeMatch.archetype.name,
-                confidence: archetypeMatch.archetype.confidence
+                confidence: archetypeMatch.archetype.confidence,
+                method: 'template-based'
             });
 
-            // Build the prompt
-            const prompt = this.promptGenerator.buildAvatarPrompt(
+            // Generate avatar using template system (no API call needed)
+            const avatarData = this.templateGenerator.generateAvatar(
                 personalityData, 
                 conversationData, 
                 archetypeMatch
             );
-
-            // Make API request
-            const response = await this.makeClaudeRequest(prompt);
-            
-            // Process and validate response
-            const avatarData = await this.processAvatarResponse(response, archetypeMatch);
             
             const endTime = Date.now();
             const generationTime = endTime - startTime;
@@ -49,17 +40,17 @@ class ClaudeAvatarService {
             this.analytics.trackEvent('avatar_generation_completed', {
                 archetype: archetypeMatch.archetype.name,
                 generationTime,
-                success: true
+                success: true,
+                method: 'template-based'
             });
 
             return {
                 ...avatarData,
                 metadata: {
+                    ...avatarData.metadata,
                     generationTime,
-                    archetype: archetypeMatch.archetype.name,
-                    confidence: archetypeMatch.archetype.confidence,
-                    model: this.model,
-                    timestamp: new Date().toISOString()
+                    generationMethod: 'template-based',
+                    reliable: true
                 }
             };
 
@@ -71,191 +62,102 @@ class ClaudeAvatarService {
             this.analytics.trackEvent('avatar_generation_failed', {
                 error: error.message,
                 generationTime,
-                archetype: archetypeMatch?.archetype?.name || 'unknown'
+                archetype: archetypeMatch?.archetype?.name || 'unknown',
+                method: 'template-based'
             });
 
-            throw this.handleAvatarError(error, archetypeMatch);
+            // Create a basic fallback avatar
+            return this.createBasicFallback(archetypeMatch, generationTime);
         }
     }
 
-    async makeClaudeRequest(prompt) {
-        const requestBody = {
-            prompt,
-            model: this.model,
-            maxTokens: this.maxTokens,
-            temperature: this.temperature
-        };
-
-        const response = await fetch(this.baseURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
-        }
-
-        const data = await response.json();
-        
-        // Convert our serverless function response to Claude API format
-        return {
-            content: [{
-                text: data.content
-            }],
-            usage: data.usage || {},
-            model: data.model || this.model
-        };
-    }
-
-    async processAvatarResponse(response, archetypeMatch) {
-        if (!response.content || !response.content[0] || !response.content[0].text) {
-            throw new Error('Invalid response format from Claude API');
-        }
-
-        const rawText = response.content[0].text.trim();
-        
-        // Try to extract JSON from the response
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error('No JSON found in Claude response');
-        }
-
-        const jsonText = jsonMatch[0];
-        
-        // Validate and parse the avatar data
-        const validation = this.promptGenerator.validateAvatarResponse(jsonText);
-        
-        if (!validation.valid) {
-            console.warn('Avatar validation failed:', validation.error);
-            
-            // Use fallback avatar with archetype customization
-            const fallbackAvatar = this.customizeFallbackAvatar(
-                validation.fallback, 
-                archetypeMatch
-            );
-            
-            return {
-                ...fallbackAvatar,
-                metadata: {
-                    fallback: true,
-                    originalError: validation.error
-                }
-            };
-        }
-
-        return validation.avatar;
-    }
-
-    customizeFallbackAvatar(fallbackAvatar, archetypeMatch) {
+    createBasicFallback(archetypeMatch, generationTime) {
         const archetype = archetypeMatch.archetype;
         
         return {
-            ...fallbackAvatar,
-            title: `Your Personal El: The ${archetype.name.replace('The', '')}`,
-            summary: `${archetype.description}. This El adapts to work specifically with your ${archetype.name.toLowerCase().replace('the', '')} style.`,
-            workingStyle: archetype.workingStyle,
-            communication: archetype.communication || fallbackAvatar.communication,
-            projectApproach: archetype.projectApproach || fallbackAvatar.projectApproach,
-            uniqueValue: archetype.value || fallbackAvatar.uniqueValue
+            name: "Reliable El",
+            title: `Your ${archetype.name.replace('The', '')} Assistant`,
+            summary: `${archetype.description}. I'm designed to work with your specific style and preferences.`,
+            personality: "Adaptable and reliable, focused on helping you achieve your goals",
+            workingStyle: archetype.workingStyle || "Collaborative and responsive to your needs",
+            communication: archetype.communication || "Clear and supportive",
+            projectApproach: archetype.projectApproach || "Systematic and goal-oriented",
+            uniqueValue: archetype.value || "Consistent support tailored to your working style",
+            strengths: archetype.strengths || ["Reliability", "Adaptability", "Goal Focus"],
+            collaboration: "I work as your steady partner, providing consistent support",
+            tools: ["Documentation", "Planning", "Regular Check-ins"],
+            motto: "Reliable support, consistent results",
+            conversationStarters: [
+                "What would you like to work on today?",
+                "How can I best support your current goals?",
+                "What's your priority right now?"
+            ],
+            metadata: {
+                generationTime,
+                archetype: archetype.name,
+                confidence: archetypeMatch.confidence,
+                generationMethod: 'basic-fallback',
+                fallback: true,
+                timestamp: new Date().toISOString()
+            }
         };
     }
 
-    handleAvatarError(error, archetypeMatch) {
-        let userMessage = 'Unable to generate personalized avatar';
-        let fallbackAvatar = null;
-
-        if (error.message.includes('API key')) {
-            userMessage = 'API key issue. Please check your Claude API configuration.';
-        } else if (error.message.includes('rate limit') || error.message.includes('429')) {
-            userMessage = 'Rate limit exceeded. Please try again in a moment.';
-        } else if (error.message.includes('network') || error.message.includes('fetch')) {
-            userMessage = 'Network error. Please check your connection and try again.';
-        } else {
-            // For other errors, provide a fallback avatar
-            fallbackAvatar = this.customizeFallbackAvatar(
-                this.promptGenerator.generateFallbackAvatar(),
-                archetypeMatch
-            );
-        }
-
-        const enhancedError = new Error(userMessage);
-        enhancedError.originalError = error;
-        enhancedError.fallbackAvatar = fallbackAvatar;
-        enhancedError.canRetry = !error.message.includes('API key');
-
-        return enhancedError;
-    }
-
-    // Method to test API connection
+    // Method to test local avatar generation
     async testConnection() {
         try {
-            // Use dedicated test endpoint for simpler debugging
-            const response = await fetch('/api/test-connection', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            });
+            const testPersonality = {
+                scores: { technical: 80, collaborative: 60, creativity: 40 }
+            };
+            const testConversation = {
+                responses: { question_0: 'I love building software solutions' }
+            };
+            const testArchetype = {
+                archetype: { name: 'TheBuilder', description: 'Test archetype' },
+                confidence: 85
+            };
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                return {
-                    success: false,
-                    message: data.error || 'Connection test failed',
-                    details: data.details || 'No additional details',
-                    debug: data.debug || {},
-                    canRetry: response.status !== 401 // Don't retry on auth errors
-                };
-            }
+            const startTime = Date.now();
+            const avatar = this.templateGenerator.generateAvatar(
+                testPersonality, 
+                testConversation, 
+                testArchetype
+            );
+            const endTime = Date.now();
 
             return {
                 success: true,
-                message: data.message || 'Claude API connection successful',
-                model: data.model || this.model,
-                response: data.response || 'Test response received'
+                message: 'Local avatar generation working perfectly',
+                generationTime: endTime - startTime,
+                method: 'template-based',
+                testAvatar: avatar.name
             };
         } catch (error) {
             return {
                 success: false,
-                message: `Network error: ${error.message}`,
+                message: `Local generation error: ${error.message}`,
                 canRetry: true
             };
         }
     }
 
-    // Method to estimate avatar generation cost
-    estimateTokenUsage(personalityData, conversationData) {
-        const promptGenerator = new AvatarPrompts();
-        const testPrompt = promptGenerator.buildAvatarPrompt(
-            personalityData, 
-            conversationData, 
-            { archetype: { name: 'TheBuilder' } }
-        );
-        
-        // Rough token estimation (1 token ≈ 4 characters)
-        const inputTokens = Math.ceil(testPrompt.length / 4);
-        const outputTokens = this.maxTokens;
-        
+    // Method to estimate generation performance
+    estimatePerformance(personalityData, conversationData) {
+        // Local generation is fast and free
         return {
-            estimatedInputTokens: inputTokens,
-            maxOutputTokens: outputTokens,
-            totalTokens: inputTokens + outputTokens,
-            estimatedCost: ((inputTokens * 0.003) + (outputTokens * 0.015)) / 1000 // Rough Claude pricing
+            estimatedGenerationTime: 50, // milliseconds
+            cost: 0, // No API costs
+            method: 'template-based',
+            reliability: 'high'
         };
     }
 
     // Batch avatar generation for testing
-    async generateMultipleAvatars(personalityDataList, maxConcurrent = 3) {
+    async generateMultipleAvatars(personalityDataList, maxConcurrent = 10) {
         const results = [];
         const errors = [];
         
-        // Process in batches to avoid rate limiting
+        // Process in batches (higher concurrency since no API limits)
         for (let i = 0; i < personalityDataList.length; i += maxConcurrent) {
             const batch = personalityDataList.slice(i, i + maxConcurrent);
             
@@ -282,10 +184,7 @@ class ClaudeAvatarService {
                 }
             });
             
-            // Small delay between batches
-            if (i + maxConcurrent < personalityDataList.length) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+            // No delay needed for local generation
         }
         
         return { results, errors, totalProcessed: personalityDataList.length };

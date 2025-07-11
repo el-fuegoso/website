@@ -5,7 +5,7 @@
 
 class ClaudeAvatarService {
     constructor() {
-        this.baseURL = 'https://api.anthropic.com/v1/messages';
+        this.baseURL = '/api/generate-avatar'; // Use our serverless function
         this.model = 'claude-3-sonnet-20240229';
         this.maxTokens = 1500;
         this.temperature = 0.7;
@@ -116,31 +116,36 @@ class ClaudeAvatarService {
 
     async makeClaudeRequest(prompt) {
         const requestBody = {
+            prompt,
+            apiKey: this.apiKey,
             model: this.model,
-            max_tokens: this.maxTokens,
-            temperature: this.temperature,
-            messages: [{
-                role: 'user',
-                content: prompt
-            }]
+            maxTokens: this.maxTokens,
+            temperature: this.temperature
         };
 
         const response = await fetch(this.baseURL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.apiKey}`,
-                'anthropic-version': '2023-06-01'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+            throw new Error(`API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
         }
 
-        return await response.json();
+        const data = await response.json();
+        
+        // Convert our serverless function response to Claude API format
+        return {
+            content: [{
+                text: data.content
+            }],
+            usage: data.usage || {},
+            model: data.model || this.model
+        };
     }
 
     async processAvatarResponse(response, archetypeMatch) {
@@ -233,7 +238,7 @@ class ClaudeAvatarService {
             const response = await this.makeClaudeRequest(testPrompt);
             return {
                 success: true,
-                message: 'Claude API connection successful',
+                message: 'Claude API connection successful via serverless function',
                 model: this.model
             };
         } catch (error) {

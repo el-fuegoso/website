@@ -33,12 +33,12 @@ export default async function handler(req, res) {
             });
         }
 
-        if (!apiKey.startsWith('sk-ant-') || apiKey.length < 20) {
+        if (!apiKey.startsWith('sk-ant-api03-') || apiKey.length < 50) {
             return res.status(400).json({ 
                 error: 'Invalid API key format',
-                expected: 'API key should start with sk-ant- and be at least 20 characters',
+                expected: 'API key should start with sk-ant-api03- and be at least 50 characters',
                 received: {
-                    prefix: apiKey.substring(0, 10),
+                    prefix: apiKey.substring(0, 15),
                     length: apiKey.length
                 }
             });

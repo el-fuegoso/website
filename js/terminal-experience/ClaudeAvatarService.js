@@ -20,8 +20,8 @@ class ClaudeAvatarService {
         }
         
         // Basic API key format validation
-        if (!apiKey.startsWith('sk-ant-') || apiKey.length < 20) {
-            throw new Error('Invalid API key format');
+        if (!apiKey.startsWith('sk-ant-api03-') || apiKey.length < 50) {
+            throw new Error('Invalid API key format. Claude API keys should start with sk-ant-api03-');
         }
         
         this.apiKey = apiKey;

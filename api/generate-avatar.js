@@ -31,9 +31,9 @@ export default async function handler(req, res) {
         }
 
         // Validate API key format
-        if (!apiKey.startsWith('sk-ant-') || apiKey.length < 20) {
+        if (!apiKey.startsWith('sk-ant-api03-') || apiKey.length < 50) {
             return res.status(400).json({ 
-                error: 'Invalid API key format' 
+                error: 'Invalid API key format. Claude API keys should start with sk-ant-api03-' 
             });
         }
 

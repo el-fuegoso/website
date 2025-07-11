@@ -1,0 +1,7 @@
+# Ignore development and test files
+scripts/
+test-terminal.html
+.env.local*
+node_modules/
+*.log
+.DS_Store

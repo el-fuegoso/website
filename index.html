@@ -19,6 +19,7 @@
     <script src="js/terminal-experience/TemplateAvatarGenerator.js?v=3"></script>
     <script src="js/terminal-experience/ClaudeAvatarService.js?v=3"></script>
     <script src="js/terminal-experience/AvatarDisplay.js?v=3"></script>
+    <script src="js/terminal-experience/CharacterTerminal.js?v=3"></script>
     <script src="js/terminal-experience/TerminalQuestionnaire.js?v=3"></script>
     <style>
         :root {
@@ -2362,6 +2363,55 @@
         // Global chat variables - reuse same instance
         let globalChatUI = null;
         let globalConversationManager = null;
+        let chatInitialized = false;
+        
+        // Global character terminal - reuse same instance
+        let globalCharacterTerminal = null;
+        
+        // Single function to initialize character terminal
+        function ensureCharacterTerminalInitialized() {
+            if (globalCharacterTerminal) {
+                return globalCharacterTerminal;
+            }
+            
+            if (window.CharacterTerminal) {
+                console.log('🖥️ Initializing global character terminal...');
+                globalCharacterTerminal = new CharacterTerminal();
+                console.log('✅ Global character terminal initialized');
+                return globalCharacterTerminal;
+            }
+            
+            console.warn('⚠️ CharacterTerminal class not available yet');
+            return null;
+        }
+        
+        // Expose globally for other scripts
+        window.ensureCharacterTerminalInitialized = ensureCharacterTerminalInitialized;
+        
+        // Single function to initialize chat system
+        function ensureChatInitialized() {
+            if (chatInitialized && globalChatUI && globalConversationManager) {
+                return { chatUI: globalChatUI, conversationManager: globalConversationManager };
+            }
+            
+            if (window.ConversationManager && window.ChatUI) {
+                console.log('🔧 Initializing global chat system...');
+                globalChatUI = new ChatUI();
+                globalConversationManager = new ConversationManager();
+                
+                globalChatUI.initialize();
+                globalConversationManager.initialize(globalChatUI);
+                globalConversationManager.loadStoredApiKey();
+                
+                chatInitialized = true;
+                console.log('✅ Global chat system initialized');
+                
+                return { chatUI: globalChatUI, conversationManager: globalConversationManager };
+            }
+            
+            console.warn('⚠️ Chat classes not available yet');
+            return null;
+        }
 
         function initializeTerminalExperience() {
             if (TerminalQuestionnaire.hasCompletedExperience()) {
@@ -2375,42 +2425,26 @@
         }
 
         function initializeConversation() {
-            // Initialize the chat system using existing conversation components
-            if (window.ConversationManager && window.ChatUI) {
-                // Create global instances only if they don't exist
-                if (!globalChatUI) {
-                    globalChatUI = new ChatUI();
-                    globalConversationManager = new ConversationManager();
-                    
-                    // Initialize the UI first
-                    globalChatUI.initialize();
-                    globalConversationManager.initialize(globalChatUI);
-                    
-                    // Load stored API key if available
-                    globalConversationManager.loadStoredApiKey();
-                    
-                    console.log('✅ Chat system initialized (global instance)');
+            // Use centralized chat initialization
+            const chat = ensureChatInitialized();
+            if (!chat) return;
+            
+            // Show the chat UI
+            chatUI.show();
+            
+            // Get user data for personalized greeting
+            const userData = TerminalQuestionnaire.getUserData();
+            if (userData && userData.userName) {
+                // Add a personalized welcome message with safe property access
+                let welcomeMessage = `Welcome back, ${userData.userName}! 🌟`;
+                
+                if (userData.analysis && userData.analysis.dominantTrait) {
+                    welcomeMessage += ` Based on our chat, I know you're ${userData.analysis.dominantTrait}. What would you like to explore today?`;
+                } else {
+                    welcomeMessage += ` What would you like to explore today?`;
                 }
                 
-                // Show the existing chat UI
-                globalChatUI.show();
-                
-                // Get user data for personalized greeting
-                const userData = TerminalQuestionnaire.getUserData();
-                if (userData && userData.userName) {
-                    // Add a personalized welcome message with safe property access
-                    let welcomeMessage = `Welcome back, ${userData.userName}! 🌟`;
-                    
-                    if (userData.analysis && userData.analysis.dominantTrait) {
-                        welcomeMessage += ` Based on our chat, I know you're ${userData.analysis.dominantTrait}. What would you like to explore today?`;
-                    } else {
-                        welcomeMessage += ` What would you like to explore today?`;
-                    }
-                    
-                    globalChatUI.addMessage(welcomeMessage, true);
-                }
-                
-                // Chat interface already shown above
+                chatUI.addMessage(welcomeMessage, true);
             }
         }
 
@@ -2712,23 +2746,17 @@ Avatar generation now uses reliable local templates - no API needed!
         // Function to set generated avatar for chat conversations
         window.setGeneratedAvatarForChat = function(avatarData) {
             try {
-                // Initialize conversation manager if not already done
-                if (!globalConversationManager) {
-                    // Create global instances if they don't exist
-                    if (!globalChatUI) {
-                        globalChatUI = new ChatUI();
-                        globalConversationManager = new ConversationManager();
-                        globalChatUI.initialize();
-                        globalConversationManager.initialize(globalChatUI);
-                        globalConversationManager.loadStoredApiKey();
-                    }
-                }
+                // Use centralized chat initialization
+                const chat = ensureChatInitialized();
+                if (!chat) return;
+                
+                const { chatUI, conversationManager } = chat;
                 
                 // Set the avatar data in the Claude client
-                globalConversationManager.client.setAvatarData(avatarData);
+                conversationManager.client.setAvatarData(avatarData);
                 
                 // Update chat UI to show avatar
-                globalChatUI.updateAvatarDisplay(avatarData);
+                chatUI.updateAvatarDisplay(avatarData);
                 
                 console.log(`🎭 Avatar "${avatarData.name}" is now active for chat conversations!`);
                 
@@ -2764,17 +2792,11 @@ Avatar generation now uses reliable local templates - no API needed!
 
         // Load stored avatar on page load
         window.addEventListener('load', function() {
-            // Initialize global chat if needed and load stored avatar
-            if (window.ConversationManager && window.ChatUI) {
-                if (!globalChatUI) {
-                    globalChatUI = new ChatUI();
-                    globalConversationManager = new ConversationManager();
-                    globalChatUI.initialize();
-                    globalConversationManager.initialize(globalChatUI);
-                    globalConversationManager.loadStoredApiKey();
-                }
-                
-                if (globalConversationManager.client.loadStoredAvatar()) {
+            // Use centralized chat initialization and load stored avatar
+            const chat = ensureChatInitialized();
+            if (chat) {
+                const { conversationManager } = chat;
+                if (conversationManager.client.loadStoredAvatar()) {
                     console.log('🎭 Stored avatar loaded for chat conversations');
                 }
             }

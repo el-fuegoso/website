@@ -48,6 +48,12 @@ class ChatUI {
                             <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                         </svg>
                     </button>
+                    <button class="chat-control-btn" id="viewCharacterBtn" title="View Character Profile" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </button>
                     <button class="chat-control-btn" id="settingsBtn" title="Settings">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="3"/>
@@ -116,6 +122,10 @@ class ChatUI {
             if (confirm('Clear conversation history?')) {
                 if (this.onClearHistory) this.onClearHistory();
             }
+        });
+        
+        this.container.querySelector('#viewCharacterBtn').addEventListener('click', () => {
+            this.showCharacterProfile();
         });
         
         this.container.querySelector('#settingsBtn').addEventListener('click', () => {
@@ -215,6 +225,7 @@ class ChatUI {
             const titleMain = document.getElementById('chatTitleMain');
             const titleSub = document.getElementById('chatTitleSub');
             const avatarDisplay = document.getElementById('chatAvatarDisplay');
+            const viewCharacterBtn = this.container.querySelector('#viewCharacterBtn');
             
             if (titleMain) {
                 titleMain.textContent = `Chat with ${avatarData.name}`;
@@ -225,6 +236,9 @@ class ChatUI {
             if (avatarDisplay) {
                 // You can add avatar image here when you have the images
                 avatarDisplay.innerHTML = this.generateAvatarHTML(avatarData);
+            }
+            if (viewCharacterBtn) {
+                viewCharacterBtn.style.display = 'block'; // Show character button when avatar is available
             }
             
             console.log(`🎨 Chat UI updated for avatar: ${avatarData.name}`);
@@ -258,6 +272,26 @@ class ChatUI {
             'TheHustler': '🚀'
         };
         return emojiMap[archetype] || '🤖';
+    }
+
+    showCharacterProfile() {
+        if (!this.currentAvatar) {
+            console.warn('No avatar data available for character profile');
+            return;
+        }
+
+        // Use global character terminal initialization
+        if (window.ensureCharacterTerminalInitialized) {
+            const characterTerminal = window.ensureCharacterTerminalInitialized();
+            if (characterTerminal) {
+                characterTerminal.show(this.currentAvatar);
+                console.log(`🖥️ Character terminal opened for ${this.currentAvatar.name}`);
+            } else {
+                console.warn('CharacterTerminal not available');
+            }
+        } else {
+            console.warn('ensureCharacterTerminalInitialized function not available');
+        }
     }
 
     showApiKeyModal() {

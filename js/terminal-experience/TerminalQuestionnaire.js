@@ -23,6 +23,7 @@ class TerminalQuestionnaire {
         this.personalityAnalyzer = new AdvancedPersonalityAnalyzer();
         this.avatarService = new ClaudeAvatarService();
         this.avatarDisplay = new AvatarDisplay();
+        this.characterTerminal = null; // Initialize CharacterTerminal on demand
         
         // Avatar generation state
         this.isGeneratingAvatar = false;
@@ -602,19 +603,38 @@ class TerminalQuestionnaire {
         };
         
         viewButton.onclick = () => {
-            this.avatarDisplay.setRegenerationCallback(() => {
-                this.regenerateAvatar(personalityData);
-            });
-            this.avatarDisplay.show(avatarData, personalityData, () => {
-                // Avatar display closed - continue with completion
-                this.finalizeCompletion(personalityData);
-            });
+            // Use global character terminal initialization
+            if (window.ensureCharacterTerminalInitialized) {
+                const characterTerminal = window.ensureCharacterTerminalInitialized();
+                if (characterTerminal) {
+                    characterTerminal.show(avatarData);
+                } else {
+                    console.warn('CharacterTerminal not available, using fallback');
+                    this.showFallbackAvatarDisplay(avatarData, personalityData);
+                }
+            } else {
+                // Fallback to old avatar display
+                this.showFallbackAvatarDisplay(avatarData, personalityData);
+            }
+            
+            // Continue with completion after showing character
+            this.finalizeCompletion(personalityData);
         };
         
         this.content.appendChild(viewButton);
         
         // Save complete user data
         this.saveCompleteUserData(personalityData, avatarData);
+    }
+
+    showFallbackAvatarDisplay(avatarData, personalityData) {
+        this.avatarDisplay.setRegenerationCallback(() => {
+            this.regenerateAvatar(personalityData);
+        });
+        this.avatarDisplay.show(avatarData, personalityData, () => {
+            // Avatar display closed - continue with completion
+            this.finalizeCompletion(personalityData);
+        });
     }
 
     showPersonalityResults(personalityData) {

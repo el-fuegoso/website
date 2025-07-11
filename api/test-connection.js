@@ -20,27 +20,14 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { apiKey } = req.body;
-
-        // Validate API key
+        // Get API key from environment variables
+        const apiKey = process.env.CLAUDE_API_KEY;
+        
         if (!apiKey) {
-            return res.status(400).json({ 
-                error: 'API key is required',
-                received: {
-                    hasApiKey: !!apiKey,
-                    bodyKeys: Object.keys(req.body)
-                }
-            });
-        }
-
-        if (!apiKey.startsWith('sk-ant-api03-') || apiKey.length < 50) {
-            return res.status(400).json({ 
-                error: 'Invalid API key format',
-                expected: 'API key should start with sk-ant-api03- and be at least 50 characters',
-                received: {
-                    prefix: apiKey.substring(0, 15),
-                    length: apiKey.length
-                }
+            console.error('CLAUDE_API_KEY environment variable not set');
+            return res.status(500).json({ 
+                error: 'Server configuration error. Claude API key not configured.',
+                hint: 'Administrator needs to set CLAUDE_API_KEY environment variable'
             });
         }
 

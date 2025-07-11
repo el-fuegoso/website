@@ -2474,33 +2474,13 @@ Your keywords:`);
                     window.testAvatarService = new ClaudeAvatarService();
                     window.testAvatarDisplay = new AvatarDisplay();
                     
-                    // Try to load stored API key
-                    window.testAvatarService.loadStoredApiKey();
+                    // Server-side API key handling - no client setup needed
                 }
                 
                 // Generate personality analysis
                 const personalityData = window.testAnalyzer.generatePersonalityInsights(mockResponses, 'QuickTest');
                 
-                // Check if we have API key
-                if (!window.testAvatarService.hasValidApiKey()) {
-                    const apiKey = prompt(`No Claude API key found. Enter your Claude API key to generate personalized avatar:
-                    
-(Leave blank to see personality analysis only)`);
-                    
-                    if (apiKey && apiKey.trim()) {
-                        try {
-                            window.testAvatarService.setApiKey(apiKey.trim());
-                        } catch (error) {
-                            alert(`Invalid API key: ${error.message}`);
-                            showQuickPersonalityResults(personalityData, keywords);
-                            return;
-                        }
-                    } else {
-                        // Show personality results without Claude generation
-                        showQuickPersonalityResults(personalityData, keywords);
-                        return;
-                    }
-                }
+                // API key is now handled server-side, so we can proceed directly
                 
                 // Show loading indicator
                 showQuickLoadingIndicator();
@@ -2641,12 +2621,9 @@ To generate full Claude avatar, set up API key in the terminal experience or tes
         }
 
         async function debugApiConnection() {
-            const apiKey = prompt(`Debug API Connection
-
-Enter your Claude API key to test the connection:
-(This will make a simple test request to verify everything works)`);
-            
-            if (!apiKey) return;
+            if (!confirm('Test Claude API connection? This will verify the server-side API configuration.')) {
+                return;
+            }
             
             try {
                 showQuickLoadingIndicator();
@@ -2656,7 +2633,7 @@ Enter your Claude API key to test the connection:
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ apiKey })
+                    body: JSON.stringify({})
                 });
                 
                 const data = await response.json();

@@ -9,52 +9,16 @@ class ClaudeAvatarService {
         this.model = 'claude-3-sonnet-20240229';
         this.maxTokens = 1500;
         this.temperature = 0.7;
-        this.apiKey = null;
         this.promptGenerator = new AvatarPrompts();
         this.analytics = new DataCollector();
     }
 
-    setApiKey(apiKey) {
-        if (!apiKey || typeof apiKey !== 'string') {
-            throw new Error('Valid API key required');
-        }
-        
-        // Basic API key format validation
-        if (!apiKey.startsWith('sk-ant-api03-') || apiKey.length < 50) {
-            throw new Error('Invalid API key format. Claude API keys should start with sk-ant-api03-');
-        }
-        
-        this.apiKey = apiKey;
-        
-        // Store for future use (in production, consider more secure storage)
-        localStorage.setItem('claude_api_key', apiKey);
-        
-        return true;
-    }
-
-    loadStoredApiKey() {
-        const stored = localStorage.getItem('claude_api_key');
-        if (stored) {
-            try {
-                this.setApiKey(stored);
-                return true;
-            } catch (error) {
-                console.warn('Stored API key is invalid:', error.message);
-                localStorage.removeItem('claude_api_key');
-                return false;
-            }
-        }
-        return false;
-    }
-
+    // API key is now handled server-side via environment variables
     hasValidApiKey() {
-        return this.apiKey && this.apiKey.length > 20;
+        return true; // Always true since we use server-side API key
     }
 
     async generateAvatar(personalityData, conversationData, archetypeMatch) {
-        if (!this.hasValidApiKey()) {
-            throw new Error('API key not set. Please configure your Claude API key first.');
-        }
 
         const startTime = Date.now();
         
@@ -117,7 +81,6 @@ class ClaudeAvatarService {
     async makeClaudeRequest(prompt) {
         const requestBody = {
             prompt,
-            apiKey: this.apiKey,
             model: this.model,
             maxTokens: this.maxTokens,
             temperature: this.temperature
@@ -229,10 +192,6 @@ class ClaudeAvatarService {
 
     // Method to test API connection
     async testConnection() {
-        if (!this.hasValidApiKey()) {
-            throw new Error('No API key configured');
-        }
-
         try {
             // Use dedicated test endpoint for simpler debugging
             const response = await fetch('/api/test-connection', {
@@ -240,9 +199,7 @@ class ClaudeAvatarService {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    apiKey: this.apiKey
-                })
+                body: JSON.stringify({})
             });
 
             const data = await response.json();

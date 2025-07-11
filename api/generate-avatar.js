@@ -21,19 +21,22 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { prompt, apiKey, model = 'claude-3-sonnet-20240229', maxTokens = 1500, temperature = 0.7 } = req.body;
+        const { prompt, model = 'claude-3-sonnet-20240229', maxTokens = 1500, temperature = 0.7 } = req.body;
 
         // Validate required fields
-        if (!prompt || !apiKey) {
+        if (!prompt) {
             return res.status(400).json({ 
-                error: 'Missing required fields: prompt and apiKey are required' 
+                error: 'Missing required field: prompt is required' 
             });
         }
 
-        // Validate API key format
-        if (!apiKey.startsWith('sk-ant-api03-') || apiKey.length < 50) {
-            return res.status(400).json({ 
-                error: 'Invalid API key format. Claude API keys should start with sk-ant-api03-' 
+        // Get API key from environment variables
+        const apiKey = process.env.CLAUDE_API_KEY;
+        
+        if (!apiKey) {
+            console.error('CLAUDE_API_KEY environment variable not set');
+            return res.status(500).json({ 
+                error: 'Server configuration error. Please contact administrator.' 
             });
         }
 

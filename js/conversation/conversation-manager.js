@@ -25,16 +25,10 @@ class ConversationManager {
     setApiKey(key) {
         // API key is now handled server-side via environment variables
         console.log('ℹ️  API key is now handled server-side automatically');
-        if (this.ui) {
-            this.ui.showApiKeyStatus(true, 'Using server-side API key');
-        }
     }
 
     loadStoredApiKey() {
         // API key is now handled server-side, always return true
-        if (this.ui) {
-            this.ui.showApiKeyStatus(true, 'Using server-side API key');
-        }
         return true;
     }
 

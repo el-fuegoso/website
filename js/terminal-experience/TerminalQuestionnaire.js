@@ -97,17 +97,22 @@ class TerminalQuestionnaire {
         // Create main container
         this.container = document.createElement('div');
         this.container.className = 'terminal-questionnaire';
+        // Check if mobile
+        const isMobile = window.innerWidth <= 768;
+        
         this.container.style.cssText = `
             position: fixed;
-            left: ${this.position.x}px;
-            top: ${this.position.y}px;
-            width: 600px;
-            max-width: 90vw;
+            left: ${isMobile ? '5px' : this.position.x + 'px'};
+            top: ${isMobile ? '5px' : this.position.y + 'px'};
+            width: ${isMobile ? 'calc(100vw - 10px)' : '600px'};
+            max-width: ${isMobile ? 'none' : '90vw'};
+            height: ${isMobile ? 'calc(100vh - 10px)' : 'auto'};
+            max-height: ${isMobile ? 'none' : '80vh'};
             background: #1a1a1a;
             color: #00ff00;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
-            border-radius: 8px;
+            font-size: ${isMobile ? '16px' : '14px'};
+            border-radius: ${isMobile ? '12px' : '8px'};
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             z-index: 10000;
             overflow: hidden;
@@ -125,15 +130,18 @@ class TerminalQuestionnaire {
     createHeader() {
         this.header = document.createElement('div');
         this.header.className = 'terminal-header';
+        const isMobile = window.innerWidth <= 768;
+        
         this.header.style.cssText = `
             background: #2a2a2a;
-            padding: 12px 16px;
+            padding: ${isMobile ? '16px 20px' : '12px 16px'};
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #444;
-            cursor: grab;
+            cursor: ${isMobile ? 'default' : 'grab'};
             user-select: none;
+            touch-action: ${isMobile ? 'none' : 'auto'};
         `;
         
         // Left side with terminal buttons
@@ -145,9 +153,13 @@ class TerminalQuestionnaire {
         
         // Close button
         const closeBtn = document.createElement('button');
+        const isMobileBtn = window.innerWidth <= 768;
         closeBtn.style.cssText = `
-            width: 12px; height: 12px; border-radius: 50%;
+            width: ${isMobileBtn ? '16px' : '12px'}; 
+            height: ${isMobileBtn ? '16px' : '12px'}; 
+            border-radius: 50%;
             background: #ff5f56; border: none; cursor: pointer;
+            touch-action: manipulation;
         `;
         closeBtn.onclick = this.close;
         closeBtn.title = 'Close';
@@ -155,8 +167,11 @@ class TerminalQuestionnaire {
         // Minimize button
         const minimizeBtn = document.createElement('button');
         minimizeBtn.style.cssText = `
-            width: 12px; height: 12px; border-radius: 50%;
+            width: ${isMobileBtn ? '16px' : '12px'}; 
+            height: ${isMobileBtn ? '16px' : '12px'}; 
+            border-radius: 50%;
             background: #ffbd2e; border: none; cursor: pointer;
+            touch-action: manipulation;
         `;
         minimizeBtn.onclick = this.minimize;
         minimizeBtn.title = 'Minimize';
@@ -164,8 +179,11 @@ class TerminalQuestionnaire {
         // Maximize button (non-functional, just for aesthetics)
         const maximizeBtn = document.createElement('button');
         maximizeBtn.style.cssText = `
-            width: 12px; height: 12px; border-radius: 50%;
+            width: ${isMobileBtn ? '16px' : '12px'}; 
+            height: ${isMobileBtn ? '16px' : '12px'}; 
+            border-radius: 50%;
             background: #27ca3f; border: none; cursor: pointer;
+            touch-action: manipulation;
         `;
         
         buttons.appendChild(closeBtn);
@@ -179,10 +197,11 @@ class TerminalQuestionnaire {
         leftSide.appendChild(buttons);
         leftSide.appendChild(title);
         
-        // Right side with drag hint
+        // Right side with drag hint (hide on mobile)
         const rightSide = document.createElement('span');
-        rightSide.textContent = '⋮⋮ Drag to move';
-        rightSide.style.cssText = 'color: #666; font-size: 10px;';
+        const isMobileDrag = window.innerWidth <= 768;
+        rightSide.textContent = isMobileDrag ? '' : '⋮⋮ Drag to move';
+        rightSide.style.cssText = `color: #666; font-size: 10px; display: ${isMobileDrag ? 'none' : 'block'};`;
         
         this.header.appendChild(leftSide);
         this.header.appendChild(rightSide);
@@ -192,11 +211,13 @@ class TerminalQuestionnaire {
     createContent() {
         this.content = document.createElement('div');
         this.content.className = 'terminal-content';
+        const isMobileContent = window.innerWidth <= 768;
         this.content.style.cssText = `
-            padding: 20px;
-            height: 400px;
+            padding: ${isMobileContent ? '16px' : '20px'};
+            height: ${isMobileContent ? 'calc(100vh - 140px)' : '400px'};
             overflow-y: auto;
             background: #1a1a1a;
+            -webkit-overflow-scrolling: touch;
         `;
         
         // ASCII Dog
@@ -232,6 +253,7 @@ class TerminalQuestionnaire {
         
         this.inputField = document.createElement('input');
         this.inputField.type = 'text';
+        const isMobileInput = window.innerWidth <= 768;
         this.inputField.style.cssText = `
             flex: 1;
             background: transparent;
@@ -240,6 +262,9 @@ class TerminalQuestionnaire {
             color: #00ff00;
             font-family: inherit;
             font-size: inherit;
+            font-size: ${isMobileInput ? '16px' : 'inherit'};
+            -webkit-appearance: none;
+            touch-action: manipulation;
         `;
         this.inputField.placeholder = 'Type your response and press Enter...';
         
@@ -296,11 +321,16 @@ class TerminalQuestionnaire {
     }
     
     addEventListeners() {
-        this.header.addEventListener('mousedown', this.handleMouseDown);
+        // Only add drag listeners on desktop
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) {
+            this.header.addEventListener('mousedown', this.handleMouseDown);
+        }
+        
         this.inputField.addEventListener('keydown', this.handleKeyPress);
         
-        // Focus input field
-        setTimeout(() => this.inputField.focus(), 100);
+        // Focus input field (with delay for mobile keyboard)
+        setTimeout(() => this.inputField.focus(), isMobile ? 300 : 100);
     }
     
     handleMouseDown(e) {

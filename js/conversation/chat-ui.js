@@ -54,12 +54,6 @@ class ChatUI {
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
                     </button>
-                    <button class="chat-control-btn" id="settingsBtn" title="Settings">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
-                        </svg>
-                    </button>
                     <button class="chat-control-btn" id="minimizeBtn" title="Minimize">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M6 9l6 6 6-6"/>
@@ -92,7 +86,6 @@ class ChatUI {
         
         document.body.appendChild(this.container);
         this.setupReferences();
-        this.createApiKeyModal();
     }
 
     setupReferences() {
@@ -128,52 +121,12 @@ class ChatUI {
             this.showCharacterProfile();
         });
         
-        this.container.querySelector('#settingsBtn').addEventListener('click', () => {
-            this.showApiKeyModal();
-        });
         
         this.container.querySelector('#minimizeBtn').addEventListener('click', () => {
             this.hide();
         });
     }
 
-    createApiKeyModal() {
-        this.apiKeyModal = document.createElement('div');
-        this.apiKeyModal.className = 'api-key-modal hidden';
-        this.apiKeyModal.innerHTML = `
-            <div class="modal-overlay"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Claude API Settings</h3>
-                    <button class="modal-close" id="closeModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="apiKeyInput">API Configuration:</label>
-                        <input type="text" id="apiKeyInput" placeholder="Using server-side authentication" disabled>
-                        <small>API key is handled server-side automatically. No configuration needed.</small>
-                    </div>
-                    <div class="api-key-status" id="apiKeyStatus"></div>
-                </div>
-                <div class="modal-footer">
-                    <button id="cancelApiKey" class="primary-btn">Close</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(this.apiKeyModal);
-        this.setupApiKeyModalListeners();
-    }
-
-    setupApiKeyModalListeners() {
-        const closeBtn = this.apiKeyModal.querySelector('#closeModal');
-        const cancelBtn = this.apiKeyModal.querySelector('#cancelApiKey');
-        const overlay = this.apiKeyModal.querySelector('.modal-overlay');
-        
-        closeBtn.addEventListener('click', () => this.hideApiKeyModal());
-        cancelBtn.addEventListener('click', () => this.hideApiKeyModal());
-        overlay.addEventListener('click', () => this.hideApiKeyModal());
-    }
 
     show() {
         if (!this.isInitialized) {
@@ -277,30 +230,6 @@ class ChatUI {
         }
     }
 
-    showApiKeyModal() {
-        // Show that we're using server-side authentication
-        this.apiKeyModal.querySelector('#apiKeyInput').value = 'Server-side authentication active';
-        this.showApiKeyStatus(true, 'Using server-side API key configuration');
-        
-        this.apiKeyModal.classList.remove('hidden');
-    }
-
-    hideApiKeyModal() {
-        this.apiKeyModal.classList.add('hidden');
-        this.apiKeyModal.querySelector('#apiKeyInput').value = '';
-        this.apiKeyModal.querySelector('#apiKeyStatus').textContent = '';
-    }
-
-    showApiKeyStatus(success, message = '') {
-        const statusElement = this.apiKeyModal.querySelector('#apiKeyStatus');
-        if (success) {
-            statusElement.textContent = message || 'API configuration active!';
-            statusElement.className = 'api-key-status success';
-        } else {
-            statusElement.textContent = message || 'API configuration issue';
-            statusElement.className = 'api-key-status error';
-        }
-    }
 
     handleSendMessage() {
         const message = this.messageInput.value.trim();

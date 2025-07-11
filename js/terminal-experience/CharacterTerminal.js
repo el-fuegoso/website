@@ -78,18 +78,21 @@ class CharacterTerminal {
             </div>
         `;
 
-        // Apply styles to match TerminalQuestionnaire exactly
+        // Apply styles to match TerminalQuestionnaire exactly with mobile support
+        const isMobile = window.innerWidth <= 768;
         Object.assign(this.container.style, {
             position: 'fixed',
-            left: `${this.position.x}px`,
-            top: `${this.position.y}px`,
-            width: '600px',
-            maxWidth: '90vw',
+            left: isMobile ? '5px' : `${this.position.x}px`,
+            top: isMobile ? '5px' : `${this.position.y}px`,
+            width: isMobile ? 'calc(100vw - 10px)' : '600px',
+            maxWidth: isMobile ? 'none' : '90vw',
+            height: isMobile ? 'calc(100vh - 10px)' : 'auto',
+            maxHeight: isMobile ? 'none' : '70vh',
             background: '#1a1a1a',
             color: '#00ff00',
             fontFamily: "'Courier New', monospace",
-            fontSize: '14px',
-            borderRadius: '8px',
+            fontSize: isMobile ? '16px' : '14px',
+            borderRadius: isMobile ? '12px' : '8px',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
             zIndex: '10001',
             overflow: 'hidden',
@@ -107,19 +110,20 @@ class CharacterTerminal {
         const closeBtn = this.container.querySelector('.terminal-control.close');
         const minimizeBtn = this.container.querySelector('.terminal-control.minimize');
 
-        // Dragging functionality
-        header.addEventListener('mousedown', this.startDrag.bind(this));
-        document.addEventListener('mousemove', this.drag.bind(this));
-        document.addEventListener('mouseup', this.stopDrag.bind(this));
+        // Only add dragging functionality on desktop
+        const isMobile = window.innerWidth <= 768;
+        if (!isMobile) {
+            header.addEventListener('mousedown', this.startDrag.bind(this));
+            document.addEventListener('mousemove', this.drag.bind(this));
+            document.addEventListener('mouseup', this.stopDrag.bind(this));
+            header.addEventListener('selectstart', (e) => e.preventDefault());
+        }
 
         // Close button
         closeBtn.addEventListener('click', () => this.hide());
         
         // Minimize button (same as close for now)
         minimizeBtn.addEventListener('click', () => this.hide());
-
-        // Prevent text selection while dragging
-        header.addEventListener('selectstart', (e) => e.preventDefault());
     }
 
     startDrag(e) {
@@ -316,6 +320,43 @@ class CharacterTerminal {
                 overflow-y: auto;
                 background: #1a1a1a;
                 color: #00ff00;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            @media (max-width: 768px) {
+                .terminal-content {
+                    padding: 12px;
+                    max-height: calc(100vh - 80px);
+                    font-size: 16px;
+                }
+                
+                .terminal-control {
+                    width: 16px !important;
+                    height: 16px !important;
+                    touch-action: manipulation;
+                }
+                
+                .terminal-header {
+                    padding: 16px 20px !important;
+                    cursor: default !important;
+                }
+                
+                .character-avatar {
+                    font-size: 2.5rem !important;
+                }
+                
+                .character-title h2 {
+                    font-size: 1.2rem !important;
+                }
+                
+                .character-subtitle {
+                    font-size: 0.8rem !important;
+                }
+                
+                .strength-tag, .tool-tag {
+                    padding: 4px 8px !important;
+                    font-size: 0.9rem !important;
+                }
             }
             
             .character-header {

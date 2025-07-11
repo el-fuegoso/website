@@ -40,6 +40,11 @@ export default async function handler(req, res) {
             });
         }
 
+        // Debug logging (temporary)
+        console.log('API Key found:', !!apiKey);
+        console.log('API Key prefix:', apiKey ? apiKey.substring(0, 15) + '...' : 'none');
+        console.log('API Key length:', apiKey ? apiKey.length : 0);
+
         // Prepare request to Claude API
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
@@ -69,7 +74,11 @@ export default async function handler(req, res) {
                 statusText: claudeResponse.statusText,
                 errorData,
                 apiKeyLength: apiKey ? apiKey.length : 0,
-                apiKeyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'none'
+                apiKeyPrefix: apiKey ? apiKey.substring(0, 15) + '...' : 'none',
+                requestHeaders: {
+                    'Authorization': `Bearer ${apiKey ? apiKey.substring(0, 15) + '...' : 'none'}`,
+                    'anthropic-version': '2023-06-01'
+                }
             });
             
             // Map common errors to user-friendly messages

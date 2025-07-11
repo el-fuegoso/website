@@ -2398,13 +2398,19 @@
                 // Get user data for personalized greeting
                 const userData = TerminalQuestionnaire.getUserData();
                 if (userData && userData.userName) {
-                    // Add a personalized welcome message
-                    const welcomeMessage = `Welcome back, ${userData.userName}! 🌟 Based on our chat, I know you're ${userData.analysis.dominantTrait}. What would you like to explore today?`;
-                    chatUI.addMessage(welcomeMessage, true);
+                    // Add a personalized welcome message with safe property access
+                    let welcomeMessage = `Welcome back, ${userData.userName}! 🌟`;
+                    
+                    if (userData.analysis && userData.analysis.dominantTrait) {
+                        welcomeMessage += ` Based on our chat, I know you're ${userData.analysis.dominantTrait}. What would you like to explore today?`;
+                    } else {
+                        welcomeMessage += ` What would you like to explore today?`;
+                    }
+                    
+                    globalChatUI.addMessage(welcomeMessage, true);
                 }
                 
-                // Show the chat interface
-                chatUI.show();
+                // Chat interface already shown above
             }
         }
 

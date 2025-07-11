@@ -23,27 +23,19 @@ class ConversationManager {
     }
 
     setApiKey(key) {
-        try {
-            this.client.setApiKey(key);
-            localStorage.setItem('claude_api_key', key);
-            if (this.ui) {
-                this.ui.showApiKeyStatus(true);
-            }
-        } catch (error) {
-            console.error('Error setting API key:', error);
-            if (this.ui) {
-                this.ui.showApiKeyStatus(false, 'Invalid API key format');
-            }
+        // API key is now handled server-side via environment variables
+        console.log('ℹ️  API key is now handled server-side automatically');
+        if (this.ui) {
+            this.ui.showApiKeyStatus(true, 'Using server-side API key');
         }
     }
 
     loadStoredApiKey() {
-        const storedKey = localStorage.getItem('claude_api_key');
-        if (storedKey) {
-            this.setApiKey(storedKey);
-            return true;
+        // API key is now handled server-side, always return true
+        if (this.ui) {
+            this.ui.showApiKeyStatus(true, 'Using server-side API key');
         }
-        return false;
+        return true;
     }
 
     async handleUserMessage(message) {

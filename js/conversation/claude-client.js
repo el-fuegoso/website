@@ -12,8 +12,9 @@ class ClaudeClient {
     }
 
     setApiKey(key) {
-        this.apiKey = key;
-        this.headers['x-api-key'] = key;
+        // API key is now handled server-side via environment variables
+        // This method is kept for backward compatibility but does nothing
+        console.log('ℹ️  API key is now handled server-side automatically');
     }
 
     setAvatarData(avatarData) {
@@ -74,9 +75,7 @@ If asked about Elliot's work, refer to the projects shown on the website while m
     }
 
     async sendMessage(message, conversationHistory = []) {
-        if (!this.apiKey) {
-            throw new Error('API key not set');
-        }
+        // API key is now handled server-side, no client-side validation needed
 
         // Filter conversation history to only include role and content
         const cleanHistory = conversationHistory.map(msg => ({
@@ -103,9 +102,12 @@ If asked about Elliot's work, refer to the projects shown on the website while m
         };
 
         try {
+            // Use only Content-Type header for server-side auth
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
-                headers: this.headers,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -123,9 +125,7 @@ If asked about Elliot's work, refer to the projects shown on the website while m
     }
 
     async streamMessage(message, conversationHistory = [], onChunk) {
-        if (!this.apiKey) {
-            throw new Error('API key not set');
-        }
+        // API key is now handled server-side, no client-side validation needed
 
         // Filter conversation history to only include role and content
         const cleanHistory = conversationHistory.map(msg => ({
@@ -153,7 +153,9 @@ If asked about Elliot's work, refer to the projects shown on the website while m
             console.log('Starting streaming request...');
             const response = await fetch(this.streamUrl, {
                 method: 'POST',
-                headers: this.headers,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(payload)
             });
 

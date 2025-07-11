@@ -125,6 +125,16 @@ If asked about Elliot's work, refer to the projects shown on the website while m
     }
 
     async streamMessage(message, conversationHistory = [], onChunk) {
+        // Try streaming first, fall back to non-streaming if it fails
+        try {
+            await this.tryStreamingMessage(message, conversationHistory, onChunk);
+        } catch (error) {
+            console.warn('Streaming failed, falling back to non-streaming:', error);
+            await this.fallbackToRegularMessage(message, conversationHistory, onChunk);
+        }
+    }
+
+    async tryStreamingMessage(message, conversationHistory = [], onChunk) {
         // API key is now handled server-side, no client-side validation needed
 
         // Filter conversation history to only include role and content
@@ -141,69 +151,86 @@ If asked about Elliot's work, refer to the projects shown on the website while m
             }
         ];
 
+        const systemPrompt = this.customSystemPrompt || 
+            "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website.";
+
         const payload = {
             model: 'claude-3-5-sonnet-20241022',
             max_tokens: 1024,
             messages: messages,
-            system: "You are a helpful assistant integrated into Elliot Lee's portfolio website. Keep responses concise and engaging. If asked about Elliot's work, refer to the projects shown on the website.",
+            system: systemPrompt,
             stream: true
         };
 
-        try {
-            console.log('Starting streaming request...');
-            const response = await fetch(this.streamUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+        console.log('Starting streaming request...');
+        const response = await fetch(this.streamUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
 
-            console.log('Response received:', response.status, response.statusText);
+        console.log('Response received:', response.status, response.statusText);
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error('Stream response error:', errorData);
-                throw new Error(`API request failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
-            }
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Stream response error:', errorData);
+            throw new Error(`API request failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        }
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-            console.log('Starting to read stream...');
-            while (true) {
-                const { done, value } = await reader.read();
-                console.log('Stream chunk:', done, value?.length);
-                if (done) break;
+        console.log('Starting to read stream...');
+        while (true) {
+            const { done, value } = await reader.read();
+            console.log('Stream chunk:', done, value?.length);
+            if (done) break;
 
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
 
-                for (const line of lines) {
-                    console.log('Processing line:', line);
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
-                        console.log('Data:', data);
-                        if (data === '[DONE]') return;
-                        
-                        try {
-                            const parsed = JSON.parse(data);
-                            console.log('Parsed:', parsed);
-                            if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-                                console.log('Calling onChunk with:', parsed.delta.text);
-                                onChunk(parsed.delta.text);
-                            }
-                        } catch (e) {
-                            console.log('JSON parse error:', e);
+            for (const line of lines) {
+                console.log('Processing line:', line);
+                if (line.startsWith('data: ')) {
+                    const data = line.slice(6);
+                    console.log('Data:', data);
+                    if (data === '[DONE]') return;
+                    
+                    try {
+                        const parsed = JSON.parse(data);
+                        console.log('Parsed:', parsed);
+                        if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                            console.log('Calling onChunk with:', parsed.delta.text);
+                            onChunk(parsed.delta.text);
                         }
+                    } catch (e) {
+                        console.log('JSON parse error:', e);
                     }
                 }
             }
-        } catch (error) {
-            console.error('Claude streaming error:', error);
-            throw error;
+        }
+    }
+
+    async fallbackToRegularMessage(message, conversationHistory = [], onChunk) {
+        console.log('Using fallback non-streaming message...');
+        
+        // Use the regular sendMessage method and simulate streaming
+        const fullResponse = await this.sendMessage(message, conversationHistory);
+        
+        // Simulate streaming by sending the response in chunks
+        const words = fullResponse.split(' ');
+        let currentText = '';
+        
+        for (let i = 0; i < words.length; i++) {
+            currentText += (i > 0 ? ' ' : '') + words[i];
+            onChunk(words[i] + (i < words.length - 1 ? ' ' : ''));
+            
+            // Small delay to simulate streaming
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
     }
 }

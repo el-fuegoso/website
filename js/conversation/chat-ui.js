@@ -11,6 +11,7 @@ class ChatUI {
         this.typingIndicator = null;
         this.apiKeyModal = null;
         this.isInitialized = false;
+        this.currentAvatar = null;
         
         this.onSendMessage = null;
         this.onApiKeySet = null;
@@ -35,8 +36,11 @@ class ChatUI {
         this.container.innerHTML = `
             <div class="chat-header">
                 <div class="chat-title">
-                    <div class="chat-avatar">${this.avatarGenerator.generateClaudeAvatar()}</div>
-                    <span>Chat with Claude</span>
+                    <div class="chat-avatar" id="chatAvatarDisplay">${this.avatarGenerator.generateClaudeAvatar()}</div>
+                    <div class="chat-title-text">
+                        <span id="chatTitleMain">Chat with Claude</span>
+                        <span id="chatTitleSub" class="chat-subtitle"></span>
+                    </div>
                 </div>
                 <div class="chat-controls">
                     <button class="chat-control-btn" id="clearHistoryBtn" title="Clear conversation">
@@ -202,6 +206,58 @@ class ChatUI {
         } else {
             this.show();
         }
+    }
+
+    updateAvatarDisplay(avatarData) {
+        this.currentAvatar = avatarData;
+        
+        if (this.isInitialized) {
+            const titleMain = document.getElementById('chatTitleMain');
+            const titleSub = document.getElementById('chatTitleSub');
+            const avatarDisplay = document.getElementById('chatAvatarDisplay');
+            
+            if (titleMain) {
+                titleMain.textContent = `Chat with ${avatarData.name}`;
+            }
+            if (titleSub) {
+                titleSub.textContent = avatarData.title;
+            }
+            if (avatarDisplay) {
+                // You can add avatar image here when you have the images
+                avatarDisplay.innerHTML = this.generateAvatarHTML(avatarData);
+            }
+            
+            console.log(`🎨 Chat UI updated for avatar: ${avatarData.name}`);
+        }
+    }
+
+    generateAvatarHTML(avatarData) {
+        // For now, generate a styled avatar based on archetype
+        const archetype = avatarData.metadata?.archetype || 'TheBuilder';
+        const archetypeEmoji = this.getArchetypeEmoji(archetype);
+        
+        return `
+            <div class="avatar-circle" title="${avatarData.name} - ${avatarData.title}">
+                <span class="avatar-emoji">${archetypeEmoji}</span>
+            </div>
+        `;
+    }
+
+    getArchetypeEmoji(archetype) {
+        const emojiMap = {
+            'TheStrategist': '🎯',
+            'TheBuilder': '🔨',
+            'TheBridge': '🌉',
+            'TheInnovator': '💡',
+            'TheExplorer': '🧭',
+            'TheDetective': '🔍',
+            'TheMaster': '🏆',
+            'TheVeteran': '⚔️',
+            'TheSkeptic': '🤔',
+            'TheDisruptor': '⚡',
+            'TheHustler': '🚀'
+        };
+        return emojiMap[archetype] || '🤖';
     }
 
     showApiKeyModal() {

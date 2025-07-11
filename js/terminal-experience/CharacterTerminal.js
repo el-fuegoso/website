@@ -63,13 +63,17 @@ class CharacterTerminal {
         this.container.className = 'character-terminal';
         this.container.innerHTML = `
             <div class="terminal-header">
-                <div class="terminal-controls">
-                    <div class="terminal-control close" title="Close"></div>
-                    <div class="terminal-control minimize" title="Minimize"></div>
-                    <div class="terminal-control maximize" title="Maximize"></div>
+                <div class="header-left">
+                    <div class="terminal-controls">
+                        <button class="terminal-control close" title="Minimize"></button>
+                        <div class="terminal-control minimize"></div>
+                        <div class="terminal-control maximize"></div>
+                    </div>
+                    <div class="terminal-title">profile@elliot-portfolio:~$ view</div>
                 </div>
-                <div class="terminal-title">Character Profile</div>
-                <div class="terminal-drag-handle"></div>
+                <div class="header-right">
+                    <span class="drag-indicator">⋮⋮ Drag to move</span>
+                </div>
             </div>
             <div class="terminal-content">
                 <div class="character-info">
@@ -78,25 +82,13 @@ class CharacterTerminal {
             </div>
         `;
 
-        // Apply styles to match TerminalQuestionnaire exactly with mobile support
+        // Apply positioning and responsive sizing
         const isMobile = window.innerWidth <= 768;
         Object.assign(this.container.style, {
-            position: 'fixed',
             left: isMobile ? '5px' : `${this.position.x}px`,
             top: isMobile ? '5px' : `${this.position.y}px`,
             width: isMobile ? 'calc(100vw - 10px)' : '600px',
             maxWidth: isMobile ? 'none' : '90vw',
-            height: isMobile ? 'calc(100vh - 10px)' : 'auto',
-            maxHeight: isMobile ? 'none' : '70vh',
-            background: '#1a1a1a',
-            color: '#00ff00',
-            fontFamily: "'Courier New', monospace",
-            fontSize: isMobile ? '16px' : '14px',
-            borderRadius: isMobile ? '12px' : '8px',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-            zIndex: '10001',
-            overflow: 'hidden',
-            transition: 'all 0.2s ease',
             display: 'none',
             opacity: '0',
             transform: `translate(0, 0) scale(0.95)`
@@ -259,19 +251,34 @@ class CharacterTerminal {
         style.id = 'character-terminal-styles';
         style.textContent = `
             .character-terminal {
-                color: #00ff00;
-                line-height: 1.4;
+                position: fixed;
+                background: #111827; /* bg-gray-900 */
+                color: #4ade80; /* text-green-400 */
+                font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+                font-size: 14px;
+                overflow: hidden;
+                border-radius: 8px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                transition: all 0.2s ease;
+                z-index: 50;
+                cursor: default;
             }
             
             .terminal-header {
-                background: #2a2a2a;
-                padding: 12px 16px;
+                background: #1f2937; /* bg-gray-800 */
+                padding: 8px 16px;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                border-bottom: 1px solid #444;
+                border-bottom: 1px solid #374151; /* border-gray-700 */
                 cursor: grab;
                 user-select: none;
+            }
+            
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 16px;
             }
             
             .terminal-controls {
@@ -285,7 +292,7 @@ class CharacterTerminal {
                 height: 12px;
                 border-radius: 50%;
                 cursor: pointer;
-                transition: opacity 0.2s;
+                transition: all 0.2s;
                 border: none;
                 outline: none;
             }
@@ -295,32 +302,44 @@ class CharacterTerminal {
             }
             
             .terminal-control.close {
-                background: #ff5f56;
+                background: #ef4444; /* bg-red-500 */
+            }
+            
+            .terminal-control.close:hover {
+                background: #f87171; /* bg-red-400 */
             }
             
             .terminal-control.minimize {
-                background: #ffbd2e;
+                background: #eab308; /* bg-yellow-500 */
             }
             
             .terminal-control.maximize {
-                background: #27ca3f;
+                background: #22c55e; /* bg-green-500 */
             }
             
             .terminal-title {
-                color: #ffffff;
-                font-weight: bold;
-                flex: 1;
-                text-align: center;
+                color: #d1d5db; /* text-gray-300 */
+                font-size: 12px;
+                font-weight: normal;
+            }
+            
+            .header-right {
+                display: flex;
+                align-items: center;
+            }
+            
+            .drag-indicator {
+                color: #6b7280; /* text-gray-400 */
                 font-size: 12px;
             }
             
             .terminal-content {
-                padding: 16px;
-                max-height: calc(70vh - 60px);
+                padding: 24px;
                 overflow-y: auto;
-                background: #1a1a1a;
-                color: #00ff00;
+                background: #111827; /* bg-gray-900 */
+                color: #4ade80; /* text-green-400 */
                 -webkit-overflow-scrolling: touch;
+                height: 400px;
             }
             
             @media (max-width: 768px) {
@@ -365,7 +384,7 @@ class CharacterTerminal {
                 gap: 16px;
                 margin-bottom: 20px;
                 padding-bottom: 16px;
-                border-bottom: 1px solid #333;
+                border-bottom: 1px solid #374151; /* border-gray-700 */
             }
             
             .character-avatar {
@@ -375,14 +394,14 @@ class CharacterTerminal {
             
             .character-title h2 {
                 margin: 0;
-                color: #00ff00;
+                color: #4ade80; /* text-green-400 */
                 font-size: 1.4rem;
                 font-weight: bold;
             }
             
             .character-subtitle {
                 margin: 4px 0 0 0;
-                color: #888;
+                color: #9ca3af; /* text-gray-400 */
                 font-size: 0.9rem;
             }
             
@@ -392,14 +411,14 @@ class CharacterTerminal {
             
             .character-section h3 {
                 margin: 0 0 8px 0;
-                color: #00ccff;
+                color: #60a5fa; /* text-blue-400 */
                 font-size: 0.9rem;
                 font-weight: bold;
             }
             
             .character-section p {
                 margin: 0;
-                color: #cccccc;
+                color: #e5e7eb; /* text-gray-200 */
                 line-height: 1.5;
             }
             
@@ -411,42 +430,42 @@ class CharacterTerminal {
             }
             
             .strength-tag, .tool-tag {
-                background: #1a4a1a;
-                color: #00ff00;
+                background: #166534; /* bg-green-800 */
+                color: #4ade80; /* text-green-400 */
                 padding: 2px 8px;
                 border-radius: 12px;
                 font-size: 0.8rem;
-                border: 1px solid #2a5a2a;
+                border: 1px solid #22c55e; /* border-green-500 */
             }
             
             .tool-tag {
-                background: #1a1a4a;
-                color: #00ccff;
-                border-color: #2a2a5a;
+                background: #1e3a8a; /* bg-blue-800 */
+                color: #60a5fa; /* text-blue-400 */
+                border-color: #3b82f6; /* border-blue-500 */
             }
             
             .motto {
-                background: #1a1a1a;
+                background: #0f172a; /* bg-slate-900 */
                 padding: 12px;
                 border-radius: 4px;
-                border-left: 3px solid #00ff00;
+                border-left: 3px solid #4ade80; /* border-green-400 */
             }
             
             .motto-text {
                 font-style: italic;
-                color: #00ff00 !important;
+                color: #4ade80 !important; /* text-green-400 */
                 font-weight: bold;
             }
             
             .character-footer {
                 margin-top: 20px;
                 padding-top: 16px;
-                border-top: 1px solid #333;
+                border-top: 1px solid #374151; /* border-gray-700 */
             }
             
             .archetype-info, .generation-info {
                 margin: 0;
-                color: #666;
+                color: #6b7280; /* text-gray-500 */
                 font-size: 0.8rem;
             }
             
@@ -454,22 +473,22 @@ class CharacterTerminal {
                 margin-top: 4px;
             }
             
-            /* Scrollbar styling */
+            /* Scrollbar styling to match terminal theme */
             .terminal-content::-webkit-scrollbar {
                 width: 8px;
             }
             
             .terminal-content::-webkit-scrollbar-track {
-                background: #1a1a1a;
+                background: #111827; /* bg-gray-900 */
             }
             
             .terminal-content::-webkit-scrollbar-thumb {
-                background: #333;
+                background: #374151; /* bg-gray-700 */
                 border-radius: 4px;
             }
             
             .terminal-content::-webkit-scrollbar-thumb:hover {
-                background: #444;
+                background: #4b5563; /* bg-gray-600 */
             }
         `;
         

@@ -18,8 +18,15 @@ class TerminalQuestionnaire {
         this.isMinimized = false;
         this.isVisible = false;
         
-        // Initialize data collector
+        // Initialize data collector and avatar generation components
         this.dataCollector = new DataCollector();
+        this.personalityAnalyzer = new AdvancedPersonalityAnalyzer();
+        this.avatarService = new ClaudeAvatarService();
+        this.avatarDisplay = new AvatarDisplay();
+        
+        // Avatar generation state
+        this.isGeneratingAvatar = false;
+        this.avatarData = null;
         
         // Initialize questions
         this.questions = [
@@ -476,13 +483,368 @@ class TerminalQuestionnaire {
         this.isComplete = true;
         this.updateProgress();
         
-        // Save user data
-        const userData = this.dataCollector.saveUserData(this.responses, this.userName);
-        
         // Hide input
         this.inputContainer.style.display = 'none';
         
-        // Add completion message
+        // Start avatar generation process
+        this.startAvatarGeneration();
+    }
+
+    async startAvatarGeneration() {
+        // Add generating message
+        const generatingDiv = document.createElement('div');
+        generatingDiv.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px;
+            background: #2a4a2a;
+            border-radius: 4px;
+        `;
+        
+        const generatingPrompt = document.createElement('span');
+        generatingPrompt.textContent = 'system@analysis:';
+        generatingPrompt.style.cssText = 'font-weight: bold; color: #ffaa00;';
+        
+        const generatingMessage = document.createElement('span');
+        generatingMessage.innerHTML = 'Analyzing personality and generating your personalized El avatar... <span style="animation: blink 1s infinite;">▊</span>';
+        generatingMessage.style.color = '#aaa';
+        
+        generatingDiv.appendChild(generatingPrompt);
+        generatingDiv.appendChild(generatingMessage);
+        this.content.appendChild(generatingDiv);
+        
+        this.isGeneratingAvatar = true;
+        
+        try {
+            // Generate personality insights
+            const personalityData = this.personalityAnalyzer.generatePersonalityInsights(this.responses, this.userName);
+            
+            // Track personality analysis
+            this.dataCollector.trackEvent('personality_analyzed', {
+                archetype: personalityData.archetype.archetype.name,
+                confidence: personalityData.archetype.archetype.confidence,
+                dominantTraits: personalityData.dominantTraits.map(t => t.trait)
+            });
+            
+            // Check if API key is available
+            if (!this.avatarService.hasValidApiKey()) {
+                this.avatarService.loadStoredApiKey();
+            }
+            
+            if (this.avatarService.hasValidApiKey()) {
+                // Generate avatar with Claude
+                generatingMessage.innerHTML = 'Generating personalized avatar with Claude AI... <span style="animation: blink 1s infinite;">▊</span>';
+                
+                const avatarData = await this.avatarService.generateAvatar(
+                    personalityData,
+                    { responses: this.responses },
+                    personalityData.archetype
+                );
+                
+                this.avatarData = avatarData;
+                this.showAvatarResults(personalityData, avatarData);
+                
+            } else {
+                // No API key available - show results without Claude generation
+                this.showPersonalityResults(personalityData);
+            }
+            
+        } catch (error) {
+            console.error('Avatar generation failed:', error);
+            this.showAvatarError(error);
+        } finally {
+            this.isGeneratingAvatar = false;
+        }
+    }
+
+    showAvatarResults(personalityData, avatarData) {
+        // Update generating message to success
+        const generatingDiv = this.content.lastElementChild;
+        if (generatingDiv) {
+            generatingDiv.querySelector('span:first-child').textContent = 'avatar@generated:';
+            generatingDiv.querySelector('span:first-child').style.color = '#00ff88';
+            generatingDiv.querySelector('span:last-child').innerHTML = `Avatar generated! Your personalized El: <strong>${avatarData.title.replace('Your Personal El: ', '')}</strong>`;
+        }
+        
+        // Add view avatar button
+        const viewButton = document.createElement('button');
+        viewButton.textContent = 'View Your Personalized El Avatar';
+        viewButton.style.cssText = `
+            background: #00ff88;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 24px;
+            margin: 16px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.2s ease;
+        `;
+        
+        viewButton.onmouseover = () => {
+            viewButton.style.background = '#00cc77';
+            viewButton.style.transform = 'translateY(-2px)';
+        };
+        
+        viewButton.onmouseout = () => {
+            viewButton.style.background = '#00ff88';
+            viewButton.style.transform = 'translateY(0)';
+        };
+        
+        viewButton.onclick = () => {
+            this.avatarDisplay.setRegenerationCallback(() => {
+                this.regenerateAvatar(personalityData);
+            });
+            this.avatarDisplay.show(avatarData, personalityData, () => {
+                // Avatar display closed - continue with completion
+                this.finalizeCompletion(personalityData);
+            });
+        };
+        
+        this.content.appendChild(viewButton);
+        
+        // Save complete user data
+        this.saveCompleteUserData(personalityData, avatarData);
+    }
+
+    showPersonalityResults(personalityData) {
+        // Update generating message for no API key
+        const generatingDiv = this.content.lastElementChild;
+        if (generatingDiv) {
+            generatingDiv.querySelector('span:first-child').textContent = 'analysis@complete:';
+            generatingDiv.querySelector('span:first-child').style.color = '#4cc9f0';
+            generatingDiv.querySelector('span:last-child').innerHTML = `Personality analyzed! You're a <strong>${personalityData.archetype.archetype.name.replace('The', '')}</strong> type.`;
+        }
+        
+        // Add personality summary
+        const summaryDiv = document.createElement('div');
+        summaryDiv.style.cssText = `
+            margin-top: 16px;
+            padding: 16px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            border-left: 4px solid #4cc9f0;
+        `;
+        
+        summaryDiv.innerHTML = `
+            <h4 style="margin: 0 0 8px 0; color: #4cc9f0;">Your Personality Profile</h4>
+            <p style="margin: 0 0 12px 0; color: #ccc;">${personalityData.personalityOverview}</p>
+            <div style="font-size: 12px; color: #666;">
+                <strong>Dominant Traits:</strong> ${personalityData.dominantTraits.map(t => t.trait).join(', ')}<br>
+                <strong>Archetype:</strong> ${personalityData.archetype.archetype.name} (${Math.round(personalityData.archetype.archetype.confidence * 100)}% confidence)
+            </div>
+        `;
+        
+        this.content.appendChild(summaryDiv);
+        
+        // Add API key setup prompt
+        const apiPrompt = document.createElement('div');
+        apiPrompt.style.cssText = `
+            margin-top: 16px;
+            padding: 16px;
+            background: #3a3a2a;
+            border-radius: 4px;
+            border-left: 4px solid #ffaa00;
+        `;
+        
+        apiPrompt.innerHTML = `
+            <h4 style="margin: 0 0 8px 0; color: #ffaa00;">Want a Personalized El Avatar?</h4>
+            <p style="margin: 0 0 12px 0; color: #ccc; font-size: 14px;">
+                To generate your personalized El avatar with detailed collaboration insights, 
+                you'll need a Claude API key. This creates a unique description of how El would 
+                work specifically with your personality type.
+            </p>
+            <button id="setupApiKey" style="background: #ffaa00; color: #1a1a1a; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-family: inherit;">
+                Setup API Key
+            </button>
+        `;
+        
+        // Add API key setup handler
+        apiPrompt.querySelector('#setupApiKey').onclick = () => {
+            this.showApiKeySetup(personalityData);
+        };
+        
+        this.content.appendChild(apiPrompt);
+        
+        // Save basic user data
+        this.saveCompleteUserData(personalityData, null);
+        
+        // Auto-continue after delay
+        setTimeout(() => {
+            this.finalizeCompletion(personalityData);
+        }, 10000);
+    }
+
+    showApiKeySetup(personalityData) {
+        const setupDiv = document.createElement('div');
+        setupDiv.style.cssText = `
+            margin-top: 16px;
+            padding: 16px;
+            background: #2a2a2a;
+            border-radius: 4px;
+        `;
+        
+        setupDiv.innerHTML = `
+            <h4 style="margin: 0 0 12px 0; color: #00ff88;">Claude API Key Setup</h4>
+            <p style="margin: 0 0 12px 0; color: #ccc; font-size: 14px;">
+                Enter your Claude API key to generate personalized avatars. 
+                Get one at <a href="https://console.anthropic.com/" target="_blank" style="color: #4cc9f0;">console.anthropic.com</a>
+            </p>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="password" id="apiKeyInput" placeholder="sk-ant-..." style="flex: 1; background: #1a1a1a; border: 1px solid #666; color: #ccc; padding: 8px; border-radius: 4px; font-family: inherit;">
+                <button id="saveApiKey" style="background: #00ff88; color: #1a1a1a; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-family: inherit;">Save</button>
+            </div>
+            <div id="apiKeyStatus" style="font-size: 12px; color: #666;"></div>
+        `;
+        
+        const input = setupDiv.querySelector('#apiKeyInput');
+        const button = setupDiv.querySelector('#saveApiKey');
+        const status = setupDiv.querySelector('#apiKeyStatus');
+        
+        button.onclick = async () => {
+            const apiKey = input.value.trim();
+            if (!apiKey) {
+                status.textContent = 'Please enter an API key';
+                status.style.color = '#ff6666';
+                return;
+            }
+            
+            try {
+                this.avatarService.setApiKey(apiKey);
+                status.textContent = 'Testing connection...';
+                status.style.color = '#ffaa00';
+                
+                const testResult = await this.avatarService.testConnection();
+                if (testResult.success) {
+                    status.textContent = 'API key saved! Generating avatar...';
+                    status.style.color = '#00ff88';
+                    
+                    // Remove setup and regenerate avatar
+                    setupDiv.remove();
+                    setTimeout(() => {
+                        this.regenerateAvatar(personalityData);
+                    }, 1000);
+                } else {
+                    status.textContent = `Connection failed: ${testResult.message}`;
+                    status.style.color = '#ff6666';
+                }
+            } catch (error) {
+                status.textContent = `Error: ${error.message}`;
+                status.style.color = '#ff6666';
+            }
+        };
+        
+        // Enter key handler
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                button.click();
+            }
+        };
+        
+        this.content.appendChild(setupDiv);
+        input.focus();
+    }
+
+    async regenerateAvatar(personalityData) {
+        try {
+            const avatarData = await this.avatarService.generateAvatar(
+                personalityData,
+                { responses: this.responses },
+                personalityData.archetype
+            );
+            
+            this.avatarData = avatarData;
+            
+            if (this.avatarDisplay.isVisible) {
+                this.avatarDisplay.updateAvatar(avatarData);
+            } else {
+                this.avatarDisplay.show(avatarData, personalityData, () => {
+                    this.finalizeCompletion(personalityData);
+                });
+            }
+            
+            // Update saved data
+            this.saveCompleteUserData(personalityData, avatarData);
+            
+        } catch (error) {
+            console.error('Avatar regeneration failed:', error);
+            alert('Failed to regenerate avatar: ' + error.message);
+        }
+    }
+
+    showAvatarError(error) {
+        const generatingDiv = this.content.lastElementChild;
+        if (generatingDiv) {
+            generatingDiv.querySelector('span:first-child').textContent = 'error@generation:';
+            generatingDiv.querySelector('span:first-child').style.color = '#ff6666';
+            generatingDiv.querySelector('span:last-child').innerHTML = `Avatar generation failed: ${error.message}`;
+        }
+        
+        // Show fallback if available
+        if (error.fallbackAvatar) {
+            const fallbackDiv = document.createElement('div');
+            fallbackDiv.style.cssText = `
+                margin-top: 16px;
+                padding: 16px;
+                background: #3a2a2a;
+                border-radius: 4px;
+                border-left: 4px solid #ffaa00;
+            `;
+            
+            fallbackDiv.innerHTML = `
+                <h4 style="margin: 0 0 8px 0; color: #ffaa00;">Fallback Avatar Available</h4>
+                <p style="margin: 0 0 12px 0; color: #ccc; font-size: 14px;">
+                    ${error.fallbackAvatar.summary}
+                </p>
+                <button id="viewFallback" style="background: #ffaa00; color: #1a1a1a; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-family: inherit;">
+                    View Fallback Avatar
+                </button>
+            `;
+            
+            fallbackDiv.querySelector('#viewFallback').onclick = () => {
+                this.avatarDisplay.show(error.fallbackAvatar, null, () => {
+                    this.finalizeCompletion(null);
+                });
+            };
+            
+            this.content.appendChild(fallbackDiv);
+        }
+        
+        // Auto-continue after delay
+        setTimeout(() => {
+            this.finalizeCompletion(null);
+        }, 8000);
+    }
+
+    saveCompleteUserData(personalityData, avatarData) {
+        // Save comprehensive user data
+        const completeData = {
+            responses: this.responses,
+            userName: this.userName,
+            personalityData,
+            avatarData,
+            timestamp: new Date().toISOString(),
+            sessionId: this.generateSessionId(),
+            completionStatus: 'completed'
+        };
+        
+        localStorage.setItem('terminal_user_data', JSON.stringify(completeData));
+        
+        // Track completion
+        this.dataCollector.trackEvent('experience_completed', {
+            userName: this.userName,
+            archetype: personalityData?.archetype?.archetype?.name || 'unknown',
+            hasAvatar: !!avatarData,
+            totalResponses: Object.keys(this.responses).length
+        });
+    }
+
+    finalizeCompletion(personalityData) {
+        // Add final completion message
         const completionDiv = document.createElement('div');
         completionDiv.style.cssText = `
             display: flex;
@@ -499,23 +861,21 @@ class TerminalQuestionnaire {
         completionPrompt.style.cssText = 'font-weight: bold; color: #00ff88;';
         
         const completionMessage = document.createElement('span');
-        completionMessage.textContent = "Connection established. Welcome to El's world! 🌟";
+        completionMessage.textContent = "Experience complete. Welcome to El's world! 🌟";
         completionMessage.style.color = '#aaa';
         
         completionDiv.appendChild(completionPrompt);
         completionDiv.appendChild(completionMessage);
         this.content.appendChild(completionDiv);
         
-        this.dataCollector.trackEvent('experience_completed', { 
-            userName: this.userName,
-            totalResponses: Object.keys(this.responses).length,
-            dominantTrait: userData.analysis.dominantTrait
-        });
-        
         // Auto-close after delay
         setTimeout(() => {
             this.close();
         }, 5000);
+    }
+
+    generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
     
     minimize() {

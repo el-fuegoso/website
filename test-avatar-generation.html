@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Generation Test Suite</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #2a2a2a;
+            color: #00ff00;
+            border: 1px solid #444;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            background: #3a3a3a;
+            border-color: #00ff00;
+        }
+        
+        button:disabled {
+            background: #0a0a0a;
+            color: #666;
+            border-color: #222;
+            cursor: not-allowed;
+        }
+        
+        .api-setup {
+            background: #2a2a0a;
+            border-color: #ffaa00;
+            padding: 20px;
+        }
+        
+        input[type="password"], input[type="text"], select {
+            background: #0a0a0a;
+            color: #00ff00;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: inherit;
+            margin: 5px;
+            min-width: 200px;
+        }
+        
+        .results {
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 5px 0;
+            border-bottom: 1px solid #222;
+        }
+        
+        .timestamp {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .error {
+            color: #ff6666;
+        }
+        
+        .success {
+            color: #00ff88;
+        }
+        
+        .warning {
+            color: #ffaa00;
+        }
+        
+        .archetype-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .archetype-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #00ff00;
+        }
+        
+        .archetype-name {
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .personality-viz {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .dimension-card {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6666, #ffaa00, #00ff88);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Avatar Generation Test Suite</h1>
+        
+        <!-- API Configuration -->
+        <div class="section api-setup">
+            <h2>🔑 API Configuration</h2>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <input type="password" id="apiKeyInput" placeholder="Enter Claude API Key (sk-ant-...)">
+                <button id="saveApiKey">Save API Key</button>
+                <button id="testConnection">Test Connection</button>
+                <span id="apiStatus" style="margin-left: 10px;"></span>
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="section">
+            <h2>🧪 Test Controls</h2>
+            <div class="controls">
+                <button id="startTerminal">Start Terminal Experience</button>
+                <button id="testPersonalityAnalysis">Test Personality Analysis</button>
+                <button id="testAvatarGeneration">Test Avatar Generation</button>
+                <button id="testAllArchetypes">Test All Archetypes</button>
+                <button id="showAnalytics">Show Analytics</button>
+                <button id="clearAllData">Clear All Data</button>
+            </div>
+        </div>
+
+        <!-- Personality Testing -->
+        <div class="section">
+            <h2>🧠 Personality Analysis</h2>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <select id="testPersonality">
+                    <option value="technical">Technical Builder</option>
+                    <option value="creative">Creative Innovator</option>
+                    <option value="leader">Strategic Leader</option>
+                    <option value="collaborative">Team Bridge</option>
+                    <option value="pirate">Adventurous Pirate</option>
+                    <option value="wizard">Technical Wizard</option>
+                    <option value="custom">Custom Input</option>
+                </select>
+                <button id="analyzePersonality">Analyze Personality</button>
+                <button id="generatePrompt">Generate Test Prompt</button>
+            </div>
+            <div id="personalityResults" class="results"></div>
+        </div>
+
+        <!-- Avatar Display -->
+        <div class="section">
+            <h2>🎭 Avatar Generation Results</h2>
+            <div id="avatarResults" class="results"></div>
+        </div>
+
+        <!-- Archetype Overview -->
+        <div class="section">
+            <h2>🏛️ Available Archetypes</h2>
+            <div id="archetypeOverview" class="archetype-grid"></div>
+        </div>
+
+        <!-- System Logs -->
+        <div class="section">
+            <h2>📊 System Logs</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button id="clearLogs">Clear Logs</button>
+                <button id="exportLogs">Export Logs</button>
+            </div>
+            <div id="logs" class="results"></div>
+        </div>
+    </div>
+
+    <!-- Include all avatar generation scripts -->
+    <script src="js/terminal-experience/DataCollector.js"></script>
+    <script src="js/terminal-experience/AdvancedPersonalityAnalyzer.js"></script>
+    <script src="js/terminal-experience/AvatarPrompts.js"></script>
+    <script src="js/terminal-experience/ClaudeAvatarService.js"></script>
+    <script src="js/terminal-experience/AvatarDisplay.js"></script>
+    <script src="js/terminal-experience/TerminalQuestionnaire.js"></script>
+
+    <script>
+        // Initialize components
+        let personalityAnalyzer, avatarService, avatarDisplay, terminal;
+        let logs = [];
+
+        function init() {
+            personalityAnalyzer = new AdvancedPersonalityAnalyzer();
+            avatarService = new ClaudeAvatarService();
+            avatarDisplay = new AvatarDisplay();
+            
+            // Load stored API key
+            avatarService.loadStoredApiKey();
+            updateApiStatus();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Show archetype overview
+            showArchetypeOverview();
+            
+            log('System initialized', 'success');
+        }
+
+        function setupEventListeners() {
+            document.getElementById('saveApiKey').onclick = saveApiKey;
+            document.getElementById('testConnection').onclick = testConnection;
+            document.getElementById('startTerminal').onclick = startTerminal;
+            document.getElementById('testPersonalityAnalysis').onclick = testPersonalityAnalysis;
+            document.getElementById('testAvatarGeneration').onclick = testAvatarGeneration;
+            document.getElementById('testAllArchetypes').onclick = testAllArchetypes;
+            document.getElementById('showAnalytics').onclick = showAnalytics;
+            document.getElementById('clearAllData').onclick = clearAllData;
+            document.getElementById('analyzePersonality').onclick = analyzePersonality;
+            document.getElementById('generatePrompt').onclick = generatePrompt;
+            document.getElementById('clearLogs').onclick = clearLogs;
+            document.getElementById('exportLogs').onclick = exportLogs;
+        }
+
+        function log(message, type = 'info') {
+            const entry = {
+                timestamp: new Date().toLocaleTimeString(),
+                message,
+                type
+            };
+            logs.push(entry);
+            
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `<span class="timestamp">${entry.timestamp}</span> ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        async function saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                log('Please enter an API key', 'error');
+                return;
+            }
+
+            try {
+                avatarService.setApiKey(apiKey);
+                log('API key saved successfully', 'success');
+                updateApiStatus();
+            } catch (error) {
+                log(`Failed to save API key: ${error.message}`, 'error');
+            }
+        }
+
+        async function testConnection() {
+            if (!avatarService.hasValidApiKey()) {
+                log('No API key configured', 'error');
+                return;
+            }
+
+            log('Testing Claude API connection...', 'info');
+            try {
+                const result = await avatarService.testConnection();
+                if (result.success) {
+                    log(`Connection successful: ${result.message}`, 'success');
+                } else {
+                    log(`Connection failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                log(`Connection test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function updateApiStatus() {
+            const status = document.getElementById('apiStatus');
+            if (avatarService.hasValidApiKey()) {
+                status.textContent = '✅ API Key Configured';
+                status.style.color = '#00ff88';
+            } else {
+                status.textContent = '❌ No API Key';
+                status.style.color = '#ff6666';
+            }
+        }
+
+        function startTerminal() {
+            if (terminal) {
+                log('Terminal already active', 'warning');
+                return;
+            }
+
+            log('Starting terminal experience...', 'info');
+            terminal = new TerminalQuestionnaire();
+            terminal.show();
+
+            // Override close method to track
+            const originalClose = terminal.close.bind(terminal);
+            terminal.close = function() {
+                log('Terminal experience closed', 'info');
+                terminal = null;
+                originalClose();
+            };
+        }
+
+        function testPersonalityAnalysis() {
+            const testResponses = getTestResponses();
+            log('Testing personality analysis...', 'info');
+
+            try {
+                const personalityData = personalityAnalyzer.generatePersonalityInsights(testResponses, 'TestUser');
+                displayPersonalityResults(personalityData);
+                log('Personality analysis completed', 'success');
+            } catch (error) {
+                log(`Personality analysis failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAvatarGeneration() {
+            if (!avatarService.hasValidApiKey()) {
+                log('API key required for avatar generation', 'error');
+                return;
+            }
+
+            const testResponses = getTestResponses();
+            log('Testing avatar generation...', 'info');
+
+            try {
+                const personalityData = personalityAnalyzer.generatePersonalityInsights(testResponses, 'TestUser');
+                const avatarData = await avatarService.generateAvatar(
+                    personalityData,
+                    { responses: testResponses },
+                    personalityData.archetype
+                );
+                
+                displayAvatarResults(avatarData);
+                log('Avatar generation completed', 'success');
+            } catch (error) {
+                log(`Avatar generation failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAllArchetypes() {
+            if (!avatarService.hasValidApiKey()) {
+                log('API key required for archetype testing', 'error');
+                return;
+            }
+
+            log('Testing all archetypes...', 'info');
+            const archetypes = Object.keys(personalityAnalyzer.avatarArchetypes);
+            
+            for (const archetype of archetypes) {
+                try {
+                    const testData = generateArchetypeTestData(archetype);
+                    const avatarData = await avatarService.generateAvatar(
+                        testData.personalityData,
+                        testData.conversationData,
+                        testData.archetypeMatch
+                    );
+                    
+                    log(`✅ ${archetype}: Generated successfully`, 'success');
+                    
+                    // Small delay between requests
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                    log(`❌ ${archetype}: ${error.message}`, 'error');
+                }
+            }
+            
+            log('Archetype testing completed', 'info');
+        }
+
+        function showAnalytics() {
+            const analytics = avatarService.getGenerationAnalytics();
+            const resultsDiv = document.getElementById('avatarResults');
+            
+            resultsDiv.innerHTML = `
+                <h3>📊 Avatar Generation Analytics</h3>
+                <p><strong>Total Attempts:</strong> ${analytics.totalAttempts}</p>
+                <p><strong>Successful Generations:</strong> ${analytics.totalCompletions}</p>
+                <p><strong>Failed Generations:</strong> ${analytics.totalFailures}</p>
+                <p><strong>Success Rate:</strong> ${analytics.successRate}%</p>
+                <p><strong>Average Generation Time:</strong> ${analytics.averageGenerationTime}ms</p>
+                
+                <h4>Archetype Distribution:</h4>
+                <pre>${JSON.stringify(analytics.archetypeDistribution, null, 2)}</pre>
+                
+                <h4>Error Types:</h4>
+                <pre>${JSON.stringify(analytics.errorTypes, null, 2)}</pre>
+            `;
+            
+            log('Analytics displayed', 'info');
+        }
+
+        function clearAllData() {
+            if (confirm('Clear all stored data including API keys and user data?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                logs = [];
+                document.getElementById('logs').innerHTML = '';
+                document.getElementById('personalityResults').innerHTML = '';
+                document.getElementById('avatarResults').innerHTML = '';
+                log('All data cleared', 'warning');
+                updateApiStatus();
+            }
+        }
+
+        function analyzePersonality() {
+            const testType = document.getElementById('testPersonality').value;
+            const testResponses = getTestResponsesForType(testType);
+            
+            try {
+                const personalityData = personalityAnalyzer.generatePersonalityInsights(testResponses, 'TestUser');
+                displayPersonalityResults(personalityData);
+                log(`Analyzed ${testType} personality type`, 'success');
+            } catch (error) {
+                log(`Personality analysis failed: ${error.message}`, 'error');
+            }
+        }
+
+        function generatePrompt() {
+            const testResponses = getTestResponses();
+            const personalityData = personalityAnalyzer.generatePersonalityInsights(testResponses, 'TestUser');
+            
+            const promptGenerator = new AvatarPrompts();
+            const prompt = promptGenerator.buildAvatarPrompt(
+                personalityData,
+                { responses: testResponses },
+                personalityData.archetype
+            );
+            
+            const resultsDiv = document.getElementById('avatarResults');
+            resultsDiv.innerHTML = `
+                <h3>🎯 Generated Prompt</h3>
+                <pre style="white-space: pre-wrap; font-size: 12px; line-height: 1.4;">${prompt}</pre>
+            `;
+            
+            log('Test prompt generated', 'info');
+        }
+
+        function displayPersonalityResults(personalityData) {
+            const resultsDiv = document.getElementById('personalityResults');
+            
+            let html = `
+                <h3>🧠 Personality Analysis Results</h3>
+                <p><strong>User:</strong> ${personalityData.userName}</p>
+                <p><strong>Archetype:</strong> ${personalityData.archetype.archetype.name}</p>
+                <p><strong>Confidence:</strong> ${Math.round(personalityData.archetype.archetype.confidence * 100)}%</p>
+                <p><strong>Overview:</strong> ${personalityData.personalityOverview}</p>
+                
+                <h4>Dominant Traits:</h4>
+                <ul>
+                    ${personalityData.dominantTraits.map(trait => 
+                        `<li>${trait.trait}: ${trait.score}/100 (${trait.level})</li>`
+                    ).join('')}
+                </ul>
+                
+                <h4>All Dimension Scores:</h4>
+                <div class="personality-viz">
+            `;
+            
+            Object.entries(personalityData.dimensionScores).forEach(([dimension, data]) => {
+                const percentage = data.score;
+                html += `
+                    <div class="dimension-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>${dimension}</span>
+                            <span>${data.score}/100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div style="font-size: 11px; color: #666; margin-top: 3px;">
+                            Level: ${data.level} | Matches: ${data.matchCount}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayAvatarResults(avatarData) {
+            const resultsDiv = document.getElementById('avatarResults');
+            
+            resultsDiv.innerHTML = `
+                <h3>🎭 Avatar Generation Results</h3>
+                <div style="background: #2a2a2a; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <h4 style="color: #00ff88; margin: 0 0 10px 0;">${avatarData.title}</h4>
+                    <p style="margin: 0 0 15px 0;">${avatarData.summary}</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <h5 style="color: #4cc9f0; margin: 0 0 5px 0;">Working Style:</h5>
+                            <p style="margin: 0; font-size: 13px;">${avatarData.workingStyle}</p>
+                        </div>
+                        <div>
+                            <h5 style="color: #4cc9f0; margin: 0 0 5px 0;">Communication:</h5>
+                            <p style="margin: 0; font-size: 13px;">${avatarData.communication}</p>
+                        </div>
+                    </div>
+                    
+                    <h5 style="color: #4cc9f0; margin: 15px 0 5px 0;">Key Strengths:</h5>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        ${avatarData.strengths.map(strength => `<li>${strength}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <button onclick="avatarDisplay.show(${JSON.stringify(avatarData).replace(/"/g, '&quot;')}, null, () => {})" 
+                        style="background: #00ff88; color: #1a1a1a; margin-top: 10px;">
+                    View Full Avatar
+                </button>
+            `;
+        }
+
+        function showArchetypeOverview() {
+            const archetypes = personalityAnalyzer.avatarArchetypes;
+            const overviewDiv = document.getElementById('archetypeOverview');
+            
+            let html = '';
+            Object.entries(archetypes).forEach(([name, archetype]) => {
+                html += `
+                    <div class="archetype-card">
+                        <div class="archetype-name">${name}</div>
+                        <div style="font-size: 13px; margin-bottom: 8px;">${archetype.description}</div>
+                        <div style="font-size: 12px; color: #666;">
+                            <strong>Working Style:</strong> ${archetype.workingStyle}
+                        </div>
+                        <div style="font-size: 11px; color: #444; margin-top: 5px;">
+                            Triggers: ${Object.entries(archetype.triggers).map(([dim, req]) => 
+                                `${dim} ≥${req.min}`
+                            ).join(', ')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            overviewDiv.innerHTML = html;
+        }
+
+        function getTestResponses() {
+            return {
+                question_0: "I'm Sarah, a frontend developer at a growing startup",
+                question_1: "I'm excited about building a new component library that will scale across our products",
+                question_2: "I'd love to have dinner with Ada Lovelace to discuss the intersection of creativity and programming",
+                question_3: "I want to make development more accessible and help teams build better user experiences"
+            };
+        }
+
+        function getTestResponsesForType(type) {
+            const responses = {
+                technical: {
+                    question_0: "I'm Alex, a senior software engineer working on distributed systems",
+                    question_1: "I'm building a high-performance microservices architecture with Kubernetes",
+                    question_2: "I'd meet with Linus Torvalds to discuss the future of system programming",
+                    question_3: "I want to build rock-solid infrastructure that scales to millions of users"
+                },
+                creative: {
+                    question_0: "I'm Jordan, a product designer who codes my own prototypes",
+                    question_1: "I'm designing an innovative AR interface that reimagines how we interact with data",
+                    question_2: "I'd have dinner with Steve Jobs to understand his design philosophy",
+                    question_3: "I want to create beautiful experiences that make technology feel magical"
+                },
+                leader: {
+                    question_0: "I'm Morgan, an engineering manager at a fast-growing company",
+                    question_1: "I'm building high-performing teams and scaling our engineering organization",
+                    question_2: "I'd meet with Satya Nadella to learn about transformational leadership",
+                    question_3: "I want to build technology that changes industries and empowers people"
+                },
+                collaborative: {
+                    question_0: "I'm Casey, a technical product manager who bridges engineering and business",
+                    question_1: "I'm working on cross-functional initiatives that require deep stakeholder alignment",
+                    question_2: "I'd have dinner with Reid Hoffman to discuss network effects and collaboration",
+                    question_3: "I want to help teams work together more effectively to build amazing products"
+                },
+                pirate: {
+                    question_0: "I'm Quinn, a startup founder exploring uncharted market territories",
+                    question_1: "I'm building something completely new that might disrupt an entire industry",
+                    question_2: "I'd sail with Grace Hopper to learn about pioneering unknown technological waters",
+                    question_3: "I want to discover new opportunities and take calculated risks to find treasure"
+                },
+                wizard: {
+                    question_0: "I'm Sage, a principal architect who solves complex technical mysteries",
+                    question_1: "I'm unraveling a distributed systems problem that's puzzled teams for months",
+                    question_2: "I'd study with Alan Turing to understand the deepest principles of computation",
+                    question_3: "I want to master the art of turning impossible technical challenges into elegant solutions"
+                }
+            };
+            
+            return responses[type] || responses.technical;
+        }
+
+        function generateArchetypeTestData(archetypeName) {
+            const archetype = personalityAnalyzer.avatarArchetypes[archetypeName];
+            const testResponses = getTestResponsesForType(archetypeName.toLowerCase().replace('the', ''));
+            
+            // Create artificial personality data that matches the archetype
+            const dimensionScores = {};
+            Object.keys(personalityAnalyzer.dimensions).forEach(dimension => {
+                if (archetype.triggers[dimension]) {
+                    dimensionScores[dimension] = {
+                        score: archetype.triggers[dimension].min + 10,
+                        level: 'high',
+                        matchCount: 3
+                    };
+                } else {
+                    dimensionScores[dimension] = {
+                        score: 30,
+                        level: 'low',
+                        matchCount: 1
+                    };
+                }
+            });
+
+            const personalityData = {
+                userName: 'TestUser',
+                dimensionScores,
+                dominantTraits: Object.entries(dimensionScores)
+                    .filter(([_, data]) => data.level === 'high')
+                    .slice(0, 3)
+                    .map(([trait, data]) => ({ trait, score: data.score, level: data.level })),
+                personalityOverview: `Test personality for ${archetypeName}`
+            };
+
+            const archetypeMatch = {
+                archetype: {
+                    name: archetypeName,
+                    ...archetype,
+                    confidence: 0.85,
+                    matchScore: 85
+                },
+                reasoning: [`Generated for ${archetypeName} testing`]
+            };
+
+            return {
+                personalityData,
+                conversationData: { responses: testResponses },
+                archetypeMatch
+            };
+        }
+
+        function clearLogs() {
+            logs = [];
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function exportLogs() {
+            const logData = {
+                timestamp: new Date().toISOString(),
+                logs: logs,
+                analytics: avatarService.getGenerationAnalytics()
+            };
+            
+            const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `avatar-test-logs-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            log('Logs exported', 'info');
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

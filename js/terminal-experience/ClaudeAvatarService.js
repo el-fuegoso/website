@@ -1,0 +1,355 @@
+/**
+ * ClaudeAvatarService.js - Claude API integration for avatar generation
+ * Handles API calls, error handling, and response processing for personalized avatar creation
+ */
+
+class ClaudeAvatarService {
+    constructor() {
+        this.baseURL = 'https://api.anthropic.com/v1/messages';
+        this.model = 'claude-3-sonnet-20240229';
+        this.maxTokens = 1500;
+        this.temperature = 0.7;
+        this.apiKey = null;
+        this.promptGenerator = new AvatarPrompts();
+        this.analytics = new DataCollector();
+    }
+
+    setApiKey(apiKey) {
+        if (!apiKey || typeof apiKey !== 'string') {
+            throw new Error('Valid API key required');
+        }
+        
+        // Basic API key format validation
+        if (!apiKey.startsWith('sk-ant-') || apiKey.length < 20) {
+            throw new Error('Invalid API key format');
+        }
+        
+        this.apiKey = apiKey;
+        
+        // Store for future use (in production, consider more secure storage)
+        localStorage.setItem('claude_api_key', apiKey);
+        
+        return true;
+    }
+
+    loadStoredApiKey() {
+        const stored = localStorage.getItem('claude_api_key');
+        if (stored) {
+            try {
+                this.setApiKey(stored);
+                return true;
+            } catch (error) {
+                console.warn('Stored API key is invalid:', error.message);
+                localStorage.removeItem('claude_api_key');
+                return false;
+            }
+        }
+        return false;
+    }
+
+    hasValidApiKey() {
+        return this.apiKey && this.apiKey.length > 20;
+    }
+
+    async generateAvatar(personalityData, conversationData, archetypeMatch) {
+        if (!this.hasValidApiKey()) {
+            throw new Error('API key not set. Please configure your Claude API key first.');
+        }
+
+        const startTime = Date.now();
+        
+        try {
+            // Track avatar generation start
+            this.analytics.trackEvent('avatar_generation_started', {
+                archetype: archetypeMatch.archetype.name,
+                confidence: archetypeMatch.archetype.confidence
+            });
+
+            // Build the prompt
+            const prompt = this.promptGenerator.buildAvatarPrompt(
+                personalityData, 
+                conversationData, 
+                archetypeMatch
+            );
+
+            // Make API request
+            const response = await this.makeClaudeRequest(prompt);
+            
+            // Process and validate response
+            const avatarData = await this.processAvatarResponse(response, archetypeMatch);
+            
+            const endTime = Date.now();
+            const generationTime = endTime - startTime;
+            
+            // Track successful generation
+            this.analytics.trackEvent('avatar_generation_completed', {
+                archetype: archetypeMatch.archetype.name,
+                generationTime,
+                success: true
+            });
+
+            return {
+                ...avatarData,
+                metadata: {
+                    generationTime,
+                    archetype: archetypeMatch.archetype.name,
+                    confidence: archetypeMatch.archetype.confidence,
+                    model: this.model,
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+        } catch (error) {
+            const endTime = Date.now();
+            const generationTime = endTime - startTime;
+            
+            // Track failed generation
+            this.analytics.trackEvent('avatar_generation_failed', {
+                error: error.message,
+                generationTime,
+                archetype: archetypeMatch?.archetype?.name || 'unknown'
+            });
+
+            throw this.handleAvatarError(error, archetypeMatch);
+        }
+    }
+
+    async makeClaudeRequest(prompt) {
+        const requestBody = {
+            model: this.model,
+            max_tokens: this.maxTokens,
+            temperature: this.temperature,
+            messages: [{
+                role: 'user',
+                content: prompt
+            }]
+        };
+
+        const response = await fetch(this.baseURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.apiKey}`,
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        }
+
+        return await response.json();
+    }
+
+    async processAvatarResponse(response, archetypeMatch) {
+        if (!response.content || !response.content[0] || !response.content[0].text) {
+            throw new Error('Invalid response format from Claude API');
+        }
+
+        const rawText = response.content[0].text.trim();
+        
+        // Try to extract JSON from the response
+        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('No JSON found in Claude response');
+        }
+
+        const jsonText = jsonMatch[0];
+        
+        // Validate and parse the avatar data
+        const validation = this.promptGenerator.validateAvatarResponse(jsonText);
+        
+        if (!validation.valid) {
+            console.warn('Avatar validation failed:', validation.error);
+            
+            // Use fallback avatar with archetype customization
+            const fallbackAvatar = this.customizeFallbackAvatar(
+                validation.fallback, 
+                archetypeMatch
+            );
+            
+            return {
+                ...fallbackAvatar,
+                metadata: {
+                    fallback: true,
+                    originalError: validation.error
+                }
+            };
+        }
+
+        return validation.avatar;
+    }
+
+    customizeFallbackAvatar(fallbackAvatar, archetypeMatch) {
+        const archetype = archetypeMatch.archetype;
+        
+        return {
+            ...fallbackAvatar,
+            title: `Your Personal El: The ${archetype.name.replace('The', '')}`,
+            summary: `${archetype.description}. This El adapts to work specifically with your ${archetype.name.toLowerCase().replace('the', '')} style.`,
+            workingStyle: archetype.workingStyle,
+            communication: archetype.communication || fallbackAvatar.communication,
+            projectApproach: archetype.projectApproach || fallbackAvatar.projectApproach,
+            uniqueValue: archetype.value || fallbackAvatar.uniqueValue
+        };
+    }
+
+    handleAvatarError(error, archetypeMatch) {
+        let userMessage = 'Unable to generate personalized avatar';
+        let fallbackAvatar = null;
+
+        if (error.message.includes('API key')) {
+            userMessage = 'API key issue. Please check your Claude API configuration.';
+        } else if (error.message.includes('rate limit') || error.message.includes('429')) {
+            userMessage = 'Rate limit exceeded. Please try again in a moment.';
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+            userMessage = 'Network error. Please check your connection and try again.';
+        } else {
+            // For other errors, provide a fallback avatar
+            fallbackAvatar = this.customizeFallbackAvatar(
+                this.promptGenerator.generateFallbackAvatar(),
+                archetypeMatch
+            );
+        }
+
+        const enhancedError = new Error(userMessage);
+        enhancedError.originalError = error;
+        enhancedError.fallbackAvatar = fallbackAvatar;
+        enhancedError.canRetry = !error.message.includes('API key');
+
+        return enhancedError;
+    }
+
+    // Method to test API connection
+    async testConnection() {
+        if (!this.hasValidApiKey()) {
+            throw new Error('No API key configured');
+        }
+
+        try {
+            const testPrompt = "Respond with exactly: 'API connection successful'";
+            const response = await this.makeClaudeRequest(testPrompt);
+            return {
+                success: true,
+                message: 'Claude API connection successful',
+                model: this.model
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message,
+                canRetry: !error.message.includes('API key')
+            };
+        }
+    }
+
+    // Method to estimate avatar generation cost
+    estimateTokenUsage(personalityData, conversationData) {
+        const promptGenerator = new AvatarPrompts();
+        const testPrompt = promptGenerator.buildAvatarPrompt(
+            personalityData, 
+            conversationData, 
+            { archetype: { name: 'TheBuilder' } }
+        );
+        
+        // Rough token estimation (1 token ≈ 4 characters)
+        const inputTokens = Math.ceil(testPrompt.length / 4);
+        const outputTokens = this.maxTokens;
+        
+        return {
+            estimatedInputTokens: inputTokens,
+            maxOutputTokens: outputTokens,
+            totalTokens: inputTokens + outputTokens,
+            estimatedCost: ((inputTokens * 0.003) + (outputTokens * 0.015)) / 1000 // Rough Claude pricing
+        };
+    }
+
+    // Batch avatar generation for testing
+    async generateMultipleAvatars(personalityDataList, maxConcurrent = 3) {
+        const results = [];
+        const errors = [];
+        
+        // Process in batches to avoid rate limiting
+        for (let i = 0; i < personalityDataList.length; i += maxConcurrent) {
+            const batch = personalityDataList.slice(i, i + maxConcurrent);
+            
+            const batchPromises = batch.map(async (data) => {
+                try {
+                    const avatar = await this.generateAvatar(
+                        data.personalityData,
+                        data.conversationData,
+                        data.archetypeMatch
+                    );
+                    return { success: true, data: avatar, originalData: data };
+                } catch (error) {
+                    return { success: false, error: error.message, originalData: data };
+                }
+            });
+            
+            const batchResults = await Promise.all(batchPromises);
+            
+            batchResults.forEach(result => {
+                if (result.success) {
+                    results.push(result);
+                } else {
+                    errors.push(result);
+                }
+            });
+            
+            // Small delay between batches
+            if (i + maxConcurrent < personalityDataList.length) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+        
+        return { results, errors, totalProcessed: personalityDataList.length };
+    }
+
+    // Get analytics for avatar generation
+    getGenerationAnalytics() {
+        const events = this.analytics.getAnalytics();
+        const avatarEvents = events.filter(e => e.type.startsWith('avatar_generation'));
+        
+        const stats = {
+            totalAttempts: avatarEvents.filter(e => e.type === 'avatar_generation_started').length,
+            totalCompletions: avatarEvents.filter(e => e.type === 'avatar_generation_completed').length,
+            totalFailures: avatarEvents.filter(e => e.type === 'avatar_generation_failed').length,
+            averageGenerationTime: 0,
+            archetypeDistribution: {},
+            errorTypes: {}
+        };
+        
+        // Calculate average generation time
+        const completedEvents = avatarEvents.filter(e => e.type === 'avatar_generation_completed');
+        if (completedEvents.length > 0) {
+            const totalTime = completedEvents.reduce((sum, event) => sum + event.data.generationTime, 0);
+            stats.averageGenerationTime = Math.round(totalTime / completedEvents.length);
+        }
+        
+        // Archetype distribution
+        avatarEvents.forEach(event => {
+            if (event.data.archetype) {
+                stats.archetypeDistribution[event.data.archetype] = 
+                    (stats.archetypeDistribution[event.data.archetype] || 0) + 1;
+            }
+        });
+        
+        // Error types
+        const errorEvents = avatarEvents.filter(e => e.type === 'avatar_generation_failed');
+        errorEvents.forEach(event => {
+            const errorType = event.data.error.split(':')[0]; // Get error category
+            stats.errorTypes[errorType] = (stats.errorTypes[errorType] || 0) + 1;
+        });
+        
+        stats.successRate = stats.totalAttempts > 0 
+            ? Math.round((stats.totalCompletions / stats.totalAttempts) * 100) 
+            : 0;
+        
+        return stats;
+    }
+}
+
+// Export for global access
+window.ClaudeAvatarService = ClaudeAvatarService;

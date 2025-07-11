@@ -19,11 +19,20 @@ export default async function handler(req, res) {
         // Get API key from environment variables
         const apiKey = process.env.CLAUDE_API_KEY;
         
+        // Debug logging for environment variable
+        console.log('🔍 Streaming API environment check:', {
+            hasApiKey: !!apiKey,
+            keyLength: apiKey ? apiKey.length : 0,
+            keyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'undefined',
+            nodeEnv: process.env.NODE_ENV,
+            vercelEnv: process.env.VERCEL_ENV
+        });
+        
         if (!apiKey) {
-            console.error('CLAUDE_API_KEY environment variable not set');
+            console.error('❌ CLAUDE_API_KEY environment variable not set in streaming API');
             return res.status(500).json({ 
                 error: 'Server configuration error: API key not configured',
-                hint: 'Please set CLAUDE_API_KEY environment variable'
+                hint: 'Please set CLAUDE_API_KEY environment variable in Vercel dashboard'
             });
         }
 

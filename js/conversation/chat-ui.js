@@ -64,9 +64,9 @@ class ChatUI {
             
             <div class="chat-messages" id="chatMessages">
                 <div class="welcome-message">
-                    <div class="message-avatar">${this.avatarGenerator.generateClaudeAvatar()}</div>
+                    <div class="message-avatar">${this.getAvatarHTML()}</div>
                     <div class="message-content">
-                        <div class="message-text">Hi! I'm Claude, an AI assistant. I can help answer questions about Elliot's work and projects. What would you like to know?</div>
+                        <div class="message-text">${this.getWelcomeMessage()}</div>
                     </div>
                 </div>
             </div>
@@ -176,6 +176,9 @@ class ChatUI {
             if (viewCharacterBtn) {
                 viewCharacterBtn.style.display = 'block'; // Show character button when avatar is available
             }
+            
+            // Update the welcome message with avatar's conversation starter
+            this.updateWelcomeMessage(avatarData);
             
             console.log(`🎨 Chat UI updated for avatar: ${avatarData.name}`);
         }
@@ -315,11 +318,12 @@ class ChatUI {
     }
 
     clearMessages() {
+        const welcomeMessage = this.getWelcomeMessage();
         this.messageContainer.innerHTML = `
             <div class="welcome-message">
-                <div class="message-avatar">${this.avatarGenerator.generateClaudeAvatar()}</div>
+                <div class="message-avatar">${this.getAvatarHTML()}</div>
                 <div class="message-content">
-                    <div class="message-text">Hi! I'm Claude, an AI assistant. I can help answer questions about Elliot's work and projects. What would you like to know?</div>
+                    <div class="message-text">${welcomeMessage}</div>
                 </div>
             </div>
         `;
@@ -351,6 +355,35 @@ class ChatUI {
         setTimeout(() => {
             this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
         }, 10);
+    }
+    
+    getWelcomeMessage() {
+        if (this.currentAvatar && this.currentAvatar.conversationStarters && this.currentAvatar.conversationStarters.length > 0) {
+            // Use the first conversation starter from the generated avatar
+            return this.currentAvatar.conversationStarters[0];
+        }
+        // Fallback to generic message
+        return "Hi! I'm Claude, an AI assistant. I can help answer questions about Elliot's work and projects. What would you like to know?";
+    }
+    
+    getAvatarHTML() {
+        if (this.currentAvatar) {
+            return this.generateAvatarHTML(this.currentAvatar);
+        }
+        return this.avatarGenerator.generateClaudeAvatar();
+    }
+    
+    updateWelcomeMessage(avatarData) {
+        const welcomeMessageElement = this.messageContainer.querySelector('.welcome-message .message-text');
+        const welcomeAvatarElement = this.messageContainer.querySelector('.welcome-message .message-avatar');
+        
+        if (welcomeMessageElement && avatarData.conversationStarters && avatarData.conversationStarters.length > 0) {
+            welcomeMessageElement.textContent = avatarData.conversationStarters[0];
+        }
+        
+        if (welcomeAvatarElement) {
+            welcomeAvatarElement.innerHTML = this.generateAvatarHTML(avatarData);
+        }
     }
 }
 

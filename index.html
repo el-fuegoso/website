@@ -705,13 +705,16 @@
 
         /* Build Your El Section */
         .build-your-el-section {
-            padding: 80px 20px;
+            padding: 80px 40px 40px;
             background: var(--bg-color);
             position: relative;
         }
 
         .build-el-header {
-            text-align: left;
+            margin-bottom: 60px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
             margin-bottom: 60px;
         }
 
@@ -721,6 +724,7 @@
             text-transform: uppercase;
             letter-spacing: -1px;
             color: var(--text-color);
+            text-align: left;
             margin-bottom: 16px;
         }
 
@@ -889,7 +893,7 @@
         /* Build Your El Section Responsive */
         @media (max-width: 768px) {
             .build-your-el-section {
-                padding: 60px 20px;
+                padding: 60px 20px 40px;
             }
 
             .build-el-header {
@@ -2942,11 +2946,6 @@
             // Initialize artifacts
             initializeArtifacts();
             
-            // Initialize performance manager for mobile optimization
-            if (typeof MobilePerformanceManager !== 'undefined') {
-                window.performanceManager = new MobilePerformanceManager();
-                console.log('✅ Mobile performance manager initialized');
-            }
             
             // Initialize enhanced mobile accessibility
             if (typeof MobileAccessibilityManager !== 'undefined') {

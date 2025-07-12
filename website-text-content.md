@@ -55,6 +55,10 @@
 ### Welcome & Greetings
 - **ASCII Dog Art**: (Visual representation of Blue the dog)
 - **Welcome Message**: "Woof! I'm El's welcome dog Blue :) ¡Bienvenidos! I'd love to find out a little more about you."
+- **Alternative Welcome Messages** (randomly selected):
+  - "Hey there! *tail wagging* Blue here - El's furry assistant. Ready for some fun questions?"
+  - "Woof woof! 🐕 I'm Blue, and I'm super excited to meet you! Let's dig into what makes you tick!"
+  - "Hello friend! *excited panting* Blue reporting for duty! I've got some great questions to help us understand you better."
 
 ### Terminal Interface Elements
 - **Terminal Header**: blue@elliot-portfolio:~$ chat
@@ -66,23 +70,65 @@
 - **Footer Help**: Press Enter to send • Type naturally
 - **Drag Hint**: ⋮⋮ Drag to move
 
-### Questionnaire Content
+### Enhanced Questionnaire Content
 
-#### Question 1
+#### Question 1 - Names & Work
 - **Question**: "What's your name, and what do you do for work?"
-- **Follow-up**: "Nice to meet you, [Name]! That sounds interesting."
+- **Follow-up Options** (varies based on response):
+  - For creative work: "Nice to meet you, [Name]! The creative world needs more people like you."
+  - For technical work: "Hey [Name]! That sounds like fascinating problem-solving work."
+  - For leadership roles: "Great to meet you, [Name]! Leading people is both challenging and rewarding."
+  - For students: "Hello [Name]! What you're studying sounds really interesting."
+  - Default: "Nice to meet you, [Name]! That sounds like meaningful work."
 
-#### Question 2  
+#### Question 2 - Current Passion Projects
 - **Question**: "What's something you've been working on lately that you're genuinely excited about?"
-- **Follow-up**: "That passion really comes through! I love hearing about projects that spark genuine excitement."
+- **Follow-up Options** (responds to enthusiasm level):
+  - High energy response: "Wow! *ears perking up* That excitement is absolutely infectious! Tell me more!"
+  - Technical project: "That passion really comes through! I love hearing about innovative solutions."
+  - Creative project: "Your creativity is shining through! Those are the projects that change everything."
+  - Personal growth: "That's beautiful - working on yourself is the most important project of all."
+  - Default: "That passion really comes through! I love hearing about projects that spark genuine excitement."
 
-#### Question 3
+#### Question 3 - Dream Dinner Conversation
 - **Question**: "If you could have dinner with anyone (dead or alive), who would it be and what would you want to talk about?"
-- **Follow-up**: "What a fascinating choice! Those would definitely be some memorable conversations."
+- **Follow-up Options** (tailored to their choice):
+  - Historical figure: "What a fascinating choice! History comes alive when you imagine those conversations."
+  - Scientist/innovator: "Brilliant pick! Those would be some mind-expanding conversations."
+  - Artist/creator: "Amazing choice! Creative minds often have the most inspiring perspectives."
+  - Family member: "That's so heartwarming. Family connections are the most precious conversations."
+  - Fictional character: "I love that! Sometimes fictional characters teach us the most about ourselves."
+  - Default: "What a fascinating choice! Those would definitely be some memorable conversations."
 
-#### Question 4
+#### Question 4 - Impact & Purpose
 - **Question**: "What kind of impact do you hope to make in your work or the world?"
-- **Follow-up**: "Incredible! It's inspiring to meet someone with such purposeful vision."
+- **Follow-up Options** (reflects their values):
+  - Environmental focus: "The planet needs more champions like you! That's incredibly important work."
+  - Social justice: "That's inspiring! Creating positive change takes real courage and determination."
+  - Innovation/tech: "Innovation for good is what the world needs! Your vision could change everything."
+  - Education/mentoring: "Teaching and empowering others creates ripple effects that last generations!"
+  - Local community: "Community impact is so meaningful - changing lives one person at a time."
+  - Default: "Incredible! It's inspiring to meet someone with such purposeful vision."
+
+### Dynamic Response Features
+
+#### Contextual Reactions
+- **Keyword Detection**: Blue responds differently based on specific words in responses
+  - "startup" → "Ooh, the entrepreneur life! *excited tail wagging*"
+  - "music" → "A fellow music lover! *howls harmoniously*"
+  - "travel" → "Adventure calls! *nose twitching with wanderlust*"
+  - "coding" → "A digital architect! *impressed head tilt*"
+  - "design" → "Beauty and function united! *appreciative wag*"
+
+#### Response Length Adaptation
+- **Short answers**: "I love the directness! Sometimes the best answers are the simplest ones."
+- **Very long answers**: "Wow, you really dive deep! *settles in comfortably* I love detailed thinkers."
+- **Medium answers**: Standard follow-ups as defined above
+
+#### Personality Mirroring
+- **Formal tone detected**: Blue becomes slightly more professional while maintaining friendliness
+- **Casual/fun tone**: Blue gets more playful and uses more dog expressions
+- **Technical language**: Blue shows appreciation for precision and detail
 
 ### Avatar Generation Process
 - **Analysis Message**: "Analyzing personality and generating your personalized El avatar..."

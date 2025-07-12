@@ -659,34 +659,23 @@ class TerminalQuestionnaire {
                 dominantTraits: personalityData.dominantTraits.map(t => t.trait)
             });
             
-            // Check if API key is available
-            if (!this.avatarService.hasValidApiKey()) {
-                this.avatarService.loadStoredApiKey();
+            // Always generate avatar using template system (no API key needed)
+            generatingMessage.innerHTML = 'Generating personalized avatar... <span style="animation: blink 1s infinite;">▊</span>';
+            
+            const avatarData = await this.avatarService.generateAvatar(
+                personalityData,
+                { responses: this.responses },
+                personalityData.archetype
+            );
+            
+            this.avatarData = avatarData;
+            
+            // Set avatar for chat conversations
+            if (window.setGeneratedAvatarForChat) {
+                window.setGeneratedAvatarForChat(avatarData);
             }
             
-            if (this.avatarService.hasValidApiKey()) {
-                // Generate avatar with Claude
-                generatingMessage.innerHTML = 'Generating personalized avatar with Claude AI... <span style="animation: blink 1s infinite;">▊</span>';
-                
-                const avatarData = await this.avatarService.generateAvatar(
-                    personalityData,
-                    { responses: this.responses },
-                    personalityData.archetype
-                );
-                
-                this.avatarData = avatarData;
-                
-                // Set avatar for chat conversations
-                if (window.setGeneratedAvatarForChat) {
-                    window.setGeneratedAvatarForChat(avatarData);
-                }
-                
-                this.showAvatarResults(personalityData, avatarData);
-                
-            } else {
-                // No API key available - show results without Claude generation
-                this.showPersonalityResults(personalityData);
-            }
+            this.showAvatarResults(personalityData, avatarData);
             
         } catch (error) {
             console.error('Avatar generation failed:', error);
@@ -1029,10 +1018,30 @@ class TerminalQuestionnaire {
         completionDiv.appendChild(completionMessage);
         this.content.appendChild(completionDiv);
         
-        // Auto-close after delay
-        setTimeout(() => {
-            this.close();
-        }, 5000);
+        // Auto-close after delay on mobile, keep open on desktop
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            setTimeout(() => {
+                this.close();
+            }, 5000);
+        } else {
+            // On desktop, add a close button instead
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.style.cssText = `
+                background: #ff5f56;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                margin-top: 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-family: inherit;
+                font-size: 12px;
+            `;
+            closeButton.onclick = () => this.close();
+            this.content.appendChild(closeButton);
+        }
     }
 
     generateSessionId() {
@@ -1175,8 +1184,8 @@ class TerminalQuestionnaire {
     }
     
     async generateClarificationWithClaude(userResponse) {
-        // Use existing Claude API service if available
-        if (!this.avatarService.hasValidApiKey()) {
+        // Check if Claude API is available for clarification
+        if (!this.hasClaudeApiForClarification()) {
             throw new Error('No Claude API key available');
         }
         
@@ -1302,6 +1311,11 @@ Blue should use dog expressions like *wags tail*, *encouraging bark*, etc.`;
             needsMoreHelp: false,
             response: "That's helpful! *encouraging nod* Feel free to share more, or if you're ready, go ahead and answer the question however feels right to you!"
         };
+    }
+    
+    // Helper method to check if Claude API is available for clarification
+    hasClaudeApiForClarification() {
+        return this.avatarService.apiKey || localStorage.getItem('claude_api_key');
     }
     
     minimize() {

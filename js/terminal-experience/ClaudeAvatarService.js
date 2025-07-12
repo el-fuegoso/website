@@ -43,7 +43,7 @@ class ClaudeAvatarService {
     async generateAvatar(personalityData, conversationData, archetypeMatch) {
         const startTime = Date.now();
         
-        console.log('🎭 ClaudeAvatarService: Starting LOCAL avatar generation (no API calls)');
+        console.log('🎭 ClaudeAvatarService: Starting template-based avatar generation (no API key required)');
         
         try {
             // Validate inputs

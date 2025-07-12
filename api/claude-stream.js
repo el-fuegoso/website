@@ -16,29 +16,15 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get API key from environment variables (Anthropic SDK standard)
+        // Get API key from environment variables
         const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
         
-        // Debug logging for environment variable
-        console.log('🔍 Streaming API environment check:', {
-            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
-            hasClaudeKey: !!process.env.CLAUDE_API_KEY,
-            keyLength: apiKey ? apiKey.length : 0,
-            keyPrefix: apiKey ? apiKey.substring(0, 15) + '...' : 'undefined',
-            keyFormat: apiKey ? (apiKey.startsWith('sk-ant-api') ? 'valid' : 'invalid') : 'missing',
-            nodeEnv: process.env.NODE_ENV,
-            vercelEnv: process.env.VERCEL_ENV
-        });
-        
         if (!apiKey) {
-            console.error('❌ ANTHROPIC_API_KEY environment variable not set in streaming API');
+            console.error('ANTHROPIC_API_KEY environment variable not set');
             return res.status(500).json({ 
-                error: 'Server configuration error: API key not configured',
-                hint: 'Please set ANTHROPIC_API_KEY environment variable in Vercel dashboard'
+                error: 'Server configuration error: API key not configured'
             });
         }
-
-        console.log('🔄 Starting streaming request to Claude API...');
 
         // Set up Server-Sent Events headers
         res.setHeader('Content-Type', 'text/event-stream');
@@ -57,9 +43,7 @@ export default async function handler(req, res) {
             ...req.body
         };
 
-        console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
-
-        // Forward streaming request to Claude API with correct headers
+        // Forward streaming request to Claude API
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
@@ -70,11 +54,9 @@ export default async function handler(req, res) {
             body: JSON.stringify(requestBody)
         });
 
-        console.log('📥 Claude API response status:', claudeResponse.status);
-
         if (!claudeResponse.ok) {
             const errorData = await claudeResponse.json().catch(() => ({}));
-            console.error('❌ Claude API error:', errorData);
+            console.error('Claude API error:', claudeResponse.status, errorData.error?.message || errorData.error);
             
             res.write(`data: ${JSON.stringify({
                 type: 'error',
@@ -95,7 +77,6 @@ export default async function handler(req, res) {
                 const { done, value } = await reader.read();
                 
                 if (done) {
-                    console.log('✅ Streaming completed');
                     res.write('data: {"type":"stream_end"}\n\n');
                     break;
                 }
@@ -111,18 +92,6 @@ export default async function handler(req, res) {
                     if (line.trim()) {
                         // Forward the line as-is (Claude already formats as SSE)
                         res.write(line + '\n');
-                        
-                        // Log content chunks for debugging
-                        if (line.startsWith('data: {') && line.includes('"delta"')) {
-                            try {
-                                const data = JSON.parse(line.substring(6));
-                                if (data.delta?.text) {
-                                    console.log('📝 Text chunk:', data.delta.text);
-                                }
-                            } catch (e) {
-                                // Ignore JSON parse errors for logging
-                            }
-                        }
                     }
                 }
                 
@@ -132,7 +101,7 @@ export default async function handler(req, res) {
                 }
             }
         } catch (streamError) {
-            console.error('❌ Streaming error:', streamError);
+            console.error('Streaming error:', streamError);
             res.write(`data: ${JSON.stringify({
                 type: 'error',
                 error: 'Streaming error',
@@ -144,7 +113,7 @@ export default async function handler(req, res) {
         }
 
     } catch (error) {
-        console.error('❌ Streaming proxy error:', error);
+        console.error('Streaming proxy error:', error);
         
         // Try to send error as SSE if headers not sent
         if (!res.headersSent) {
@@ -154,8 +123,7 @@ export default async function handler(req, res) {
         res.write(`data: ${JSON.stringify({
             type: 'error',
             error: 'Internal server error',
-            message: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            message: error.message
         })}\n\n`);
         res.end();
     }

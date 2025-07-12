@@ -160,7 +160,6 @@ If asked about Elliot's work, refer to the projects shown on the website while m
             // Model and other defaults are set server-side
         };
 
-        console.log('Starting streaming request...');
         const response = await fetch(this.streamUrl, {
             method: 'POST',
             headers: {
@@ -168,8 +167,6 @@ If asked about Elliot's work, refer to the projects shown on the website while m
             },
             body: JSON.stringify(payload)
         });
-
-        console.log('Response received:', response.status, response.statusText);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -181,10 +178,8 @@ If asked about Elliot's work, refer to the projects shown on the website while m
         const decoder = new TextDecoder();
         let buffer = '';
 
-        console.log('Starting to read stream...');
         while (true) {
             const { done, value } = await reader.read();
-            console.log('Stream chunk:', done, value?.length);
             if (done) break;
 
             buffer += decoder.decode(value, { stream: true });
@@ -192,21 +187,17 @@ If asked about Elliot's work, refer to the projects shown on the website while m
             buffer = lines.pop() || '';
 
             for (const line of lines) {
-                console.log('Processing line:', line);
                 if (line.startsWith('data: ')) {
                     const data = line.slice(6);
-                    console.log('Data:', data);
                     if (data === '[DONE]') return;
                     
                     try {
                         const parsed = JSON.parse(data);
-                        console.log('Parsed:', parsed);
                         if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-                            console.log('Calling onChunk with:', parsed.delta.text);
                             onChunk(parsed.delta.text);
                         }
                     } catch (e) {
-                        console.log('JSON parse error:', e);
+                        // Ignore JSON parse errors
                     }
                 }
             }
@@ -214,7 +205,6 @@ If asked about Elliot's work, refer to the projects shown on the website while m
     }
 
     async fallbackToRegularMessage(message, conversationHistory = [], onChunk) {
-        console.log('Using fallback non-streaming message...');
         
         // Use the regular sendMessage method and simulate streaming
         const fullResponse = await this.sendMessage(message, conversationHistory);

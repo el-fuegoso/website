@@ -16,23 +16,13 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get API key from environment variables (Anthropic SDK standard)
+        // Get API key from environment variables
         const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
         
-        // Debug logging for environment variable
-        console.log('🔍 Environment check:', {
-            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
-            hasClaudeKey: !!process.env.CLAUDE_API_KEY,
-            keyLength: apiKey ? apiKey.length : 0,
-            keyPrefix: apiKey ? apiKey.substring(0, 15) + '...' : 'undefined',
-            keyFormat: apiKey ? (apiKey.startsWith('sk-ant-api') ? 'valid' : 'invalid') : 'missing'
-        });
-        
         if (!apiKey) {
-            console.error('❌ ANTHROPIC_API_KEY environment variable not set');
+            console.error('ANTHROPIC_API_KEY environment variable not set');
             return res.status(500).json({ 
-                error: 'Server configuration error: API key not configured',
-                hint: 'Please set ANTHROPIC_API_KEY environment variable in Vercel dashboard'
+                error: 'Server configuration error: API key not configured'
             });
         }
 
@@ -43,12 +33,7 @@ export default async function handler(req, res) {
             ...req.body
         };
 
-        console.log('📤 Non-streaming request to Claude API...', {
-            model: requestBody.model,
-            messageCount: requestBody.messages?.length || 0
-        });
-
-        // Forward request to Claude API with correct headers
+        // Forward request to Claude API
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
@@ -59,18 +44,11 @@ export default async function handler(req, res) {
             body: JSON.stringify(requestBody)
         });
 
-        console.log('📥 Claude API response status:', claudeResponse.status);
-
         // Get response data
         const responseData = await claudeResponse.json();
 
         if (!claudeResponse.ok) {
-            console.error('❌ Claude API error:', responseData);
-        } else {
-            console.log('✅ Claude API success:', {
-                model: responseData.model,
-                usage: responseData.usage
-            });
+            console.error('Claude API error:', claudeResponse.status, responseData.error?.message || responseData.error);
         }
 
         // Forward Claude's response status and data

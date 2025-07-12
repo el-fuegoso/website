@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const apiKey = process.env.CLAUDE_API_KEY;
+        const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
         
         // Get deployment information
         const deploymentInfo = {
@@ -29,7 +29,9 @@ export default async function handler(req, res) {
 
         // Check API key status
         const apiKeyStatus = {
-            isSet: !!apiKey,
+            anthropicKeySet: !!process.env.ANTHROPIC_API_KEY,
+            claudeKeySet: !!process.env.CLAUDE_API_KEY,
+            activeKey: apiKey ? 'found' : 'missing',
             length: apiKey ? apiKey.length : 0,
             prefix: apiKey ? apiKey.substring(0, 15) + '...' : 'not set',
             isValidFormat: apiKey ? apiKey.startsWith('sk-ant-api') : false

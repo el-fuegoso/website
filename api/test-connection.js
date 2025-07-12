@@ -20,23 +20,23 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get API key from environment variables
-        const apiKey = process.env.CLAUDE_API_KEY;
+        // Get API key from environment variables (Anthropic SDK standard)
+        const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
         
         if (!apiKey) {
-            console.error('CLAUDE_API_KEY environment variable not set');
+            console.error('ANTHROPIC_API_KEY environment variable not set');
             return res.status(500).json({ 
                 error: 'Server configuration error. Claude API key not configured.',
-                hint: 'Administrator needs to set CLAUDE_API_KEY environment variable'
+                hint: 'Administrator needs to set ANTHROPIC_API_KEY environment variable'
             });
         }
 
-        // Make simple test request to Claude
+        // Make simple test request to Claude with correct headers
         const testResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
+                'x-api-key': apiKey,
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify({

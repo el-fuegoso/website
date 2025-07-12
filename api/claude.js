@@ -16,25 +16,23 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get API key from environment variables
-        const apiKey = process.env.CLAUDE_API_KEY;
+        // Get API key from environment variables (Anthropic SDK standard)
+        const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
         
         // Debug logging for environment variable
         console.log('🔍 Environment check:', {
-            hasApiKey: !!apiKey,
+            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+            hasClaudeKey: !!process.env.CLAUDE_API_KEY,
             keyLength: apiKey ? apiKey.length : 0,
-            keyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'undefined',
-            allEnvKeys: Object.keys(process.env).filter(key => 
-                key.includes('CLAUDE') || key.includes('API')
-            )
+            keyPrefix: apiKey ? apiKey.substring(0, 15) + '...' : 'undefined',
+            keyFormat: apiKey ? (apiKey.startsWith('sk-ant-api') ? 'valid' : 'invalid') : 'missing'
         });
         
         if (!apiKey) {
-            console.error('❌ CLAUDE_API_KEY environment variable not set');
-            console.error('Available env vars:', Object.keys(process.env).slice(0, 10));
+            console.error('❌ ANTHROPIC_API_KEY environment variable not set');
             return res.status(500).json({ 
                 error: 'Server configuration error: API key not configured',
-                hint: 'Please set CLAUDE_API_KEY environment variable in Vercel dashboard'
+                hint: 'Please set ANTHROPIC_API_KEY environment variable in Vercel dashboard'
             });
         }
 
@@ -50,12 +48,12 @@ export default async function handler(req, res) {
             messageCount: requestBody.messages?.length || 0
         });
 
-        // Forward request to Claude API
+        // Forward request to Claude API with correct headers
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
+                'x-api-key': apiKey,
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify(requestBody)

@@ -16,23 +16,25 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get API key from environment variables
-        const apiKey = process.env.CLAUDE_API_KEY;
+        // Get API key from environment variables (Anthropic SDK standard)
+        const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
         
         // Debug logging for environment variable
         console.log('🔍 Streaming API environment check:', {
-            hasApiKey: !!apiKey,
+            hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+            hasClaudeKey: !!process.env.CLAUDE_API_KEY,
             keyLength: apiKey ? apiKey.length : 0,
-            keyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'undefined',
+            keyPrefix: apiKey ? apiKey.substring(0, 15) + '...' : 'undefined',
+            keyFormat: apiKey ? (apiKey.startsWith('sk-ant-api') ? 'valid' : 'invalid') : 'missing',
             nodeEnv: process.env.NODE_ENV,
             vercelEnv: process.env.VERCEL_ENV
         });
         
         if (!apiKey) {
-            console.error('❌ CLAUDE_API_KEY environment variable not set in streaming API');
+            console.error('❌ ANTHROPIC_API_KEY environment variable not set in streaming API');
             return res.status(500).json({ 
                 error: 'Server configuration error: API key not configured',
-                hint: 'Please set CLAUDE_API_KEY environment variable in Vercel dashboard'
+                hint: 'Please set ANTHROPIC_API_KEY environment variable in Vercel dashboard'
             });
         }
 
@@ -57,12 +59,12 @@ export default async function handler(req, res) {
 
         console.log('📤 Request body:', JSON.stringify(requestBody, null, 2));
 
-        // Forward streaming request to Claude API
+        // Forward streaming request to Claude API with correct headers
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
+                'x-api-key': apiKey,
                 'anthropic-version': '2023-06-01'
             },
             body: JSON.stringify(requestBody)

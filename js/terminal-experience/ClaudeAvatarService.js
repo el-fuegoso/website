@@ -8,11 +8,36 @@ class ClaudeAvatarService {
         this.templateGenerator = new TemplateAvatarGenerator();
         this.analytics = new DataCollector();
         this.fallbackEnabled = true; // Always use local generation
+        this.apiKey = null;
+        this.baseUrl = 'https://api.anthropic.com/v1/messages';
     }
 
-    // Local generation doesn't need API key validation
+    // API key management
     hasValidApiKey() {
-        return true; // Always true since we use local generation
+        return !!this.apiKey || this.hasStoredApiKey();
+    }
+    
+    hasStoredApiKey() {
+        return !!localStorage.getItem('claude_api_key');
+    }
+    
+    setApiKey(apiKey) {
+        this.apiKey = apiKey;
+        localStorage.setItem('claude_api_key', apiKey);
+    }
+    
+    loadStoredApiKey() {
+        const stored = localStorage.getItem('claude_api_key');
+        if (stored) {
+            this.apiKey = stored;
+            return true;
+        }
+        return false;
+    }
+    
+    clearApiKey() {
+        this.apiKey = null;
+        localStorage.removeItem('claude_api_key');
     }
 
     async generateAvatar(personalityData, conversationData, archetypeMatch) {
@@ -248,6 +273,83 @@ class ClaudeAvatarService {
             : 0;
         
         return stats;
+    }
+    
+    // Claude API methods for conversation analysis
+    async makeClaudeRequest(messages, maxTokens = 1000) {
+        if (!this.apiKey) {
+            this.loadStoredApiKey();
+        }
+        
+        if (!this.apiKey) {
+            throw new Error('No Claude API key available');
+        }
+        
+        const requestBody = {
+            model: 'claude-3-haiku-20240307',
+            max_tokens: maxTokens,
+            messages: messages
+        };
+        
+        try {
+            const response = await fetch(this.baseUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': this.apiKey,
+                    'anthropic-version': '2023-06-01'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`Claude API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+            }
+            
+            const data = await response.json();
+            return data.content[0].text;
+            
+        } catch (error) {
+            console.error('Claude API request failed:', error);
+            throw error;
+        }
+    }
+    
+    async testConnection() {
+        if (!this.hasValidApiKey()) {
+            return {
+                success: false,
+                message: 'No API key available',
+                canRetry: false
+            };
+        }
+        
+        try {
+            const testResponse = await this.makeClaudeRequest([
+                { role: 'user', content: 'Respond with just "API working" if you receive this message.' }
+            ], 50);
+            
+            if (testResponse.toLowerCase().includes('api working')) {
+                return {
+                    success: true,
+                    message: 'Claude API connection successful',
+                    method: 'claude-api'
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'Unexpected response from Claude API',
+                    canRetry: true
+                };
+            }
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message,
+                canRetry: error.message.includes('rate limit') || error.message.includes('timeout')
+            };
+        }
     }
 }
 

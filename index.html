@@ -710,6 +710,26 @@
             position: relative;
         }
 
+        .build-el-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .build-el-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .build-el-subtitle {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            font-weight: 400;
+            margin: 0;
+        }
+
         .build-el-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -727,7 +747,7 @@
             position: relative;
             aspect-ratio: 1;
             border: 2px solid var(--text-color);
-            border-radius: 12px;
+            border-radius: 0;
             cursor: pointer;
             transition: all 0.3s ease;
             overflow: hidden;
@@ -737,6 +757,10 @@
         .el-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .el-card:hover .card-icon {
+            opacity: 0;
         }
 
         .card-icon-container {
@@ -858,17 +882,25 @@
                 -webkit-tap-highlight-color: transparent;
             }
             
-            #chatTrigger {
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: transparent;
-                padding: 12px 16px;
-            }
         }
 
         /* Build Your El Section Responsive */
         @media (max-width: 768px) {
             .build-your-el-section {
                 padding: 60px 20px;
+            }
+
+            .build-el-header {
+                margin-bottom: 40px;
+            }
+
+            .build-el-title {
+                font-size: 2.5rem;
+            }
+
+            .build-el-subtitle {
+                font-size: 1.1rem;
+                padding: 0 10px;
             }
 
             .cards-grid {
@@ -933,7 +965,6 @@
             <a href="#home" class="nav-item">HOME</a>
             <a href="#projects" class="nav-item">PROJECTS</a>
             <a href="#contact" class="nav-item">CONTACT</a>
-            <button id="chatTrigger" class="nav-item" style="background: none; border: none; font: inherit; cursor: pointer;">CHAT</button>
         </div>
     </nav>
 
@@ -990,6 +1021,12 @@
     <!-- Build Your El Section -->
     <section class="build-your-el-section" id="build-your-el">
         <div class="build-el-container">
+            <!-- Section Header -->
+            <div class="build-el-header">
+                <h2 class="build-el-title">Create</h2>
+                <p class="build-el-subtitle">Have you ever thought about making your own AI?</p>
+            </div>
+            
             <!-- Cards Grid -->
             <div class="cards-grid">
                 <!-- Card 1: Discovery Conversation -->
@@ -1329,6 +1366,622 @@
             transitions: { duration: 1200, delay: 150 },
             titles: ["ELLIOT LEE", "PRODUCT MANAGER", "BUILDER", "ACCOUNT MANAGER", "HUMAN"]
         };
+
+        // Performance monitoring configuration
+        const PERFORMANCE_CONFIG = {
+            battery: {
+                lowThreshold: 0.2,
+                criticalThreshold: 0.1
+            },
+            thermal: {
+                throttleTemp: 45, // Celsius
+                shutdownTemp: 55
+            },
+            network: {
+                slowConnection: ['slow-2g', '2g'],
+                fastConnection: ['4g', '5g']
+            },
+            performance: {
+                targetFPS: 60,
+                minFPS: 30
+            }
+        };
+
+        // Mobile Performance Manager
+        class MobilePerformanceManager {
+            constructor() {
+                this.isLowPower = false;
+                this.isCriticalMode = false;
+                this.currentFPS = 60;
+                this.frameCount = 0;
+                this.lastFPSUpdate = Date.now();
+                this.originalConfig = this.backupConfig();
+                this.setupMonitoring();
+            }
+            
+            backupConfig() {
+                return JSON.parse(JSON.stringify(CONFIG.artifacts));
+            }
+            
+            async setupMonitoring() {
+                // Battery API monitoring
+                if ('getBattery' in navigator) {
+                    try {
+                        const battery = await navigator.getBattery();
+                        this.monitorBattery(battery);
+                    } catch (e) {
+                        console.log('Battery API not available');
+                    }
+                }
+                
+                // Network connection monitoring
+                if ('connection' in navigator) {
+                    this.monitorConnection();
+                }
+                
+                // Frame rate monitoring
+                this.startFPSMonitoring();
+                
+                // Visibility change optimization
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.pauseHeavyAnimations();
+                    } else {
+                        this.resumeAnimations();
+                    }
+                });
+                
+                // Device memory monitoring (if available)
+                if ('deviceMemory' in navigator && navigator.deviceMemory < 4) {
+                    this.enableLowMemoryMode();
+                }
+            }
+            
+            monitorBattery(battery) {
+                const checkBattery = () => {
+                    const batteryInfo = {
+                        level: battery.level,
+                        charging: battery.charging,
+                        chargingTime: battery.chargingTime,
+                        dischargingTime: battery.dischargingTime
+                    };
+                    
+                    if (battery.level < PERFORMANCE_CONFIG.battery.criticalThreshold) {
+                        this.enableCriticalMode(batteryInfo);
+                    } else if (battery.level < PERFORMANCE_CONFIG.battery.lowThreshold) {
+                        this.enableLowPowerMode(batteryInfo);
+                    } else if (!battery.charging && this.isLowPower) {
+                        // Only disable low power if we're not charging and battery is good
+                        this.disableLowPowerMode();
+                    }
+                };
+                
+                battery.addEventListener('levelchange', checkBattery);
+                battery.addEventListener('chargingchange', checkBattery);
+                checkBattery();
+            }
+            
+            monitorConnection() {
+                const connection = navigator.connection;
+                const checkConnection = () => {
+                    if (PERFORMANCE_CONFIG.network.slowConnection.includes(connection.effectiveType)) {
+                        this.enableLowBandwidthMode();
+                    } else if (PERFORMANCE_CONFIG.network.fastConnection.includes(connection.effectiveType)) {
+                        this.disableLowBandwidthMode();
+                    }
+                };
+                
+                connection.addEventListener('change', checkConnection);
+                checkConnection();
+            }
+            
+            startFPSMonitoring() {
+                const measureFPS = () => {
+                    this.frameCount++;
+                    const now = Date.now();
+                    
+                    if (now - this.lastFPSUpdate >= 1000) {
+                        this.currentFPS = this.frameCount;
+                        this.frameCount = 0;
+                        this.lastFPSUpdate = now;
+                        
+                        // Adjust performance based on FPS
+                        if (this.currentFPS < PERFORMANCE_CONFIG.performance.minFPS && !this.isLowPower) {
+                            this.enablePerformanceMode();
+                        }
+                        
+                        this.updatePerformanceIndicator();
+                    }
+                    
+                    requestAnimationFrame(measureFPS);
+                };
+                measureFPS();
+            }
+            
+            enableLowPowerMode(batteryInfo = null) {
+                if (this.isLowPower) return;
+                this.isLowPower = true;
+                
+                // Reduce particle counts by 75%
+                CONFIG.artifacts.particles.count = Math.floor(this.originalConfig.particles.count * 0.25);
+                CONFIG.artifacts.hankies.resolution = Math.floor(this.originalConfig.hankies.resolution * 0.5);
+                CONFIG.artifacts.ascii.width = Math.floor(this.originalConfig.ascii.width * 0.7);
+                CONFIG.artifacts.ascii.height = Math.floor(this.originalConfig.ascii.height * 0.7);
+                CONFIG.artifacts.metamorphosis.numLines = Math.floor(this.originalConfig.metamorphosis.numLines * 0.5);
+                CONFIG.artifacts.metamorphosis.lineSegments = Math.floor(this.originalConfig.metamorphosis.lineSegments * 0.5);
+                CONFIG.artifacts.sineWaves.layers = Math.floor(this.originalConfig.sineWaves.layers * 0.5);
+                CONFIG.artifacts.sineWaves.points = Math.floor(this.originalConfig.sineWaves.points * 0.5);
+                
+                // Reduce animation speeds
+                CONFIG.artifacts.hankies.animationSpeed *= 0.5;
+                
+                // Show low power indicator
+                const message = batteryInfo ? 
+                    `Low Power Mode: ${Math.round(batteryInfo.level * 100)}% battery` : 
+                    'Low Power Mode Active';
+                this.showPowerModeIndicator(message, '#ff9500');
+                
+                // Restart current artifact with new settings
+                this.restartCurrentArtifact();
+                
+                console.log('Low power mode enabled', batteryInfo);
+            }
+            
+            enableCriticalMode(batteryInfo) {
+                if (this.isCriticalMode) return;
+                this.isCriticalMode = true;
+                this.isLowPower = true;
+                
+                // Stop all animations except essential UI
+                this.pauseAllArtifacts();
+                this.showPowerModeIndicator(
+                    `Critical Battery: ${Math.round(batteryInfo.level * 100)}% - Animations Paused`, 
+                    '#ff3300'
+                );
+                console.log('Critical battery mode enabled', batteryInfo);
+            }
+            
+            enablePerformanceMode() {
+                // Automatically reduce settings when FPS drops
+                CONFIG.artifacts.particles.count = Math.floor(CONFIG.artifacts.particles.count * 0.8);
+                CONFIG.artifacts.hankies.resolution = Math.max(8, Math.floor(CONFIG.artifacts.hankies.resolution * 0.8));
+                
+                this.showPowerModeIndicator(`Performance Mode: ${this.currentFPS}fps`, '#ffa500');
+                this.restartCurrentArtifact();
+            }
+            
+            enableLowMemoryMode() {
+                CONFIG.artifacts.particles.count = Math.floor(CONFIG.artifacts.particles.count * 0.6);
+                CONFIG.artifacts.ascii.width = Math.floor(CONFIG.artifacts.ascii.width * 0.8);
+                CONFIG.artifacts.ascii.height = Math.floor(CONFIG.artifacts.ascii.height * 0.8);
+                
+                this.showPowerModeIndicator('Low Memory Mode', '#ff6600');
+                console.log('Low memory mode enabled');
+            }
+            
+            enableLowBandwidthMode() {
+                // Reduce update frequencies for network-dependent features
+                CONFIG.transitions.duration = Math.min(CONFIG.transitions.duration * 1.5, 2000);
+                this.showPowerModeIndicator('Slow Connection Detected', '#666666');
+            }
+            
+            disableLowPowerMode() {
+                if (!this.isLowPower) return;
+                this.isLowPower = false;
+                this.isCriticalMode = false;
+                
+                // Restore original settings
+                CONFIG.artifacts = JSON.parse(JSON.stringify(this.originalConfig));
+                
+                this.hidePowerModeIndicator();
+                this.restartCurrentArtifact();
+                console.log('Low power mode disabled');
+            }
+            
+            disableLowBandwidthMode() {
+                CONFIG.transitions.duration = 1200; // Reset to default
+            }
+            
+            pauseHeavyAnimations() {
+                // Pause current artifact animations
+                if (window.currentArtifactAnimation) {
+                    cancelAnimationFrame(window.currentArtifactAnimation);
+                }
+                
+                // Pause Three.js rendering
+                Object.values(threeScenes).forEach(scene => {
+                    if (scene.renderer && scene.renderer.setAnimationLoop) {
+                        scene.renderer.setAnimationLoop(null);
+                    }
+                });
+            }
+            
+            pauseAllArtifacts() {
+                this.pauseHeavyAnimations();
+                // Set black background to save energy
+                document.body.style.background = '#000000';
+            }
+            
+            resumeAnimations() {
+                if (!this.isCriticalMode && !document.hidden) {
+                    // Restart current artifact if not in critical mode
+                    if (typeof artifacts !== 'undefined' && artifacts[currentArtifact]) {
+                        artifacts[currentArtifact]();
+                    }
+                    
+                    // Restore background
+                    document.body.style.background = '';
+                }
+            }
+            
+            restartCurrentArtifact() {
+                if (this.isCriticalMode) return;
+                
+                // Clean up current artifact
+                if (threeScenes[`artifact-${currentArtifact + 1}`]?.cleanup) {
+                    threeScenes[`artifact-${currentArtifact + 1}`].cleanup();
+                }
+                
+                // Restart with new settings
+                setTimeout(() => {
+                    if (artifacts[currentArtifact]) {
+                        artifacts[currentArtifact]();
+                    }
+                }, 100);
+            }
+            
+            showPowerModeIndicator(message, color = '#ff9500') {
+                let indicator = document.getElementById('powerModeIndicator');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.id = 'powerModeIndicator';
+                    indicator.style.cssText = `
+                        position: fixed;
+                        top: 80px;
+                        right: 20px;
+                        background: ${color};
+                        color: white;
+                        padding: 8px 12px;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        z-index: 1002;
+                        font-family: 'Roboto Mono', monospace;
+                        max-width: 200px;
+                        text-align: center;
+                        animation: slideInRight 0.3s ease-out;
+                    `;
+                    document.body.appendChild(indicator);
+                    
+                    // Add animation
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes slideInRight {
+                            from { transform: translateX(100%); opacity: 0; }
+                            to { transform: translateX(0); opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                } else {
+                    indicator.style.background = color;
+                }
+                indicator.textContent = message;
+            }
+            
+            hidePowerModeIndicator() {
+                const indicator = document.getElementById('powerModeIndicator');
+                if (indicator) {
+                    indicator.style.animation = 'slideInRight 0.3s ease-out reverse';
+                    setTimeout(() => indicator.remove(), 300);
+                }
+            }
+            
+            updatePerformanceIndicator() {
+                const perfInfo = document.getElementById('performanceInfo');
+                if (perfInfo) {
+                    let status = 'Optimized';
+                    let color = '#00ff00';
+                    
+                    if (this.isCriticalMode) {
+                        status = 'Critical Battery';
+                        color = '#ff3300';
+                    } else if (this.isLowPower) {
+                        status = 'Low Power';
+                        color = '#ff9500';
+                    } else if (this.currentFPS < PERFORMANCE_CONFIG.performance.minFPS) {
+                        status = `${this.currentFPS}fps`;
+                        color = '#ffa500';
+                    }
+                    
+                    perfInfo.textContent = `Performance: ${status}`;
+                    perfInfo.style.color = color;
+                }
+            }
+        }
+
+        // Enhanced Mobile Accessibility Manager
+        class MobileAccessibilityManager {
+            constructor() {
+                this.setupMobileA11y();
+                this.setupScreenReaderSupport();
+                this.setupVoiceOverSupport();
+                this.setupTalkBackSupport();
+                this.addLiveRegions();
+            }
+            
+            setupMobileA11y() {
+                // Enhanced focus management for mobile
+                document.addEventListener('focusin', (e) => {
+                    const target = e.target;
+                    
+                    // Ensure focused element is visible on mobile
+                    if (target.classList.contains('glitch-title') || 
+                        target.classList.contains('spark-magic') ||
+                        target.classList.contains('chat-control-btn')) {
+                        target.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }
+                    
+                    // Add focus announcement for screen readers
+                    if (target.hasAttribute('aria-label')) {
+                        this.announceToScreenReader(`Focused: ${target.getAttribute('aria-label')}`);
+                    }
+                });
+                
+                // Enhanced keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    // Handle escape key to close modals
+                    if (e.key === 'Escape') {
+                        this.handleEscapeKey();
+                    }
+                    
+                    // Handle arrow keys for artifact navigation
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                        const activeElement = document.activeElement;
+                        if (activeElement.classList.contains('glitch-title') || 
+                            activeElement.classList.contains('spark-magic')) {
+                            e.preventDefault();
+                            
+                            if (e.key === 'ArrowRight') {
+                                changeEverything();
+                                this.announceToScreenReader('Next experience loaded');
+                            } else if (window.gestureManager?.previousArtifact) {
+                                window.gestureManager.previousArtifact();
+                                this.announceToScreenReader('Previous experience loaded');
+                            }
+                        }
+                    }
+                });
+            }
+            
+            addLiveRegions() {
+                // Create ARIA live region for dynamic announcements
+                const liveRegion = document.createElement('div');
+                liveRegion.setAttribute('aria-live', 'polite');
+                liveRegion.setAttribute('aria-atomic', 'true');
+                liveRegion.setAttribute('id', 'liveRegion');
+                liveRegion.className = 'sr-only';
+                liveRegion.style.cssText = `
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    padding: 0;
+                    margin: -1px;
+                    overflow: hidden;
+                    clip: rect(0, 0, 0, 0);
+                    white-space: nowrap;
+                    border: 0;
+                `;
+                document.body.appendChild(liveRegion);
+                
+                // Create assertive live region for urgent announcements
+                const assertiveRegion = document.createElement('div');
+                assertiveRegion.setAttribute('aria-live', 'assertive');
+                assertiveRegion.setAttribute('aria-atomic', 'true');
+                assertiveRegion.setAttribute('id', 'assertiveRegion');
+                assertiveRegion.className = 'sr-only';
+                assertiveRegion.style.cssText = liveRegion.style.cssText;
+                document.body.appendChild(assertiveRegion);
+            }
+            
+            setupScreenReaderSupport() {
+                // Enhance artifact change announcements
+                const originalChangeEverything = window.changeEverything;
+                window.changeEverything = () => {
+                    originalChangeEverything.call(window);
+                    
+                    setTimeout(() => {
+                        const currentTitle = CONFIG.titles[currentTitleIndex];
+                        const experienceNumber = currentArtifact + 1;
+                        this.announceToScreenReader(
+                            `Now showing experience ${experienceNumber}: ${currentTitle} with interactive artwork`
+                        );
+                    }, 500);
+                };
+                
+                // Add landmarks and structure
+                this.addLandmarkRoles();
+                this.enhanceFormAccessibility();
+            }
+            
+            addLandmarkRoles() {
+                // Add main landmark
+                const heroContainer = document.querySelector('.hero-container');
+                if (heroContainer) {
+                    heroContainer.setAttribute('role', 'main');
+                    heroContainer.setAttribute('aria-label', 'Portfolio showcase with interactive art');
+                }
+                
+                // Add navigation landmark
+                const navBar = document.querySelector('.nav-bar');
+                if (navBar) {
+                    navBar.setAttribute('role', 'navigation');
+                    navBar.setAttribute('aria-label', 'Main navigation');
+                }
+                
+                // Add complementary landmarks for sections
+                const contactSection = document.querySelector('.contact-section');
+                if (contactSection) {
+                    contactSection.setAttribute('role', 'complementary');
+                    contactSection.setAttribute('aria-label', 'Contact information');
+                }
+                
+                const projectsSection = document.querySelector('.projects-section');
+                if (projectsSection) {
+                    projectsSection.setAttribute('role', 'region');
+                    projectsSection.setAttribute('aria-label', 'Featured projects');
+                }
+            }
+            
+            enhanceFormAccessibility() {
+                // Enhance chat input
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) {
+                    messageInput.setAttribute('aria-describedby', 'messageInputDesc');
+                    
+                    const description = document.createElement('div');
+                    description.id = 'messageInputDesc';
+                    description.className = 'sr-only';
+                    description.textContent = 'Type your message and press Enter to send';
+                    messageInput.parentNode.insertBefore(description, messageInput);
+                }
+                
+                // Enhance project items
+                document.querySelectorAll('.project-item').forEach((item, index) => {
+                    item.setAttribute('role', 'button');
+                    item.setAttribute('aria-expanded', 'false');
+                    item.setAttribute('aria-describedby', `project-desc-${index}`);
+                    item.setAttribute('tabindex', '0');
+                    
+                    const originalToggle = item.onclick;
+                    item.onclick = function() {
+                        originalToggle.call(this);
+                        const isOpen = this.classList.contains('open');
+                        this.setAttribute('aria-expanded', isOpen.toString());
+                        
+                        const action = isOpen ? 'expanded' : 'collapsed';
+                        window.accessibilityManager.announceToScreenReader(
+                            `Project ${this.querySelector('.project-header').textContent} ${action}`
+                        );
+                    };
+                    
+                    // Add keyboard support
+                    item.addEventListener('keydown', (e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                            e.preventDefault();
+                            item.click();
+                        }
+                    });
+                });
+            }
+            
+            setupVoiceOverSupport() {
+                // Enhanced VoiceOver navigation for iOS
+                document.querySelector('.glitch-title').setAttribute(
+                    'aria-description', 
+                    'Interactive title that cycles through different professional identities and changes the background artwork. Swipe or use arrow keys to navigate.'
+                );
+                
+                document.querySelector('.spark-magic').setAttribute(
+                    'aria-description',
+                    'Alternative control to cycle through visual experiences'
+                );
+                
+                // Add VoiceOver-specific hint text
+                if (this.isIOSDevice()) {
+                    const voiceOverHints = document.createElement('div');
+                    voiceOverHints.className = 'sr-only';
+                    voiceOverHints.textContent = 'VoiceOver users: Use flick gestures to navigate between elements, and double-tap to activate. Swipe left or right on the main area to change experiences.';
+                    document.body.appendChild(voiceOverHints);
+                }
+            }
+            
+            setupTalkBackSupport() {
+                // Enhanced TalkBack support for Android
+                if (this.isAndroidDevice()) {
+                    // Add content descriptions for TalkBack
+                    document.querySelectorAll('[role="button"]').forEach(button => {
+                        if (!button.hasAttribute('aria-description')) {
+                            const label = button.getAttribute('aria-label') || button.textContent;
+                            button.setAttribute('aria-description', `Button: ${label}`);
+                        }
+                    });
+                    
+                    // Add TalkBack-specific instructions
+                    const talkBackHints = document.createElement('div');
+                    talkBackHints.className = 'sr-only';
+                    talkBackHints.textContent = 'TalkBack users: Use explore by touch to navigate, and double-tap to activate elements. Swipe gestures change the visual experience.';
+                    document.body.appendChild(talkBackHints);
+                }
+            }
+            
+            announceToScreenReader(message, urgent = false) {
+                const regionId = urgent ? 'assertiveRegion' : 'liveRegion';
+                const region = document.getElementById(regionId);
+                if (region) {
+                    // Clear first to ensure the announcement triggers
+                    region.textContent = '';
+                    setTimeout(() => {
+                        region.textContent = message;
+                    }, 100);
+                    
+                    // Clear after announcement
+                    setTimeout(() => {
+                        region.textContent = '';
+                    }, 3000);
+                }
+            }
+            
+            handleEscapeKey() {
+                // Close any open modals or overlays
+                const chatOverlay = document.querySelector('.chat-overlay.active');
+                if (chatOverlay) {
+                    chatOverlay.classList.remove('active');
+                    this.announceToScreenReader('Chat closed');
+                    return;
+                }
+                
+                const terminalOverlay = document.getElementById('terminalOverlay');
+                if (terminalOverlay && terminalOverlay.style.display === 'block') {
+                    terminalOverlay.style.display = 'none';
+                    this.announceToScreenReader('Terminal closed');
+                    return;
+                }
+                
+                // Close any expanded project items
+                const openProjects = document.querySelectorAll('.project-item.open');
+                if (openProjects.length > 0) {
+                    openProjects.forEach(project => {
+                        project.classList.remove('open');
+                        project.setAttribute('aria-expanded', 'false');
+                    });
+                    this.announceToScreenReader('All projects collapsed');
+                }
+            }
+            
+            isIOSDevice() {
+                return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            }
+            
+            isAndroidDevice() {
+                return /Android/.test(navigator.userAgent);
+            }
+            
+            // Performance mode accessibility adjustments
+            adjustForPerformanceMode() {
+                if (window.performanceManager?.isLowPower) {
+                    // Reduce animation announcements in low power mode
+                    this.announceToScreenReader('Low power mode active - reduced animations for better battery life');
+                }
+                
+                if (window.performanceManager?.isCriticalMode) {
+                    this.announceToScreenReader('Critical battery mode - animations paused to conserve power', true);
+                }
+            }
+        }
 
         // Global state
         let currentArtifact = 0;
@@ -2287,6 +2940,18 @@
 
             // Initialize artifacts
             initializeArtifacts();
+            
+            // Initialize performance manager for mobile optimization
+            if (typeof MobilePerformanceManager !== 'undefined') {
+                window.performanceManager = new MobilePerformanceManager();
+                console.log('✅ Mobile performance manager initialized');
+            }
+            
+            // Initialize enhanced mobile accessibility
+            if (typeof MobileAccessibilityManager !== 'undefined') {
+                window.accessibilityManager = new MobileAccessibilityManager();
+                console.log('✅ Mobile accessibility manager initialized');
+            }
 
             // Add click effects to buttons
             document.querySelectorAll('.cta-button').forEach(button => {
@@ -2326,13 +2991,232 @@
             }, 250);
         });
 
-        // Touch support for mobile
-        document.addEventListener('touchstart', function(e) {
-            if (e.target.classList.contains('glitch-title') || e.target.classList.contains('spark-magic')) {
-                e.preventDefault();
-                changeEverything();
+        // Enhanced Touch Gesture System for Mobile
+        class TouchGestureManager {
+            constructor() {
+                this.startX = 0;
+                this.startY = 0;
+                this.startTime = 0;
+                this.threshold = 50; // minimum swipe distance
+                this.timeThreshold = 300; // maximum swipe time
+                this.setupGestures();
+                this.showMobileHints();
             }
-        }, { passive: false });
+            
+            setupGestures() {
+                const heroContainer = document.querySelector('.hero-container');
+                let isDragging = false;
+                
+                heroContainer.addEventListener('touchstart', (e) => {
+                    // Handle title/magic button taps
+                    if (e.target.classList.contains('glitch-title') || e.target.classList.contains('spark-magic')) {
+                        e.preventDefault();
+                        changeEverything();
+                        return;
+                    }
+                    
+                    // Start gesture tracking
+                    this.startX = e.touches[0].clientX;
+                    this.startY = e.touches[0].clientY;
+                    this.startTime = Date.now();
+                    isDragging = false;
+                }, { passive: false });
+                
+                heroContainer.addEventListener('touchmove', (e) => {
+                    if (!this.startX || !this.startY) return;
+                    
+                    const currentX = e.touches[0].clientX;
+                    const deltaX = Math.abs(currentX - this.startX);
+                    
+                    // Detect if user is actively swiping
+                    if (deltaX > 10) {
+                        isDragging = true;
+                        // Add visual feedback during swipe
+                        this.addSwipeVisualFeedback(currentX - this.startX);
+                    }
+                }, { passive: true });
+                
+                heroContainer.addEventListener('touchend', (e) => {
+                    if (!this.startX || !this.startY) return;
+                    
+                    const endX = e.changedTouches[0].clientX;
+                    const endY = e.changedTouches[0].clientY;
+                    const endTime = Date.now();
+                    
+                    const deltaX = endX - this.startX;
+                    const deltaY = endY - this.startY;
+                    const deltaTime = endTime - this.startTime;
+                    
+                    // Remove any visual feedback
+                    this.removeSwipeVisualFeedback();
+                    
+                    // Check if it's a valid swipe
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && 
+                        Math.abs(deltaX) > this.threshold && 
+                        deltaTime < this.timeThreshold &&
+                        isDragging) {
+                        
+                        e.preventDefault();
+                        
+                        if (deltaX > 0) {
+                            // Swipe right - previous artifact
+                            this.previousArtifact();
+                        } else {
+                            // Swipe left - next artifact
+                            this.nextArtifact();
+                        }
+                    }
+                    
+                    // Reset
+                    this.startX = 0;
+                    this.startY = 0;
+                    this.startTime = 0;
+                    isDragging = false;
+                }, { passive: false });
+            }
+            
+            nextArtifact() {
+                if (!isTransitioning) {
+                    changeEverything();
+                    this.showSwipeSuccess('right');
+                }
+            }
+            
+            previousArtifact() {
+                if (!isTransitioning) {
+                    isTransitioning = true;
+                    
+                    // Cycle backwards through titles
+                    currentTitleIndex = currentTitleIndex === 0 ? CONFIG.titles.length - 1 : currentTitleIndex - 1;
+                    this.updateTitleText();
+                    
+                    // Cycle backwards through artifacts
+                    setTimeout(() => {
+                        const currentElement = document.querySelector('.artifact.active');
+                        currentElement.classList.remove('active');
+                        
+                        if (threeScenes[`artifact-${currentArtifact + 1}`]?.cleanup) {
+                            threeScenes[`artifact-${currentArtifact + 1}`].cleanup();
+                        }
+                        
+                        currentArtifact = currentArtifact === 0 ? artifacts.length - 1 : currentArtifact - 1;
+                        
+                        const nextElement = document.getElementById(`artifact-${currentArtifact + 1}`);
+                        nextElement.classList.add('active');
+                        
+                        setTimeout(() => {
+                            artifacts[currentArtifact]();
+                            isTransitioning = false;
+                        }, 100);
+                    }, CONFIG.transitions.delay);
+                    
+                    this.showSwipeSuccess('left');
+                }
+            }
+            
+            updateTitleText() {
+                const titleElement = document.querySelector('.glitch-title');
+                gsap.to(titleElement, {
+                    duration: 1.2,
+                    text: { value: CONFIG.titles[currentTitleIndex], delimiter: "" },
+                    ease: "none"
+                });
+            }
+            
+            addSwipeVisualFeedback(deltaX) {
+                const heroContainer = document.querySelector('.hero-container');
+                const opacity = Math.min(Math.abs(deltaX) / 100, 0.3);
+                
+                if (deltaX > 0) {
+                    heroContainer.style.background = `linear-gradient(90deg, rgba(102, 102, 102, ${opacity}) 0%, transparent 100%)`;
+                } else {
+                    heroContainer.style.background = `linear-gradient(-90deg, rgba(102, 102, 102, ${opacity}) 0%, transparent 100%)`;
+                }
+            }
+            
+            removeSwipeVisualFeedback() {
+                const heroContainer = document.querySelector('.hero-container');
+                heroContainer.style.background = '';
+            }
+            
+            showSwipeSuccess(direction) {
+                const indicator = document.createElement('div');
+                indicator.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    ${direction === 'right' ? 'right: 20px;' : 'left: 20px;'}
+                    transform: translateY(-50%);
+                    background: rgba(102, 102, 102, 0.9);
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 25px;
+                    font-size: 0.8rem;
+                    z-index: 1002;
+                    font-family: 'Roboto Mono', monospace;
+                    animation: swipeSuccess 0.6s ease-out;
+                `;
+                indicator.textContent = direction === 'right' ? '← Previous' : 'Next →';
+                document.body.appendChild(indicator);
+                
+                setTimeout(() => indicator.remove(), 600);
+            }
+            
+            showMobileHints() {
+                if (window.innerWidth <= 768) {
+                    const hintsHTML = `
+                        <div class="mobile-hints" style="
+                            position: absolute;
+                            bottom: 100px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            color: rgba(51, 51, 51, 0.6);
+                            font-size: 0.8rem;
+                            text-align: center;
+                            z-index: 10;
+                            pointer-events: none;
+                            animation: fadeInOut 4s ease-in-out infinite;
+                        ">
+                            ← Swipe to explore →<br>
+                            <span style="font-size: 0.7rem;">Tap title to cycle</span>
+                        </div>
+                    `;
+                    document.querySelector('.hero-content').insertAdjacentHTML('beforeend', hintsHTML);
+                }
+            }
+        }
+        
+        // CSS animations for swipe feedback
+        const swipeStyles = document.createElement('style');
+        swipeStyles.textContent = `
+            @keyframes swipeSuccess {
+                0% { opacity: 0; transform: translateY(-50%) scale(0.8); }
+                50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
+                100% { opacity: 0; transform: translateY(-50%) scale(1); }
+            }
+            
+            @keyframes fadeInOut {
+                0%, 100% { opacity: 0; }
+                50% { opacity: 1; }
+            }
+            
+            @media (max-width: 768px) {
+                .mobile-hints {
+                    display: block;
+                }
+            }
+            
+            @media (min-width: 769px) {
+                .mobile-hints {
+                    display: none;
+                }
+            }
+        `;
+        document.head.appendChild(swipeStyles);
+        
+        // Initialize gesture manager on mobile devices
+        if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+            window.gestureManager = new TouchGestureManager();
+        }
 
         // Initialize when page loads
         window.addEventListener('load', initialize);
@@ -2468,15 +3352,8 @@
             }
         }
 
-        // Chat trigger handler
+        // Navigation handlers
         document.addEventListener('DOMContentLoaded', function() {
-            const chatTrigger = document.getElementById('chatTrigger');
-            if (chatTrigger) {
-                chatTrigger.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    initializeTerminalExperience();
-                });
-            }
 
             // Meet Your El button handler
             const meetYourElBtn = document.getElementById('meetYourElBtn');

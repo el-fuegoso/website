@@ -38,19 +38,19 @@ class TerminalQuestionnaire {
         this.questions = [
             {
                 text: "What's your name, and what do you do for work?",
-                followUp: (response) => this.generateWorkFollowUp(response)
+                followUp: (response) => this.generateClaudeFollowUp(response, 'work_intro')
             },
             {
                 text: "What's something you've been working on lately that you're genuinely excited about?",
-                followUp: (response) => this.generatePassionFollowUp(response)
+                followUp: (response) => this.generateClaudeFollowUp(response, 'passion_project')
             },
             {
                 text: "If you could have dinner with anyone (dead or alive), who would it be and what would you want to talk about?",
-                followUp: (response) => this.generateDinnerFollowUp(response)
+                followUp: (response) => this.generateClaudeFollowUp(response, 'dinner_conversation')
             },
             {
                 text: "What kind of impact do you hope to make in your work or the world?",
-                followUp: (response) => this.generateImpactFollowUp(response)
+                followUp: (response) => this.generateClaudeFollowUp(response, 'impact_vision')
             }
         ];
         
@@ -433,30 +433,69 @@ class TerminalQuestionnaire {
             this.responses[`question_${this.currentQuestion}`] = response;
             this.conversationState = 'answering';
             
+            // Add to conversation history
+            this.conversationHistory.push(
+                { role: 'user', content: response },
+            );
+            
             const currentQ = this.questions[this.currentQuestion];
             
-            setTimeout(() => {
-                if (this.currentQuestion < this.questions.length - 1) {
-                    this.typeMessage(currentQ.followUp(response), true, () => {
-                        setTimeout(() => {
-                            this.currentQuestion++;
-                            this.conversationState = 'asking';
-                            this.updateProgress();
-                            this.typeMessage(this.questions[this.currentQuestion].text, true);
-                        }, 1000);
-                    });
-                } else {
-                    // Final response
-                    this.typeMessage(currentQ.followUp(response), true, () => {
-                        setTimeout(() => {
-                            this.typeMessage(
-                                `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
-                                true,
-                                () => {
-                                    this.completeExperience();
-                                }
-                            );
-                        }, 1500);
+            // Get dynamic follow-up response
+            setTimeout(async () => {
+                try {
+                    const followUpResponse = await currentQ.followUp(response);
+                    
+                    // Add Blue's response to conversation history
+                    this.conversationHistory.push(
+                        { role: 'assistant', content: followUpResponse }
+                    );
+                    
+                    if (this.currentQuestion < this.questions.length - 1) {
+                        this.typeMessage(followUpResponse, true, () => {
+                            setTimeout(() => {
+                                this.currentQuestion++;
+                                this.conversationState = 'asking';
+                                this.updateProgress();
+                                this.typeMessage(this.questions[this.currentQuestion].text, true);
+                            }, 1000);
+                        });
+                    } else {
+                        // Final response
+                        this.typeMessage(followUpResponse, true, () => {
+                            setTimeout(() => {
+                                this.typeMessage(
+                                    `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
+                                    true,
+                                    () => {
+                                        this.completeExperience();
+                                    }
+                                );
+                            }, 1500);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error generating follow-up:', error);
+                    // Fallback to simple response
+                    const fallbackResponse = this.getFallbackFollowUp(response, 'general');
+                    this.typeMessage(fallbackResponse, true, () => {
+                        if (this.currentQuestion < this.questions.length - 1) {
+                            setTimeout(() => {
+                                this.currentQuestion++;
+                                this.conversationState = 'asking';
+                                this.updateProgress();
+                                this.typeMessage(this.questions[this.currentQuestion].text, true);
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                this.typeMessage(
+                                    `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
+                                    true,
+                                    () => {
+                                        this.completeExperience();
+                                    }
+                                );
+                            }, 1500);
+                        }
                     });
                 }
             }, 500);
@@ -479,28 +518,55 @@ class TerminalQuestionnaire {
             
             const currentQ = this.questions[this.currentQuestion];
             
-            setTimeout(() => {
-                if (this.currentQuestion < this.questions.length - 1) {
-                    this.typeMessage(currentQ.followUp(response), true, () => {
-                        setTimeout(() => {
-                            this.currentQuestion++;
-                            this.conversationState = 'asking';
-                            this.updateProgress();
-                            this.typeMessage(this.questions[this.currentQuestion].text, true);
-                        }, 1000);
-                    });
-                } else {
-                    // Final response
-                    this.typeMessage(currentQ.followUp(response), true, () => {
-                        setTimeout(() => {
-                            this.typeMessage(
-                                `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
-                                true,
-                                () => {
-                                    this.completeExperience();
-                                }
-                            );
-                        }, 1500);
+            setTimeout(async () => {
+                try {
+                    const followUpResponse = await currentQ.followUp(response);
+                    
+                    if (this.currentQuestion < this.questions.length - 1) {
+                        this.typeMessage(followUpResponse, true, () => {
+                            setTimeout(() => {
+                                this.currentQuestion++;
+                                this.conversationState = 'asking';
+                                this.updateProgress();
+                                this.typeMessage(this.questions[this.currentQuestion].text, true);
+                            }, 1000);
+                        });
+                    } else {
+                        // Final response
+                        this.typeMessage(followUpResponse, true, () => {
+                            setTimeout(() => {
+                                this.typeMessage(
+                                    `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
+                                    true,
+                                    () => {
+                                        this.completeExperience();
+                                    }
+                                );
+                            }, 1500);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error generating follow-up after clarification:', error);
+                    const fallbackResponse = this.getFallbackFollowUp(response, 'general');
+                    this.typeMessage(fallbackResponse, true, () => {
+                        if (this.currentQuestion < this.questions.length - 1) {
+                            setTimeout(() => {
+                                this.currentQuestion++;
+                                this.conversationState = 'asking';
+                                this.updateProgress();
+                                this.typeMessage(this.questions[this.currentQuestion].text, true);
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                this.typeMessage(
+                                    `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
+                                    true,
+                                    () => {
+                                        this.completeExperience();
+                                    }
+                                );
+                            }, 1500);
+                        }
                     });
                 }
             }, 500);
@@ -1049,94 +1115,89 @@ class TerminalQuestionnaire {
     }
     
     // Dynamic response generation methods
-    generateWorkFollowUp(response) {
-        const lowerResponse = response.toLowerCase();
+    async generateClaudeFollowUp(response, context) {
+        try {
+            // Try to get a personalized Claude response
+            return await this.getClaudeFollowUp(response, context);
+        } catch (error) {
+            console.warn('Claude API unavailable for follow-up, using fallback:', error);
+            // Fallback to simpler responses if Claude API fails
+            return this.getFallbackFollowUp(response, context);
+        }
+    }
+    
+    async getClaudeFollowUp(response, context) {
         const name = this.userName || 'friend';
+        const conversationHistory = this.getConversationContext();
         
-        // Detect work type and respond accordingly
-        if (lowerResponse.includes('design') || lowerResponse.includes('creative') || lowerResponse.includes('art')) {
-            return `Nice to meet you, ${name}! The creative world needs more people like you.`;
-        } else if (lowerResponse.includes('engineer') || lowerResponse.includes('developer') || lowerResponse.includes('programmer') || lowerResponse.includes('tech')) {
-            return `Hey ${name}! That sounds like fascinating problem-solving work.`;
-        } else if (lowerResponse.includes('manager') || lowerResponse.includes('lead') || lowerResponse.includes('director') || lowerResponse.includes('ceo')) {
-            return `Great to meet you, ${name}! Leading people is both challenging and rewarding.`;
-        } else if (lowerResponse.includes('student') || lowerResponse.includes('studying') || lowerResponse.includes('school')) {
-            return `Hello ${name}! What you're studying sounds really interesting.`;
-        } else if (lowerResponse.includes('startup') || lowerResponse.includes('entrepreneur')) {
-            return `Nice to meet you, ${name}! Ooh, the entrepreneur life! *excited tail wagging*`;
-        } else {
-            return `Nice to meet you, ${name}! That sounds like meaningful work.`;
+        const prompt = this.buildBluePrompt(response, context, name, conversationHistory);
+        
+        const claudeResponse = await this.avatarService.makeClaudeRequest([
+            { role: 'user', content: prompt }
+        ], 150);
+        
+        return claudeResponse.trim();
+    }
+    
+    buildBluePrompt(response, context, name, conversationHistory) {
+        const basePersonality = `You are Blue, El's enthusiastic welcome dog assistant. You're friendly, energetic, curious, and genuinely excited to learn about people. You use dog expressions occasionally (*tail wagging*, *ears perking up*) but naturally. Keep responses to 1-2 sentences and always sound authentically interested in what the person shared.`;
+        
+        const contextPrompts = {
+            'work_intro': `The user just introduced themselves and their work. Respond with genuine curiosity about their field, acknowledge their name warmly, and maybe ask a follow-up question or show enthusiasm about their work.`,
+            'passion_project': `The user shared something they're excited about working on. Match their energy level and show genuine interest in their passion. If they seem really excited, be more energetic. If it's more subdued, be thoughtfully encouraging.`,
+            'dinner_conversation': `The user shared who they'd want to have dinner with and what they'd discuss. Show curiosity about their choice and what it reveals about their interests or values.`,
+            'impact_vision': `The user shared their hopes for impact. Be supportive and encouraging about their vision while showing you understand what drives them.`
+        };
+        
+        let conversationContext = '';
+        if (conversationHistory.length > 0) {
+            conversationContext = `\nPrevious conversation context: ${conversationHistory.slice(-3).map(msg => `${msg.role}: ${msg.content}`).join('\n')}`;
+        }
+        
+        return `${basePersonality}
+
+${contextPrompts[context] || 'Respond encouragingly to what the user shared.'}
+
+User's response: "${response}"
+User's name: ${name}${conversationContext}
+
+Your response as Blue:`;
+    }
+    
+    getConversationContext() {
+        // Return recent conversation for context
+        return this.conversationHistory.slice(-4); // Last 4 exchanges
+    }
+    
+    getFallbackFollowUp(response, context) {
+        const name = this.userName || 'friend';
+        const lowerResponse = response.toLowerCase();
+        
+        // Simplified fallbacks based on context
+        switch(context) {
+            case 'work_intro':
+                if (lowerResponse.includes('design') || lowerResponse.includes('creative')) {
+                    return `Nice to meet you, ${name}! The creative world needs more people like you. *tail wagging*`;
+                } else if (lowerResponse.includes('tech') || lowerResponse.includes('engineer')) {
+                    return `Hey ${name}! That sounds like fascinating problem-solving work.`;
+                } else {
+                    return `Nice to meet you, ${name}! That sounds like meaningful work.`;
+                }
+            case 'passion_project':
+                if (response.includes('!') && response.length > 50) {
+                    return "Wow! *ears perking up* That excitement is absolutely infectious!";
+                } else {
+                    return "That passion really comes through! I love hearing about projects that spark genuine excitement.";
+                }
+            case 'dinner_conversation':
+                return "What a fascinating choice! Those would definitely be some memorable conversations.";
+            case 'impact_vision':
+                return "Incredible! It's inspiring to meet someone with such purposeful vision.";
+            default:
+                return `That's really interesting, ${name}! Tell me more!`;
         }
     }
     
-    generatePassionFollowUp(response) {
-        const lowerResponse = response.toLowerCase();
-        
-        // Detect enthusiasm level and content type
-        if (response.includes('!') && response.length > 100) {
-            return "Wow! *ears perking up* That excitement is absolutely infectious! Tell me more!";
-        } else if (lowerResponse.includes('code') || lowerResponse.includes('programming') || lowerResponse.includes('tech') || lowerResponse.includes('app')) {
-            return "That passion really comes through! I love hearing about innovative solutions.";
-        } else if (lowerResponse.includes('art') || lowerResponse.includes('music') || lowerResponse.includes('design') || lowerResponse.includes('creative')) {
-            return "Your creativity is shining through! Those are the projects that change everything.";
-        } else if (lowerResponse.includes('myself') || lowerResponse.includes('personal') || lowerResponse.includes('growth') || lowerResponse.includes('learning')) {
-            return "That's beautiful - working on yourself is the most important project of all.";
-        } else if (lowerResponse.includes('music')) {
-            return "A fellow music lover! *howls harmoniously* That passion really comes through!";
-        } else if (lowerResponse.includes('travel') || lowerResponse.includes('adventure')) {
-            return "Adventure calls! *nose twitching with wanderlust* That sounds incredible!";
-        } else {
-            return "That passion really comes through! I love hearing about projects that spark genuine excitement.";
-        }
-    }
-    
-    generateDinnerFollowUp(response) {
-        const lowerResponse = response.toLowerCase();
-        
-        // Detect the type of person they'd want to meet
-        if (lowerResponse.includes('einstein') || lowerResponse.includes('shakespeare') || lowerResponse.includes('lincoln') || 
-            lowerResponse.includes('historical') || lowerResponse.includes('ancient') || lowerResponse.includes('past')) {
-            return "What a fascinating choice! History comes alive when you imagine those conversations.";
-        } else if (lowerResponse.includes('scientist') || lowerResponse.includes('inventor') || lowerResponse.includes('researcher') ||
-                   lowerResponse.includes('tesla') || lowerResponse.includes('curie') || lowerResponse.includes('hawking')) {
-            return "Brilliant pick! Those would be some mind-expanding conversations.";
-        } else if (lowerResponse.includes('artist') || lowerResponse.includes('musician') || lowerResponse.includes('writer') ||
-                   lowerResponse.includes('painter') || lowerResponse.includes('creative')) {
-            return "Amazing choice! Creative minds often have the most inspiring perspectives.";
-        } else if (lowerResponse.includes('mom') || lowerResponse.includes('dad') || lowerResponse.includes('family') ||
-                   lowerResponse.includes('grandmother') || lowerResponse.includes('grandfather') || lowerResponse.includes('parent')) {
-            return "That's so heartwarming. Family connections are the most precious conversations.";
-        } else if (lowerResponse.includes('character') || lowerResponse.includes('fictional') || lowerResponse.includes('book') ||
-                   lowerResponse.includes('movie') || lowerResponse.includes('series')) {
-            return "I love that! Sometimes fictional characters teach us the most about ourselves.";
-        } else {
-            return "What a fascinating choice! Those would definitely be some memorable conversations.";
-        }
-    }
-    
-    generateImpactFollowUp(response) {
-        const lowerResponse = response.toLowerCase();
-        
-        // Detect the type of impact they want to make
-        if (lowerResponse.includes('environment') || lowerResponse.includes('climate') || lowerResponse.includes('planet') ||
-            lowerResponse.includes('sustainability') || lowerResponse.includes('green')) {
-            return "The planet needs more champions like you! That's incredibly important work.";
-        } else if (lowerResponse.includes('justice') || lowerResponse.includes('equality') || lowerResponse.includes('rights') ||
-                   lowerResponse.includes('social') || lowerResponse.includes('community') || lowerResponse.includes('change')) {
-            return "That's inspiring! Creating positive change takes real courage and determination.";
-        } else if (lowerResponse.includes('innovation') || lowerResponse.includes('technology') || lowerResponse.includes('invent') ||
-                   lowerResponse.includes('solve') || lowerResponse.includes('future')) {
-            return "Innovation for good is what the world needs! Your vision could change everything.";
-        } else if (lowerResponse.includes('teach') || lowerResponse.includes('education') || lowerResponse.includes('mentor') ||
-                   lowerResponse.includes('learn') || lowerResponse.includes('knowledge')) {
-            return "Teaching and empowering others creates ripple effects that last generations!";
-        } else if (lowerResponse.includes('local') || lowerResponse.includes('neighborhood') || lowerResponse.includes('small') ||
-                   lowerResponse.includes('help people')) {
-            return "Community impact is so meaningful - changing lives one person at a time.";
-        } else {
-            return "Incredible! It's inspiring to meet someone with such purposeful vision.";
-        }
-    }
     
     // Claude API methods for conversation analysis
     async analyzeResponseForClarification(response) {

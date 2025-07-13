@@ -396,7 +396,24 @@ class TerminalQuestionnaire {
         // Clear input immediately
         this.inputField.value = '';
         
-        // Handle based on conversation state
+        // First check if this is a natural conversation request (not questionnaire-related)
+        const conversationAnalysis = await this.analyzeConversationIntent(response);
+        
+        if (conversationAnalysis.isNaturalConversation) {
+            // Handle as natural conversation while maintaining Blue's character
+            setTimeout(async () => {
+                try {
+                    const naturalResponse = await this.generateNaturalConversationResponse(response);
+                    this.typeMessage(naturalResponse, true);
+                } catch (error) {
+                    console.error('Error generating natural conversation response:', error);
+                    this.typeMessage("*confused head tilt* I didn't quite catch that! Let me focus on getting to know you better. " + this.questions[this.currentQuestion].text, true);
+                }
+            }, 500);
+            return;
+        }
+
+        // Handle based on conversation state for questionnaire flow
         if (this.conversationState === 'clarifying') {
             await this.handleClarificationResponse(response);
         } else {
@@ -1140,6 +1157,70 @@ Your response as Blue:`;
     getConversationContext() {
         // Return recent conversation for context
         return this.conversationHistory.slice(-4); // Last 4 exchanges
+    }
+    
+    async analyzeConversationIntent(response) {
+        // Check if the user is making a natural conversation request vs answering the questionnaire
+        const prompt = `Analyze this user message: "${response}"
+
+The user is in a questionnaire where Blue the dog is asking: "${this.questions[this.currentQuestion].text}"
+
+Determine if the user is:
+A) Answering or trying to answer the questionnaire question
+B) Making a natural conversation request (asking Blue to do something, casual chat, off-topic question)
+
+Examples of B (natural conversation):
+- "can you speak spanish" 
+- "tell me a joke"
+- "what's your favorite color"
+- "how are you"
+- "can you help me with math"
+
+Examples of A (answering questionnaire):
+- "My name is John and I'm a developer"
+- "I don't understand the question"
+- "I work in marketing"
+
+Respond with JSON: {"isNaturalConversation": boolean, "reasoning": "brief explanation"}`;
+
+        try {
+            const analysis = await this.avatarService.makeClaudeRequest([
+                { role: 'user', content: prompt }
+            ]);
+            
+            return JSON.parse(analysis);
+        } catch (error) {
+            console.warn('Failed to analyze conversation intent:', error);
+            // Default to questionnaire flow if analysis fails
+            return { isNaturalConversation: false, reasoning: "Analysis failed" };
+        }
+    }
+    
+    async generateNaturalConversationResponse(response) {
+        const currentQuestion = this.questions[this.currentQuestion].text;
+        const conversationHistory = this.getConversationContext();
+        
+        const prompt = `You are Blue, El's enthusiastic welcome dog assistant helping with a personality questionnaire. The user just said: "${response}"
+
+This is NOT an answer to the questionnaire question ("${currentQuestion}") - it's a natural conversation request or casual interaction.
+
+Respond as Blue would:
+1. Stay in character as a friendly, energetic dog (use expressions like *tail wagging*, *excited bark*)
+2. Address their request naturally and helpfully
+3. After addressing their request, gently guide back to the questionnaire
+4. Keep it conversational and warm
+5. If they asked you to speak another language, DO speak that language if you can
+6. Be genuine and engaging, not robotic
+
+Recent conversation context: ${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+Respond as Blue would to their request, then guide back to the questionnaire:`;
+
+        const response_text = await this.avatarService.makeClaudeRequest([
+            { role: 'user', content: prompt }
+        ]);
+        
+        return response_text.trim();
     }
     
     

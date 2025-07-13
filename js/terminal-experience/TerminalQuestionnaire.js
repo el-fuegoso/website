@@ -475,28 +475,7 @@ class TerminalQuestionnaire {
                     }
                 } catch (error) {
                     console.error('Error generating follow-up:', error);
-                    // Fallback to simple response
-                    const fallbackResponse = this.getFallbackFollowUp(response, 'general');
-                    this.typeMessage(fallbackResponse, true, () => {
-                        if (this.currentQuestion < this.questions.length - 1) {
-                            setTimeout(() => {
-                                this.currentQuestion++;
-                                this.conversationState = 'asking';
-                                this.updateProgress();
-                                this.typeMessage(this.questions[this.currentQuestion].text, true);
-                            }, 1000);
-                        } else {
-                            setTimeout(() => {
-                                this.typeMessage(
-                                    `Thanks for sharing, ${this.userName || 'friend'}! 🐕 El will love learning about you. Feel free to explore the rest of the site, and don't hesitate to reach out if you want to chat more!`,
-                                    true,
-                                    () => {
-                                        this.completeExperience();
-                                    }
-                                );
-                            }, 1500);
-                        }
-                    });
+                    throw error; // Let the error bubble up - shouldn't happen with working API
                 }
             }, 500);
             
@@ -1116,14 +1095,8 @@ class TerminalQuestionnaire {
     
     // Dynamic response generation methods
     async generateClaudeFollowUp(response, context) {
-        try {
-            // Try to get a personalized Claude response
-            return await this.getClaudeFollowUp(response, context);
-        } catch (error) {
-            console.warn('Claude API unavailable for follow-up, using fallback:', error);
-            // Fallback to simpler responses if Claude API fails
-            return this.getFallbackFollowUp(response, context);
-        }
+        // Always use Claude for natural conversation - no fallbacks
+        return await this.getClaudeFollowUp(response, context);
     }
     
     async getClaudeFollowUp(response, context) {
@@ -1169,34 +1142,6 @@ Your response as Blue:`;
         return this.conversationHistory.slice(-4); // Last 4 exchanges
     }
     
-    getFallbackFollowUp(response, context) {
-        const name = this.userName || 'friend';
-        const lowerResponse = response.toLowerCase();
-        
-        // Simplified fallbacks based on context
-        switch(context) {
-            case 'work_intro':
-                if (lowerResponse.includes('design') || lowerResponse.includes('creative')) {
-                    return `Nice to meet you, ${name}! The creative world needs more people like you. *tail wagging*`;
-                } else if (lowerResponse.includes('tech') || lowerResponse.includes('engineer')) {
-                    return `Hey ${name}! That sounds like fascinating problem-solving work.`;
-                } else {
-                    return `Nice to meet you, ${name}! That sounds like meaningful work.`;
-                }
-            case 'passion_project':
-                if (response.includes('!') && response.length > 50) {
-                    return "Wow! *ears perking up* That excitement is absolutely infectious!";
-                } else {
-                    return "That passion really comes through! I love hearing about projects that spark genuine excitement.";
-                }
-            case 'dinner_conversation':
-                return "What a fascinating choice! Those would definitely be some memorable conversations.";
-            case 'impact_vision':
-                return "Incredible! It's inspiring to meet someone with such purposeful vision.";
-            default:
-                return `That's really interesting, ${name}! Tell me more!`;
-        }
-    }
     
     
     // Claude API methods for conversation analysis
@@ -1215,19 +1160,11 @@ Your response as Blue:`;
         
         // If it seems like a clarification request, use Claude for intelligent response
         if (seemsLikeClarification || response.length < 10) {
-            try {
-                const clarification = await this.generateClarificationWithClaude(response);
-                return {
-                    isRequest: true,
-                    clarification: clarification
-                };
-            } catch (error) {
-                console.warn('Claude clarification failed, using fallback:', error);
-                return {
-                    isRequest: true,
-                    clarification: this.getFallbackClarification(response)
-                };
-            }
+            const clarification = await this.generateClarificationWithClaude(response);
+            return {
+                isRequest: true,
+                clarification: clarification
+            };
         }
         
         return { isRequest: false };
@@ -1235,21 +1172,10 @@ Your response as Blue:`;
     
     async analyzeFollowupResponse(response) {
         // Analyze if the user is now providing an answer or still needs help
-        try {
-            const analysis = await this.analyzeFollowupWithClaude(response);
-            return analysis;
-        } catch (error) {
-            console.warn('Claude followup analysis failed, using fallback:', error);
-            return this.getFallbackFollowupAnalysis(response);
-        }
+        return await this.analyzeFollowupWithClaude(response);
     }
     
     async generateClarificationWithClaude(userResponse) {
-        // Check if Claude API is available for clarification
-        if (!this.hasClaudeApiForClarification()) {
-            throw new Error('No Claude API key available');
-        }
-        
         const currentQuestion = this.questions[this.currentQuestion];
         const questionContext = this.getQuestionContext(this.currentQuestion);
         
@@ -1265,15 +1191,11 @@ Context: ${questionContext}
 
 Respond as Blue would:`;
 
-        try {
-            const response = await this.avatarService.makeClaudeRequest([
-                { role: 'user', content: prompt }
-            ]);
-            
-            return response;
-        } catch (error) {
-            throw new Error(`Claude API call failed: ${error.message}`);
-        }
+        const response = await this.avatarService.makeClaudeRequest([
+            { role: 'user', content: prompt }
+        ]);
+        
+        return response;
     }
     
     async analyzeFollowupWithClaude(userResponse) {
@@ -1330,54 +1252,8 @@ Blue should use dog expressions like *wags tail*, *encouraging bark*, etc.`;
         return contexts[questionIndex] || "General getting-to-know-you question.";
     }
     
-    getFallbackClarification(userResponse) {
-        const currentQuestion = this.questions[this.currentQuestion];
-        
-        // Simple fallback clarifications based on question
-        const fallbacks = [
-            "No worries! *friendly tail wag* I'm just asking for your name and what you do - like your job, studies, or main activity. For example: 'I'm Sarah and I'm a teacher' or 'I'm Alex and I'm studying computer science.'",
-            
-            "*head tilt* I'm curious about something you're working on that gets you excited! It could be a work project, hobby, learning something new, or even a personal goal. What's been on your mind lately?",
-            
-            "This is a fun one! *excited panting* If you could sit down for dinner with anyone - alive, from history, or even fictional - who would it be? And what would you want to chat about with them?",
-            
-            "*thoughtful ear perk* I'm asking about the positive difference you'd like to make! It could be big (changing the world) or small (helping your neighbors), in your work or personal life. What impact matters to you?"
-        ];
-        
-        return fallbacks[this.currentQuestion] || "Let me know if you need help with this question! *encouraging wag*";
-    }
     
-    getFallbackFollowupAnalysis(userResponse) {
-        const lowerResponse = userResponse.toLowerCase();
-        
-        // Simple heuristics for fallback
-        if (lowerResponse.includes('still') || lowerResponse.includes('more help') || 
-            lowerResponse.includes('don\'t') || lowerResponse.includes('confused')) {
-            return {
-                isAnswer: false,
-                needsMoreHelp: true,
-                additionalHelp: "No problem at all! *patient tail wag* Take your time. You can share whatever feels comfortable - there's no wrong answer here!"
-            };
-        }
-        
-        if (userResponse.length > 15 && !lowerResponse.includes('?')) {
-            return {
-                isAnswer: true,
-                needsMoreHelp: false
-            };
-        }
-        
-        return {
-            isAnswer: false,
-            needsMoreHelp: false,
-            response: "That's helpful! *encouraging nod* Feel free to share more, or if you're ready, go ahead and answer the question however feels right to you!"
-        };
-    }
     
-    // Helper method to check if Claude API is available for clarification
-    hasClaudeApiForClarification() {
-        return this.avatarService.apiKey || localStorage.getItem('claude_api_key');
-    }
     
     minimize() {
         this.isMinimized = !this.isMinimized;

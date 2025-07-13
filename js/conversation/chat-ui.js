@@ -198,17 +198,18 @@ class ChatUI {
 
     getArchetypeEmoji(archetype) {
         const emojiMap = {
-            'TheStrategist': '🎯',
             'TheBuilder': '🔨',
-            'TheBridge': '🌉',
-            'TheInnovator': '💡',
-            'TheExplorer': '🧭',
             'TheDetective': '🔍',
-            'TheMaster': '🏆',
-            'TheVeteran': '⚔️',
-            'TheSkeptic': '🤔',
-            'TheDisruptor': '⚡',
-            'TheHustler': '🚀'
+            'GrumpyOldManEl': '🤬',
+            'TheHustler': '🚀',
+            'PirateEl': '🏴‍☠️',
+            'GymBroEl': '💪',
+            'FreakyEl': '🌶️',
+            'CoffeeAddictEl': '☕',
+            'ConspiracyEl': '👁️',
+            'AGIEl': '🤖',
+            'ProcrastinationEl': '😴',
+            'TechBroEl': '📱'
         };
         return emojiMap[archetype] || '🤖';
     }

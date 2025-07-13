@@ -147,7 +147,14 @@ class TemplateAvatarGenerator {
      * Generate various avatar components
      */
     generateName(template, insights) {
-        const baseNames = template.names || ['El', 'Assistant', 'Companion'];
+        // Use the character's specific names if available, otherwise fall back to generic generation
+        const characterNames = template.names;
+        if (characterNames && characterNames.length > 0) {
+            return this.randomChoice(characterNames);
+        }
+        
+        // Fallback for characters without specific names
+        const baseNames = ['El', 'Assistant', 'Companion'];
         const topicModifiers = {
             'technology': ['Tech', 'Code', 'Dev', 'Digital'],
             'design': ['Creative', 'Visual', 'Design', 'Aesthetic'],

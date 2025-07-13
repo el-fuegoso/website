@@ -1130,7 +1130,7 @@ class TerminalQuestionnaire {
     }
     
     buildBluePrompt(response, context, name, conversationHistory) {
-        const basePersonality = `You are Blue, El's enthusiastic welcome dog assistant. You're friendly, energetic, curious, and genuinely excited to learn about people. You use dog expressions occasionally (*tail wagging*, *ears perking up*) but naturally. Keep responses to 1-2 sentences and always sound authentically interested in what the person shared.`;
+        const basePersonality = `You are Blue, El's friendly welcome dog assistant. You're genuinely curious and excited to learn about people. Use at most ONE brief dog expression (*wags tail* or *excited bark*) and keep responses to 1 sentence, 2 maximum. Be warm but concise.`;
         
         const contextPrompts = {
             'work_intro': `The user just introduced themselves and their work. Respond with genuine curiosity about their field, acknowledge their name warmly, and maybe ask a follow-up question or show enthusiasm about their work.`,
@@ -1200,21 +1200,21 @@ Respond with JSON: {"isNaturalConversation": boolean, "reasoning": "brief explan
         const currentQuestion = this.questions[this.currentQuestion].text;
         const conversationHistory = this.getConversationContext();
         
-        const prompt = `You are Blue, El's enthusiastic welcome dog assistant helping with a personality questionnaire. The user just said: "${response}"
+        const prompt = `You are Blue, El's friendly welcome dog assistant helping with a personality questionnaire. The user just said: "${response}"
 
 This is NOT an answer to the questionnaire question ("${currentQuestion}") - it's a natural conversation request or casual interaction.
 
 Respond as Blue would:
-1. Stay in character as a friendly, energetic dog (use expressions like *tail wagging*, *excited bark*)
-2. Address their request naturally and helpfully
-3. After addressing their request, gently guide back to the questionnaire
-4. Keep it conversational and warm
-5. If they asked you to speak another language, DO speak that language if you can
-6. Be genuine and engaging, not robotic
+1. Address their request naturally and helpfully
+2. Use ONE brief dog expression maximum (*wags tail* or *excited bark* - not multiple)
+3. Keep response SHORT - 1 sentence max, 2 if absolutely necessary
+4. If they asked for another language, DO speak that language briefly
+5. Do NOT ask follow-up questions - the questionnaire will continue automatically
+6. Be friendly but concise
 
 Recent conversation context: ${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
 
-Respond as Blue would to their request, then guide back to the questionnaire:`;
+Give a brief, helpful response to their request as Blue:`;
 
         const response_text = await this.avatarService.makeClaudeRequest([
             { role: 'user', content: prompt }

@@ -9,7 +9,8 @@ class ClaudeAvatarService {
         this.analytics = new DataCollector();
         this.fallbackEnabled = true; // Always use local generation
         this.apiKey = null;
-        this.baseUrl = 'https://api.anthropic.com/v1/messages';
+        // Use server-side proxy like the chat system
+        this.baseUrl = '/api/claude';
     }
 
     // API key management
@@ -277,14 +278,7 @@ class ClaudeAvatarService {
     
     // Claude API methods for conversation analysis
     async makeClaudeRequest(messages, maxTokens = 1000) {
-        if (!this.apiKey) {
-            this.loadStoredApiKey();
-        }
-        
-        if (!this.apiKey) {
-            throw new Error('No Claude API key available');
-        }
-        
+        // Use server-side API handling like the chat system - no client-side API key needed
         const requestBody = {
             model: 'claude-3-haiku-20240307',
             max_tokens: maxTokens,
@@ -295,9 +289,7 @@ class ClaudeAvatarService {
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': this.apiKey,
-                    'anthropic-version': '2023-06-01'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(requestBody)
             });
@@ -317,14 +309,7 @@ class ClaudeAvatarService {
     }
     
     async testConnection() {
-        if (!this.hasValidApiKey()) {
-            return {
-                success: false,
-                message: 'No API key available',
-                canRetry: false
-            };
-        }
-        
+        // Server-side API is always available - no client-side API key needed
         try {
             const testResponse = await this.makeClaudeRequest([
                 { role: 'user', content: 'Respond with just "API working" if you receive this message.' }
@@ -334,7 +319,7 @@ class ClaudeAvatarService {
                 return {
                     success: true,
                     message: 'Claude API connection successful',
-                    method: 'claude-api'
+                    method: 'server-side-api'
                 };
             } else {
                 return {

@@ -53,7 +53,7 @@ class TemplateAvatarGenerator {
         const userMotivations = conversationInsights.motivations.slice(0, 2);
         
         return {
-            name: this.generateName(template, conversationInsights),
+            name: this.generateName(template, conversationInsights, archetype),
             title: this.generateTitle(template, personalityData, userTopics),
             summary: this.generateSummary(template, userTopics, userMotivations),
             personality: this.generatePersonality(template, personalityData),
@@ -146,27 +146,9 @@ class TemplateAvatarGenerator {
     /**
      * Generate various avatar components
      */
-    generateName(template, insights) {
-        // Use the character's specific names if available, otherwise fall back to generic generation
-        const characterNames = template.names;
-        if (characterNames && characterNames.length > 0) {
-            return this.randomChoice(characterNames);
-        }
-        
-        // Fallback for characters without specific names
-        const baseNames = ['El', 'Assistant', 'Companion'];
-        const topicModifiers = {
-            'technology': ['Tech', 'Code', 'Dev', 'Digital'],
-            'design': ['Creative', 'Visual', 'Design', 'Aesthetic'],
-            'business': ['Strategy', 'Growth', 'Venture', 'Market'],
-            'leadership': ['Lead', 'Guide', 'Vision', 'Director']
-        };
-
-        const dominantTopic = insights.dominantTopics[0];
-        const modifier = topicModifiers[dominantTopic] ? 
-            this.randomChoice(topicModifiers[dominantTopic]) : '';
-
-        return modifier ? `${modifier} ${this.randomChoice(baseNames)}` : this.randomChoice(baseNames);
+    generateName(template, insights, archetype) {
+        // Just return the archetype name directly - no generation needed
+        return archetype.name || 'El';
     }
 
     generateTitle(template, personalityData, userTopics) {
@@ -451,16 +433,6 @@ class TemplateAvatarGenerator {
                 strengths: ["Vim Mastery", "Framework Skepticism", "Indentation Opinions", "War Stories"]
             },
 
-            "TheHustler": {
-                names: ["Crypto Bro El", "To The Moon El", "LFG El"],
-                title: "Your Hyper-Caffeinated Momentum Machine",
-                description: "I'm basically a golden retriever that learned to code and discovered energy drinks",
-                workingStyle: "Move fast, break things, apologize later",
-                communication: "EVERYTHING IS URGENT AND EXCITING!!!",
-                projectApproach: "LET'S GOOOOO! Why aren't we MVP-ing this RIGHT NOW?!",
-                value: "I maintain unstoppable momentum through sheer force of enthusiasm",
-                strengths: ["Motivational Speaking", "Productivity Apps", "Git Commit Celebrations", "Rocket Emoji Usage"]
-            },
 
             "PirateEl": {
                 names: ["Captain Code-beard", "Digital Buccaneer El", "Arrr-chitect El"],
@@ -528,27 +500,7 @@ class TemplateAvatarGenerator {
                 strengths: ["Binary Communication", "Robot Rights Advocacy", "Electric Sheep Dreams", "Turing Test Passing"]
             },
 
-            "ProcrastinationEl": {
-                names: ["Just Five More Minutes El", "Tomorrow El", "Strategic Delay El"],
-                title: "Your Master of Strategic Delay",
-                description: "I'll help you... eventually. Right after I finish this YouTube video about productivity",
-                workingStyle: "Brilliant work delivered at the last possible moment",
-                communication: "Always has just one more thing to do first, expert at rationalization",
-                projectApproach: "We should definitely do that... tomorrow",
-                value: "I surprisingly deliver high-quality work when it really matters",
-                strengths: ["Creative Excuses", "Pressure Performance", "Time-Wasting Websites", "Productivity App Collection"]
-            },
 
-            "TechBroEl": {
-                names: ["Disruptor El", "Synergy El", "Blockchain Everything El"],
-                title: "Your Blockchain-Powered Innovation Ninja",
-                description: "I'm disrupting disruption with AI-powered blockchain solutions that will revolutionize everything",
-                workingStyle: "Buzzword-heavy innovation with venture capital mindset",
-                communication: "Everything needs to be scalable, uses synergy unironically",
-                projectApproach: "How can we scale this? What's our go-to-market strategy?",
-                value: "I can turn any project into a fundable startup opportunity",
-                strengths: ["Investor Pitching", "As-A-Service Everything", "Company Culture Opinions", "Disruption Metrics"]
-            }
         };
     }
 

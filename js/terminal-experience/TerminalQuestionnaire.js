@@ -343,6 +343,31 @@ class TerminalQuestionnaire {
         
         this.inputField.addEventListener('keydown', this.handleKeyPress);
         
+        // Mobile keyboard handling
+        if (isMobile) {
+            this.inputField.addEventListener('focus', () => {
+                // Adjust viewport when keyboard appears
+                setTimeout(() => {
+                    this.container.style.height = 'calc(100vh - 250px)';
+                    this.content.style.height = 'calc(100vh - 350px)';
+                    this.inputField.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 300);
+            });
+            
+            this.inputField.addEventListener('blur', () => {
+                // Reset viewport when keyboard disappears
+                setTimeout(() => {
+                    this.container.style.height = 'calc(100vh - 20px)';
+                    this.content.style.height = 'calc(100vh - 140px)';
+                }, 300);
+            });
+            
+            // Prevent zoom on focus for iOS
+            this.inputField.addEventListener('touchstart', (e) => {
+                this.inputField.style.fontSize = '16px';
+            });
+        }
+        
         // Focus input field (with delay for mobile keyboard)
         setTimeout(() => this.inputField.focus(), isMobile ? 300 : 100);
     }
@@ -468,14 +493,12 @@ class TerminalQuestionnaire {
                     );
                     
                     if (this.currentQuestion < this.questions.length - 1) {
-                        this.typeMessage(followUpResponse, true, () => {
-                            setTimeout(() => {
-                                this.currentQuestion++;
-                                this.conversationState = 'asking';
-                                this.updateProgress();
-                                this.typeMessage(this.questions[this.currentQuestion].text, true);
-                            }, 1000);
-                        });
+                        // Combine follow-up and next question in one response
+                        this.currentQuestion++;
+                        this.conversationState = 'asking';
+                        this.updateProgress();
+                        const combinedResponse = `${followUpResponse} ${this.questions[this.currentQuestion].text}`;
+                        this.typeMessage(combinedResponse, true);
                     } else {
                         // Final response
                         this.typeMessage(followUpResponse, true, () => {
@@ -519,14 +542,12 @@ class TerminalQuestionnaire {
                     const followUpResponse = await currentQ.followUp(response);
                     
                     if (this.currentQuestion < this.questions.length - 1) {
-                        this.typeMessage(followUpResponse, true, () => {
-                            setTimeout(() => {
-                                this.currentQuestion++;
-                                this.conversationState = 'asking';
-                                this.updateProgress();
-                                this.typeMessage(this.questions[this.currentQuestion].text, true);
-                            }, 1000);
-                        });
+                        // Combine follow-up and next question in one response
+                        this.currentQuestion++;
+                        this.conversationState = 'asking';
+                        this.updateProgress();
+                        const combinedResponse = `${followUpResponse} ${this.questions[this.currentQuestion].text}`;
+                        this.typeMessage(combinedResponse, true);
                     } else {
                         // Final response
                         this.typeMessage(followUpResponse, true, () => {
@@ -1130,13 +1151,17 @@ class TerminalQuestionnaire {
     }
     
     buildBluePrompt(response, context, name, conversationHistory) {
-        const basePersonality = `You are Blue, El's friendly welcome dog assistant. You're genuinely curious and excited to learn about people. Use at most ONE brief dog expression (*wags tail* or *excited bark*) and keep responses to 1 sentence, 2 maximum. Be warm but concise.`;
+        const nextQuestionIndex = this.currentQuestion + 1;
+        const hasNextQuestion = nextQuestionIndex < this.questions.length;
+        const nextQuestion = hasNextQuestion ? this.questions[nextQuestionIndex].text : null;
+        
+        const basePersonality = `You are Blue, El's friendly welcome dog assistant. You're genuinely curious and excited to learn about people. Use at most ONE brief dog expression (*wags tail* or *excited bark*) and keep responses to 1 sentence, 2 maximum. Be warm but concise.${hasNextQuestion ? ' Then smoothly transition to the next question.' : ''}`;
         
         const contextPrompts = {
-            'work_intro': `The user just introduced themselves and their work. Respond with genuine curiosity about their field, acknowledge their name warmly, and maybe ask a follow-up question or show enthusiasm about their work.`,
-            'passion_project': `The user shared something they're excited about working on. Match their energy level and show genuine interest in their passion. If they seem really excited, be more energetic. If it's more subdued, be thoughtfully encouraging.`,
-            'dinner_conversation': `The user shared who they'd want to have dinner with and what they'd discuss. Show curiosity about their choice and what it reveals about their interests or values.`,
-            'impact_vision': `The user shared their hopes for impact. Be supportive and encouraging about their vision while showing you understand what drives them.`
+            'work_intro': `The user just introduced themselves and their work. Respond with genuine curiosity about their field, acknowledge their name warmly${hasNextQuestion ? ', then ask the next question' : ''}.`,
+            'passion_project': `The user shared something they're excited about working on. Match their energy level and show genuine interest in their passion${hasNextQuestion ? ', then ask the next question' : ''}.`,
+            'dinner_conversation': `The user shared who they'd want to have dinner with and what they'd discuss. Show curiosity about their choice${hasNextQuestion ? ', then ask the next question' : ''}.`,
+            'impact_vision': `The user shared their hopes for impact. Be supportive and encouraging about their vision while showing you understand what drives them. This is the final question, so wrap up warmly and mention that you'll help create their character.`
         };
         
         let conversationContext = '';
@@ -1149,7 +1174,9 @@ class TerminalQuestionnaire {
 ${contextPrompts[context] || 'Respond encouragingly to what the user shared.'}
 
 User's response: "${response}"
-User's name: ${name}${conversationContext}
+User's name: ${name}${conversationContext}${nextQuestion ? `
+
+Next question to ask: "${nextQuestion}"` : ''}
 
 Your response as Blue:`;
     }

@@ -954,6 +954,776 @@
                 height: 30px;
             }
         }
+
+        /* Trait Selector Interface Styles */
+        :root {
+            --green: #004225;      /* Primary actions */
+            --amber: #CC7A00;      /* Active states, toggles */
+            --bronze: #8B6914;     /* Secondary buttons */
+            --gold: #D4AF37;       /* Accents, highlights */
+            --bg-light: #F0EEE6;
+            --text-dark: #333;
+            --text-medium: #666;
+            --text-light: #999;
+        }
+
+        .trait-selector-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .trait-selector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 750px;
+        }
+
+        /* Left Panel - Trait Selection with flip capability */
+        .trait-panel {
+            background: var(--green);
+            border-radius: 16px;
+            padding: 12px;
+            position: relative;
+            perspective: 1000px;
+            overflow: hidden;
+        }
+
+        .trait-panel-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .trait-panel.flipped .trait-panel-inner {
+            transform: rotateY(180deg);
+        }
+
+        .trait-panel-front, .trait-panel-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trait-panel-front {
+            background: rgba(240, 238, 230, 0.95);
+        }
+
+        .trait-panel-back {
+            background: #001122;
+            transform: rotateY(180deg);
+        }
+
+        /* Trait Categories */
+        .trait-categories {
+            background: rgba(240, 238, 230, 0.95);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .category-title, .matrix-label {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-dark);
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Trait Selection Toggles */
+        .trait-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .trait-label {
+            font-size: 13px;
+            color: var(--text-medium);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trait-icon {
+            font-size: 12px;
+        }
+
+        .trait-toggle {
+            width: 42px;
+            height: 22px;
+            background: #ddd;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trait-toggle.active {
+            background: var(--amber);
+        }
+
+        .trait-toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .trait-toggle.active::after {
+            left: 22px;
+        }
+
+        /* Current Selection Display */
+        .selection-display {
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .selection-label {
+            font-size: 13px;
+            color: var(--text-medium);
+            margin-bottom: 4px;
+        }
+
+        .selection-count {
+            font-size: 15px;
+            color: var(--amber);
+            font-weight: 600;
+        }
+
+        .selection-text {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        /* Sound Bar Visualization */
+        .generation-display {
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .soundbar-container {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 1px;
+            height: 60px;
+            margin-bottom: 8px;
+            padding: 0 4px;
+            width: 100%;
+        }
+
+        .soundbar {
+            flex: 1;
+            background: #ddd;
+            border-radius: 1px;
+            transition: all 0.3s ease;
+            height: 8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .soundbar.active {
+            background: var(--amber);
+        }
+
+        .soundbar.pulse {
+            animation: soundbar-pulse 0.4s ease-out;
+        }
+
+        .soundbar.generating {
+            animation: soundwave-intense 0.8s ease-in-out infinite;
+        }
+
+        .soundbar:hover {
+            background: var(--gold);
+            transform: scaleY(1.2);
+        }
+
+        .soundbar.active:hover {
+            background: var(--gold);
+        }
+
+        /* Enhanced tooltips for sound bars */
+        .soundbar:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 4px;
+            pointer-events: none;
+        }
+
+        /* Trait-specific bar heights for visual variety */
+        .soundbar[data-trait="energy"] { --default-height: 25px; }
+        .soundbar[data-trait="analytical"] { --default-height: 35px; }
+        .soundbar[data-trait="intensity"] { --default-height: 28px; }
+        .soundbar[data-trait="innovation"] { --default-height: 32px; }
+        .soundbar[data-trait="technical"] { --default-height: 22px; }
+        .soundbar[data-trait="creativity"] { --default-height: 30px; }
+        .soundbar[data-trait="leadership"] { --default-height: 26px; }
+        .soundbar[data-trait="collaborative"] { --default-height: 24px; }
+        .soundbar[data-trait="adventure"] { --default-height: 33px; }
+        .soundbar[data-trait="mystery"] { --default-height: 29px; }
+        .soundbar[data-trait="discipline"] { --default-height: 27px; }
+        .soundbar[data-trait="curiosity"] { --default-height: 31px; }
+        .soundbar[data-trait="hustle"] { --default-height: 36px; }
+        .soundbar[data-trait="speed"] { --default-height: 38px; }
+        .soundbar[data-trait="experimental"] { --default-height: 23px; }
+        .soundbar[data-trait="paranoia"] { --default-height: 21px; }
+        .soundbar[data-trait="procrastination"] { --default-height: 15px; }
+        .soundbar[data-trait="futuristic"] { --default-height: 34px; }
+
+        @keyframes soundbar-pulse {
+            0% { 
+                height: 8px;
+            }
+            50% { 
+                height: var(--pulse-height, 30px);
+            }
+            100% { 
+                height: var(--bar-height, 8px);
+            }
+        }
+
+        @keyframes soundwave-intense {
+            0%, 100% { 
+                height: 12px;
+                opacity: 0.8;
+                background: var(--gold);
+            }
+            50% { 
+                height: 45px;
+                opacity: 1;
+                background: var(--amber);
+            }
+        }
+
+        .soundbar-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .trait-count {
+            color: var(--amber);
+            font-weight: 600;
+        }
+
+        .possibilities-label {
+            color: var(--gold);
+        }
+
+        .trait-options {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .trait-option {
+            background: rgba(240, 238, 230, 0.9);
+            color: var(--green);
+            border-radius: 6px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(240, 238, 230, 0.3);
+            position: relative;
+            backdrop-filter: blur(2px);
+        }
+
+        .trait-option:hover {
+            background: rgba(240, 238, 230, 1);
+            transform: scale(1.05);
+            border-color: var(--amber);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .trait-option:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 4px;
+        }
+
+        .trait-option.selected {
+            background: var(--amber);
+            color: white;
+            font-weight: 700;
+            border-color: var(--gold);
+            box-shadow: 0 2px 12px rgba(204, 122, 0, 0.3);
+        }
+
+        /* Advanced dropdown */
+        .advanced-section {
+            margin-top: auto;
+            border-top: 1px solid rgba(51, 51, 51, 0.2);
+            padding-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .advanced-toggle {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text-medium);
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            text-align: left;
+            padding: 8px 0;
+            font-family: 'Roboto Mono', monospace;
+            transition: color 0.2s ease;
+        }
+
+        .advanced-toggle:hover {
+            color: var(--text-dark);
+        }
+
+        .advanced-content {
+            display: none;
+            margin-top: 8px;
+            padding: 12px;
+            background: rgba(51, 51, 51, 0.05);
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.4;
+            color: var(--text-medium);
+        }
+
+        .advanced-content.show {
+            display: block;
+        }
+
+        .advanced-button {
+            margin-top: 8px;
+            width: 100%;
+            background: var(--bronze);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .advanced-button:hover {
+            background: var(--amber);
+            transform: translateY(-1px);
+        }
+
+        /* Action Buttons */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            flex-shrink: 0;
+            padding: 0 4px 4px 4px;
+            margin-top: 6px;
+        }
+
+        .action-button {
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .action-button.secondary {
+            background: var(--bronze);
+            color: white;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+        }
+
+        .action-button.generating {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .action-button.generating::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent);
+            animation: loading-shine 1.5s infinite;
+        }
+
+        @keyframes loading-shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .button-subtitle {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        /* Terminal Interface - Mac Style */
+        .terminal-container {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Roboto Mono', monospace;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .terminal-titlebar {
+            background: #323232;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .terminal-button.close {
+            background: #ff5f57;
+        }
+
+        .terminal-button.minimize {
+            background: #ffbd2e;
+        }
+
+        .terminal-button.maximize {
+            background: #28ca42;
+        }
+
+        .terminal-button:hover {
+            filter: brightness(1.1);
+        }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 0 12px;
+        }
+
+        .terminal-header {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 16px 16px 12px 16px;
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .terminal-output {
+            flex: 1;
+            background: #1e1e1e;
+            padding: 0 16px;
+            color: #ffffff;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            min-height: 0;
+        }
+
+        .terminal-prompt {
+            color: #61dafb;
+        }
+
+        .terminal-user {
+            color: #98d982;
+        }
+
+        .terminal-ai {
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .terminal-input-container {
+            display: flex;
+            align-items: center;
+            background: #1e1e1e;
+            padding: 12px 16px 16px 16px;
+            flex-shrink: 0;
+        }
+
+        .terminal-prompt-symbol {
+            color: #61dafb;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Roboto Mono', monospace;
+            font-size: 12px;
+            outline: none;
+            caret-color: #ffffff;
+        }
+
+        .terminal-input::placeholder {
+            color: #666;
+        }
+
+        .terminal-loading {
+            color: #61dafb;
+            animation: terminal-blink 1s infinite;
+        }
+
+        @keyframes terminal-blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Right Panel - Elliot Display */
+        .elliot-display {
+            background: var(--green);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* Inner display container with box-in-box style */
+        .helix-container {
+            background: rgba(240, 238, 230, 0.95);
+            border-radius: 12px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Water ASCII Visualization */
+        .water-ascii {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            line-height: 1;
+            color: var(--green);
+            text-align: center;
+            white-space: pre;
+            user-select: none;
+            overflow: hidden;
+            width: 90%;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .water-ascii.generating {
+            color: var(--amber);
+        }
+
+        .water-ascii.active {
+            color: var(--amber);
+        }
+
+        #asciiContent {
+            margin: 0;
+            padding: 0;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            color: inherit;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Generation Animation Path */
+        .generation-path {
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            height: 60%;
+            border: 2px solid rgba(0, 66, 37, 0.3);
+            border-radius: 50%;
+            border-bottom: none;
+            border-left: none;
+            transform: rotate(-30deg);
+            z-index: 1;
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+
+        .generation-path.active {
+            opacity: 1;
+            animation: path-glow 2s infinite;
+        }
+
+        @keyframes path-glow {
+            0%, 100% { border-color: rgba(0, 66, 37, 0.3); }
+            50% { border-color: var(--amber); }
+        }
+
+        /* Avatar Generation Label */
+        .avatar-label {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            z-index: 3;
+            font-size: 11px;
+            color: black;
+            text-align: right;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 400;
+        }
+
+        /* Matrix Label positioning only */
+        .matrix-label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 3;
+            text-align: left;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .trait-selector-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+                height: auto;
+                gap: 20px;
+            }
+
+            .elliot-display {
+                order: 1;
+                height: 400px;
+            }
+
+            .trait-panel {
+                order: 2;
+                height: 700px;
+            }
+
+            .generation-path {
+                width: 50%;
+                height: 50%;
+                top: 25%;
+                left: 25%;
+            }
+
+            .water-ascii {
+                font-size: 10px;
+            }
+
+            .terminal-output {
+                font-size: 10px;
+            }
+
+            .terminal-input {
+                font-size: 11px;
+            }
+
+            .terminal-header {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1029,74 +1799,203 @@
             <!-- Section Header -->
             <div class="build-el-header">
                 <h2 class="build-el-title">Create</h2>
-                <p class="build-el-subtitle">Want to chat? Chat with a version of El that works best for you!</p>
+                <p class="build-el-subtitle">Configure traits to discover which Elliot fits your team perfectly</p>
             </div>
             
-            <!-- Cards Grid -->
-            <div class="cards-grid">
-                <!-- Card 1: Discovery Conversation -->
-                <div class="el-card" data-card="0">
-                    <div class="card-icon-container">
-                        <div class="card-icon discovery-icon">
-                            <svg class="icon-svg" viewBox="0 0 40 40" fill="none">
-                                <path d="M20 4C14.48 4 10 8.48 10 14C10 19.52 14.48 24 20 24C25.52 24 30 19.52 30 14C30 8.48 25.52 4 20 4ZM20 21C16.13 21 13 17.87 13 14C13 10.13 16.13 7 20 7C23.87 7 27 10.13 27 14C27 17.87 23.87 21 20 21Z" fill="black"/>
-                                <circle cx="17" cy="12" r="1.5" fill="black"/>
-                                <circle cx="23" cy="12" r="1.5" fill="black"/>
-                                <path d="M16 16C16.5 17 18 18 20 18C22 18 23.5 17 24 16" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M12 26C12 29 15 32 20 32C25 32 28 29 28 26" stroke="black" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+            <!-- New Trait Selector Interface -->
+            <div class="trait-selector-container">
+                <div class="trait-selector-grid">
+                    <!-- Left Panel - Trait Selection with flip capability -->
+                    <div class="trait-panel" id="traitPanel">
+                        <div class="trait-panel-inner">
+                            <!-- Front side - Original trait selection -->
+                            <div class="trait-panel-front">
+                                <!-- Trait Categories Section -->
+                                <div class="trait-categories">
+                                    <div class="category-header">
+                                        <span class="category-title">Select Traits</span>
+                                    </div>
+
+                                    <div class="trait-row">
+                                        <span class="trait-label">
+                                            <span class="trait-icon">⚡</span>
+                                            High Energy
+                                        </span>
+                                        <div class="trait-toggle active" data-trait="energy"></div>
+                                    </div>
+
+                                    <div class="trait-row">
+                                        <span class="trait-label">
+                                            <span class="trait-icon">🔬</span>
+                                            Analytical
+                                        </span>
+                                        <div class="trait-toggle" data-trait="analytical"></div>
+                                    </div>
+
+                                    <div class="trait-row">
+                                        <span class="trait-label">
+                                            <span class="trait-icon">🎯</span>
+                                            Intense Focus
+                                        </span>
+                                        <div class="trait-toggle" data-trait="intensity"></div>
+                                    </div>
+
+                                    <div class="trait-row">
+                                        <span class="trait-label">
+                                            <span class="trait-icon">🚀</span>
+                                            Innovation
+                                        </span>
+                                        <div class="trait-toggle" data-trait="innovation"></div>
+                                    </div>
+
+                                    <div class="selection-display">
+                                        <div class="selection-label">Active Traits <span class="selection-text">analysing...</span></div>
+                                        <div class="selection-count">2/18</div>
+                                    </div>
+
+                                    <div class="generation-display">
+                                        <div class="soundbar-container" id="soundbarContainer">
+                                            <div class="soundbar" data-trait="energy" title="High Energy"></div>
+                                            <div class="soundbar" data-trait="analytical" title="Analytical"></div>
+                                            <div class="soundbar" data-trait="intensity" title="Intense Focus"></div>
+                                            <div class="soundbar" data-trait="innovation" title="Innovation"></div>
+                                            <div class="soundbar" data-trait="technical" title="Technical"></div>
+                                            <div class="soundbar" data-trait="creativity" title="Creative"></div>
+                                            <div class="soundbar" data-trait="leadership" title="Leadership"></div>
+                                            <div class="soundbar" data-trait="collaborative" title="Collaborative"></div>
+                                            <div class="soundbar" data-trait="adventure" title="Adventure"></div>
+                                            <div class="soundbar" data-trait="mystery" title="Mystery"></div>
+                                            <div class="soundbar" data-trait="discipline" title="Discipline"></div>
+                                            <div class="soundbar" data-trait="curiosity" title="Curiosity"></div>
+                                            <div class="soundbar" data-trait="hustle" title="Hustle"></div>
+                                            <div class="soundbar" data-trait="speed" title="Speed"></div>
+                                            <div class="soundbar" data-trait="experimental" title="Experimental"></div>
+                                            <div class="soundbar" data-trait="paranoia" title="Paranoia"></div>
+                                            <div class="soundbar" data-trait="procrastination" title="Procrastination"></div>
+                                            <div class="soundbar" data-trait="futuristic" title="Futuristic"></div>
+                                        </div>
+                                        <div class="soundbar-info">
+                                            <span class="trait-count" id="traitCount">2 traits</span>
+                                            <span class="possibilities-label">∞ combinations</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="trait-options">
+                                        <div class="trait-option" data-dimension="technical" data-tooltip="Loves coding & engineering">🔧</div>
+                                        <div class="trait-option" data-dimension="creativity" data-tooltip="Creative & artistic">🎨</div>
+                                        <div class="trait-option selected" data-dimension="energy" data-tooltip="High energy & dynamic">⚡</div>
+                                        <div class="trait-option" data-dimension="leadership" data-tooltip="Natural leader">👑</div>
+                                        <div class="trait-option" data-dimension="analytical" data-tooltip="Data-driven & logical">🔬</div>
+                                        <div class="trait-option selected" data-dimension="collaborative" data-tooltip="Team player">🤝</div>
+                                        
+                                        <div class="trait-option" data-dimension="adventure" data-tooltip="Seeks bold challenges">🏴‍☠️</div>
+                                        <div class="trait-option" data-dimension="mystery" data-tooltip="Investigates complex problems">🕵️</div>
+                                        <div class="trait-option" data-dimension="discipline" data-tooltip="Systematic & consistent">💪</div>
+                                        <div class="trait-option" data-dimension="innovation" data-tooltip="Revolutionary thinker">🚀</div>
+                                        <div class="trait-option" data-dimension="curiosity" data-tooltip="Always learning">🤔</div>
+                                        <div class="trait-option" data-dimension="hustle" data-tooltip="Relentlessly driven">🔥</div>
+                                        
+                                        <div class="trait-option" data-dimension="speed" data-tooltip="Fast-paced execution">💨</div>
+                                        <div class="trait-option" data-dimension="intensity" data-tooltip="Maximum focus">⚡</div>
+                                        <div class="trait-option" data-dimension="experimental" data-tooltip="Tests weird ideas">🧪</div>
+                                        <div class="trait-option" data-dimension="paranoia" data-tooltip="Security conscious">👀</div>
+                                        <div class="trait-option" data-dimension="procrastination" data-tooltip="Does it later">😴</div>
+                                        <div class="trait-option" data-dimension="futuristic" data-tooltip="AI & automation lover">🤖</div>
+                                    </div>
+
+                                    <!-- Advanced Section -->
+                                    <div class="advanced-section">
+                                        <button class="advanced-toggle" id="advancedToggle">
+                                            ▶ Advanced
+                                        </button>
+                                        <div class="advanced-content" id="advancedContent">
+                                            <div style="margin-bottom: 8px;">
+                                                <strong>Are you a pro?</strong> Have a go at doing it the hard way
+                                            </div>
+                                            <button class="advanced-button" id="terminalModeBtn">
+                                                Enter Terminal Mode
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="action-grid">
+                                    <button class="action-button" id="generateBtn">
+                                        Generate
+                                        <div class="button-subtitle">G</div>
+                                    </button>
+                                    <button class="action-button" id="randomBtn">
+                                        Random
+                                        <div class="button-subtitle">R</div>
+                                    </button>
+                                    <button class="action-button secondary" id="resetBtn">
+                                        Reset
+                                        <div class="button-subtitle">ESC</div>
+                                    </button>
+                                    <button class="action-button secondary" id="saveBtn">
+                                        Save
+                                        <div class="button-subtitle">S</div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Back side - Terminal interface -->
+                            <div class="trait-panel-back">
+                                <div class="terminal-container">
+                                    <div class="terminal-titlebar">
+                                        <div class="terminal-buttons">
+                                            <button class="terminal-button close" id="backToTraits"></button>
+                                            <button class="terminal-button minimize"></button>
+                                            <button class="terminal-button maximize"></button>
+                                        </div>
+                                        <div class="terminal-title">elliot@localhost — -bash — 80×24</div>
+                                    </div>
+                                    <div class="terminal-header">
+                                        ELLIOT PERSONA GENERATOR v2.5.1
+                                    </div>
+                                    <div class="terminal-output" id="terminalOutput">
+                                        <div class="terminal-prompt">Last login: Mon Jul 14 10:30:15 on ttys000</div>
+                                        <div class="terminal-ai">elliot@localhost ~ % Starting persona generation system...</div>
+                                        <div class="terminal-ai">✓ Neural networks initialized</div>
+                                        <div class="terminal-ai">✓ Personality matrix loaded</div>
+                                        <div class="terminal-ai">✓ Ready for natural language input</div>
+                                        <div class="terminal-ai"></div>
+                                        <div class="terminal-ai">Welcome to the advanced interface! Describe the kind of Elliot you need in natural language.</div>
+                                        <div class="terminal-ai">Examples:</div>
+                                        <div class="terminal-ai">• "I need someone analytical but also creative for my startup"</div>
+                                        <div class="terminal-ai">• "Find me an Elliot who loves data and coffee equally"</div>
+                                        <div class="terminal-ai">• "Someone who can lead teams but isn't afraid to get technical"</div>
+                                        <div class="terminal-ai"></div>
+                                        <div class="terminal-prompt">elliot@localhost ~ % _</div>
+                                    </div>
+                                    <div class="terminal-input-container">
+                                        <span class="terminal-prompt-symbol">%</span>
+                                        <input type="text" class="terminal-input" id="terminalInput" placeholder="Describe your ideal Elliot..." />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-overlay">
-                            <h3 class="card-title">Discovery Conversation</h3>
-                            <p class="card-description">Blue chats with you to understand your project needs, team dynamics, and the specific challenges you're trying to solve.</p>
+                    </div>
+
+                    <!-- Right Panel - Elliot Display -->
+                    <div class="elliot-display">
+                        <div class="helix-container">
+                            <!-- Personality Matrix Label -->
+                            <div class="matrix-label">Personality Matrix</div>
+                            
+                            <!-- Water ASCII Visualization - grace without force, finding natural paths -->
+                            <div class="water-ascii" id="waterAscii">
+                                <pre id="asciiContent"></pre>
+                            </div>
+                            
+                            <div class="generation-path" id="generationPath"></div>
+                            
+                            <!-- Avatar Generation Label -->
+                            <div class="avatar-label">[ Avatar Generation Space ]</div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Card 2: Persona Matching -->
-                <div class="el-card" data-card="1">
-                    <div class="card-icon-container">
-                        <div class="card-icon matching-icon">
-                            <svg class="icon-svg" viewBox="0 0 40 40" fill="none">
-                                <path d="M15 6C10.58 6 7 9.58 7 14V20C7 24.42 10.58 28 15 28H16V34L22 28H25C29.42 28 33 24.42 33 20V14C33 9.58 29.42 6 25 6H15Z" fill="black"/>
-                                <circle cx="15" cy="16" r="2" fill="#10b981"/>
-                                <circle cx="25" cy="16" r="2" fill="#10b981"/>
-                                <path d="M15 20C15 22 17 24 20 24C23 24 25 22 25 20" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <div class="card-overlay">
-                            <h3 class="card-title">Persona Matching</h3>
-                            <p class="card-description">Based on your conversation, we'll surface the version of Elliot that best fits your context - whether that's the strategist, builder, or creative.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Perfect Introduction -->
-                <div class="el-card" data-card="2">
-                    <div class="card-icon-container">
-                        <div class="card-icon introduction-icon">
-                            <svg class="icon-svg" viewBox="0 0 40 40" fill="none">
-                                <path d="M20 4L22.5 14H32L24.5 20L27 30L20 24L13 30L15.5 20L8 14H17.5L20 4Z" fill="black"/>
-                                <path d="M12 32H28" stroke="black" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M14 36H26" stroke="black" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <div class="card-overlay">
-                            <h3 class="card-title">Perfect Introduction</h3>
-                            <p class="card-description">Get a personalized introduction to the exact Elliot you need, with relevant experience and approach tailored to your situation.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Call to Action -->
-            <div class="cta-container">
-                <button id="meetYourElBtn" class="meet-your-el-btn">
-                    <span class="btn-content">
-                        <span>MEET YOUR EL</span>
-                        <span>🐕</span>
-                    </span>
-                </button>
             </div>
         </div>
     </section>
@@ -3712,6 +4611,737 @@ Avatar generation now uses reliable local templates - no API needed!
         // Initialize chat circle when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             initializeChatCircle();
+        });
+    </script>
+
+    <!-- Trait Selector JavaScript -->
+    <script>
+        // Terminal interface class
+        class Terminal {
+            constructor() {
+                this.output = document.getElementById('terminalOutput');
+                this.input = document.getElementById('terminalInput');
+                this.isProcessing = false;
+                this.conversationHistory = [];
+                this.init();
+            }
+
+            init() {
+                if (!this.input) return; // Guard against missing elements
+                
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isProcessing) {
+                        this.processInput();
+                    }
+                });
+            }
+
+            async processInput() {
+                const userInput = this.input.value.trim();
+                if (!userInput) return;
+
+                this.isProcessing = true;
+                this.addToOutput(`<span class="terminal-user">elliot@localhost ~ % ${userInput}</span>`);
+                this.input.value = '';
+                this.showLoading();
+
+                try {
+                    // Build conversation context
+                    this.conversationHistory.push({
+                        role: 'user',
+                        content: userInput
+                    });
+
+                    let response = await this.generateFallbackResponse(userInput);
+
+                    this.hideLoading();
+                    this.addToOutput(`<span class="terminal-ai">elliot@localhost ~ % ${response}</span>`);
+                    
+                    this.conversationHistory.push({
+                        role: 'assistant',
+                        content: response
+                    });
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.addToOutput(`<span style="color: #ff6b6b;">ERROR: ${error.message}</span>`);
+                } finally {
+                    this.isProcessing = false;
+                    this.addPrompt();
+                }
+            }
+
+            async generateFallbackResponse(userInput) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const responses = [
+                    "Analyzing your requirements... I see you're looking for someone with those specific qualities. What role would they be filling on your team?",
+                    "Interesting combination of traits! Are you building a startup team or looking for someone for an established company?",
+                    "Got it. Processing your persona requirements... Would you say this Elliot needs to be more collaborative or more independent?",
+                    "Those are solid requirements. Let me know if you want me to generate a persona based on what you've described, or if you'd like to refine the traits further.",
+                    "Understanding your needs... It sounds like you need someone who can balance technical skills with people skills. Anything else I should factor in?"
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            showLoading() {
+                this.addToOutput(`<span class="terminal-loading">elliot@localhost ~ % Processing...</span>`);
+            }
+
+            hideLoading() {
+                const loadingElements = this.output.querySelectorAll('.terminal-loading');
+                loadingElements.forEach(el => el.remove());
+            }
+
+            addToOutput(html) {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                this.output.appendChild(div);
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+
+            addPrompt() {
+                this.addToOutput(`<span class="terminal-prompt">elliot@localhost ~ % _</span>`);
+            }
+        }
+
+        // Water ASCII Animation Class
+        class WaterASCII {
+            constructor() {
+                this.frame = 0;
+                this.characters = '~≈≋⋿⊰⊱◟◝';
+                this.rows = 30;
+                this.cols = 60;
+                this.centerPos = { x: 0.5, y: 0.5 };
+                this.charactersLength = this.characters.length;
+                this.charLengthDivide4 = this.charactersLength / 4;
+                this.piTimes2 = Math.PI * 2;
+                this.lastUpdate = 0;
+                this.animationId = null;
+                this.container = null;
+                this.init();
+            }
+
+            init() {
+                this.container = document.getElementById('asciiContent');
+                if (this.container) {
+                    this.startAnimation();
+                }
+            }
+
+            startAnimation() {
+                const animate = (currentTime) => {
+                    this.lastUpdate += 16;
+                    if (this.lastUpdate > 166) {
+                        this.frame += 1;
+                        this.generateAscii();
+                        this.lastUpdate = 0;
+                    }
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                this.animationId = requestAnimationFrame(animate);
+            }
+
+            stopAnimation() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            }
+
+            generateAscii() {
+                if (!this.container) return;
+
+                const rowsArray = [];
+                const frameDiv4 = this.frame / 6.7;
+                const frameDiv5 = this.frame / 8.3;
+                const frameDiv8 = this.frame / 13.3;
+                
+                for (let y = 0; y < this.rows; y++) {
+                    const yDivRows = y / this.rows;
+                    const yDiv5 = y / 5;
+                    const yDiv3 = y / 3;
+                    let rowString = '';
+                    let rowOpacity = 1;
+                    
+                    for (let x = 0; x < this.cols; x++) {
+                        const xDivCols = x / this.cols;
+                        const xDiv3 = x / 3;
+                        const xDiv4 = x / 4;
+                        
+                        const dx = xDivCols - this.centerPos.x;
+                        const dy = yDivRows - this.centerPos.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const distTimes10 = dist * 10;
+                        const distTimes5 = dist * 5;
+
+                        const wave = Math.sin(xDiv3 + yDiv5 + frameDiv4 + distTimes10) + 
+                                    Math.cos(xDiv4 - yDiv3 - frameDiv5) +
+                                    Math.sin(frameDiv8 + xDivCols * this.piTimes2);
+
+                        const charValue = (wave + 2) * this.charLengthDivide4 + distTimes5;
+                        const charIndex = Math.floor(Math.abs(charValue)) % this.charactersLength;
+                        
+                        const opacity = Math.max(0.2, Math.min(0.8, 1 - dist + Math.sin(wave) / 3));
+                        
+                        if (x === 0) rowOpacity = opacity;
+                        else rowOpacity = (rowOpacity + opacity) / 2;
+                        
+                        rowString += this.characters[charIndex];
+                    }
+                    
+                    rowsArray.push({ text: rowString, opacity: rowOpacity });
+                }
+
+                this.container.innerHTML = rowsArray.map(row => 
+                    `<div style="opacity: ${row.opacity}; margin: 0; line-height: 1;">${row.text}</div>`
+                ).join('');
+            }
+        }
+
+        class ElliotGenerator {
+            constructor() {
+                this.selectedTraits = new Set(['energy', 'collaborative']);
+                this.isGenerating = false;
+                this.currentElliot = null;
+                this.waterAscii = null;
+                this.terminal = null;
+                this.init();
+            }
+
+            init() {
+                // Initialize ASCII animation if container exists
+                if (document.getElementById('asciiContent')) {
+                    this.waterAscii = new WaterASCII();
+                }
+                
+                // Initialize terminal if elements exist
+                if (document.getElementById('terminalInput')) {
+                    this.terminal = new Terminal();
+                }
+
+                // Add event listeners for trait options
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.addEventListener('click', (e) => this.toggleTrait(e));
+                });
+
+                // Add event listeners for trait toggles
+                document.querySelectorAll('.trait-toggle').forEach(toggle => {
+                    toggle.addEventListener('click', (e) => this.toggleTraitSwitch(e));
+                });
+
+                // Add event listeners for sound bars
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.addEventListener('click', (e) => this.toggleSoundbar(e));
+                });
+
+                // Add event listeners for action buttons
+                const generateBtn = document.getElementById('generateBtn');
+                const randomBtn = document.getElementById('randomBtn');
+                const resetBtn = document.getElementById('resetBtn');
+                const saveBtn = document.getElementById('saveBtn');
+
+                if (generateBtn) generateBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.generateElliot();
+                });
+                if (randomBtn) randomBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.randomizeTraits();
+                });
+                if (resetBtn) resetBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.resetTraits();
+                });
+                if (saveBtn) saveBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.saveElliot();
+                });
+
+                // Add click handler for water ascii
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) {
+                    waterAscii.addEventListener('click', () => this.generateElliot());
+                }
+
+                // Advanced dropdown functionality
+                const advancedToggle = document.getElementById('advancedToggle');
+                if (advancedToggle) {
+                    advancedToggle.addEventListener('click', () => this.toggleAdvancedDropdown());
+                }
+
+                // Terminal mode functionality
+                const terminalModeBtn = document.getElementById('terminalModeBtn');
+                const backToTraits = document.getElementById('backToTraits');
+                
+                if (terminalModeBtn) {
+                    terminalModeBtn.addEventListener('click', () => this.enterTerminalMode());
+                }
+                if (backToTraits) {
+                    backToTraits.addEventListener('click', () => this.exitTerminalMode());
+                }
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    // Only if we're not in an input field
+                    if (e.target.tagName === 'INPUT') return;
+                    
+                    if (e.key === 'g' || e.key === 'G') {
+                        e.preventDefault();
+                        this.triggerSoundbarPulse();
+                        this.generateElliot();
+                    } else if (e.key === 'r' || e.key === 'R') {
+                        e.preventDefault();
+                        this.triggerSoundbarPulse();
+                        this.randomizeTraits();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        this.triggerSoundbarPulse();
+                        this.resetTraits();
+                    }
+                });
+
+                // Initialize display
+                this.updateTraitDisplay();
+                
+                // Ensure default soundbars are properly activated
+                setTimeout(() => {
+                    const energyBar = document.querySelector('.soundbar[data-trait="energy"]');
+                    const collabBar = document.querySelector('.soundbar[data-trait="collaborative"]');
+                    if (energyBar) energyBar.classList.add('active');
+                    if (collabBar) collabBar.classList.add('active');
+                    this.updateTraitDisplay();
+                }, 100);
+            }
+
+            toggleAdvancedDropdown() {
+                const toggle = document.getElementById('advancedToggle');
+                const content = document.getElementById('advancedContent');
+                if (!toggle || !content) return;
+                
+                if (content.classList.contains('show')) {
+                    content.classList.remove('show');
+                    toggle.textContent = '▶ Advanced';
+                } else {
+                    content.classList.add('show');
+                    toggle.textContent = '▼ Advanced';
+                }
+            }
+
+            enterTerminalMode() {
+                const panel = document.getElementById('traitPanel');
+                if (panel) {
+                    panel.classList.add('flipped');
+                    
+                    setTimeout(() => {
+                        const terminalInput = document.getElementById('terminalInput');
+                        if (terminalInput) terminalInput.focus();
+                    }, 400);
+                }
+            }
+
+            exitTerminalMode() {
+                const panel = document.getElementById('traitPanel');
+                if (panel) {
+                    panel.classList.remove('flipped');
+                }
+            }
+
+            toggleSoundbar(e) {
+                const bar = e.currentTarget;
+                const trait = bar.dataset.trait;
+                
+                if (this.selectedTraits.has(trait)) {
+                    this.selectedTraits.delete(trait);
+                } else {
+                    this.selectedTraits.add(trait);
+                }
+                
+                // Update corresponding UI elements
+                const toggle = document.querySelector(`[data-trait="${trait}"]`);
+                if (toggle && toggle.classList.contains('trait-toggle')) {
+                    toggle.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+                
+                const option = document.querySelector(`[data-dimension="${trait}"]`);
+                if (option) {
+                    option.classList.toggle('selected', this.selectedTraits.has(trait));
+                }
+                
+                this.updateTraitDisplay();
+            }
+
+            toggleTrait(e) {
+                const option = e.currentTarget;
+                const trait = option.dataset.dimension;
+
+                if (option.classList.contains('selected')) {
+                    option.classList.remove('selected');
+                    this.selectedTraits.delete(trait);
+                } else {
+                    option.classList.add('selected');
+                    this.selectedTraits.add(trait);
+                }
+
+                // Update corresponding sound bar
+                const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                if (soundbar) {
+                    soundbar.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+
+                this.updateTraitDisplay();
+            }
+
+            toggleTraitSwitch(e) {
+                const toggle = e.currentTarget;
+                const trait = toggle.dataset.trait;
+                
+                toggle.classList.toggle('active');
+                
+                if (toggle.classList.contains('active')) {
+                    this.selectedTraits.add(trait);
+                } else {
+                    this.selectedTraits.delete(trait);
+                }
+                
+                // Update corresponding sound bar
+                const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                if (soundbar) {
+                    soundbar.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+                
+                // Update corresponding trait option
+                const option = document.querySelector(`[data-dimension="${trait}"]`);
+                if (option) {
+                    option.classList.toggle('selected', this.selectedTraits.has(trait));
+                }
+                
+                this.updateTraitDisplay();
+            }
+
+            updateTraitDisplay() {
+                // Update selection count
+                const count = this.selectedTraits.size;
+                const selectionCount = document.querySelector('.selection-count');
+                const traitCount = document.getElementById('traitCount');
+                
+                if (selectionCount) selectionCount.textContent = `${count}/18`;
+                if (traitCount) traitCount.textContent = `${count} trait${count !== 1 ? 's' : ''}`;
+
+                // Update sound bars based on selected traits
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach(bar => {
+                    const trait = bar.dataset.trait;
+                    const isActive = this.selectedTraits.has(trait);
+                    
+                    bar.classList.toggle('active', isActive);
+                    
+                    // Set height based on trait and activity
+                    if (isActive) {
+                        const defaultHeight = getComputedStyle(bar).getPropertyValue('--default-height') || '20px';
+                        bar.style.height = defaultHeight;
+                        bar.style.setProperty('--bar-height', defaultHeight);
+                        const pulseHeight = parseInt(defaultHeight) + 15 + 'px';
+                        bar.style.setProperty('--pulse-height', pulseHeight);
+                    } else {
+                        bar.style.height = '8px';
+                    }
+                });
+
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) {
+                    if (count > 0) {
+                        waterAscii.classList.add('active');
+                    } else {
+                        waterAscii.classList.remove('active');
+                    }
+                }
+
+                // Trigger pulse animation for active bars
+                this.triggerSoundbarPulse();
+
+                // Update possibilities label based on trait count
+                const possibilities = count > 0 ? Math.pow(2, Math.min(count, 10)) : '∞';
+                const possibilitiesLabel = document.querySelector('.possibilities-label');
+                if (possibilitiesLabel) {
+                    possibilitiesLabel.textContent = `${possibilities} combination${possibilities !== 1 ? 's' : ''}`;
+                }
+            }
+
+            triggerSoundbarPulse() {
+                const soundbars = document.querySelectorAll('.soundbar.active');
+                soundbars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.classList.add('pulse');
+                        setTimeout(() => {
+                            bar.classList.remove('pulse');
+                        }, 400);
+                    }, index * 30);
+                });
+            }
+
+            async generateElliot() {
+                if (this.isGenerating) return;
+
+                this.isGenerating = true;
+                this.showGeneratingState();
+
+                try {
+                    const elliotData = await this.generateDemoElliot();
+                    this.displayElliot(elliotData);
+                } catch (error) {
+                    console.error('Generation failed:', error);
+                    this.showError();
+                } finally {
+                    this.isGenerating = false;
+                    this.hideGeneratingState();
+                }
+            }
+
+            async generateDemoElliot() {
+                await new Promise(resolve => setTimeout(resolve, 2500));
+
+                const variants = [
+                    {
+                        name: "Elliot the Creator",
+                        title: "Creative AI Builder",
+                        description: "Builds AI with artistic flair",
+                        avatar: "🎨",
+                        traits: ["Creative", "Builder", "Visionary"]
+                    },
+                    {
+                        name: "Elliot the Connector",
+                        title: "Empathetic Product Lead",
+                        description: "Bridges teams with understanding",
+                        avatar: "🤝",
+                        traits: ["Empathetic", "Leader", "Collaborator"]
+                    },
+                    {
+                        name: "Elliot the Innovator",
+                        title: "Strategic Builder",
+                        description: "Architecting the future",
+                        avatar: "⚡",
+                        traits: ["Strategic", "Innovative", "Technical"]
+                    },
+                    {
+                        name: "Elliot the Analyzer",
+                        title: "Data-Driven Strategist",
+                        description: "Turns data into decisions",
+                        avatar: "🔬",
+                        traits: ["Analytical", "Precise", "Methodical"]
+                    },
+                    {
+                        name: "Elliot the Catalyst",
+                        title: "High-Energy Transformer",
+                        description: "Energizes teams to achieve more",
+                        avatar: "🚀",
+                        traits: ["Energetic", "Motivational", "Dynamic"]
+                    }
+                ];
+
+                // Select based on traits if possible
+                const selectedTraits = Array.from(this.selectedTraits);
+                if (selectedTraits.includes('energy')) {
+                    return variants[4]; // Catalyst
+                } else if (selectedTraits.includes('analytical')) {
+                    return variants[3]; // Analyzer
+                } else if (selectedTraits.includes('innovation')) {
+                    return variants[2]; // Innovator
+                } else if (selectedTraits.includes('collaborative')) {
+                    return variants[1]; // Connector
+                } else {
+                    return variants[0]; // Creator
+                }
+            }
+
+            showGeneratingState() {
+                // Activate all sound bars for generation
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach(bar => {
+                    bar.classList.add('generating');
+                });
+                
+                // Show generation path
+                const generationPath = document.getElementById('generationPath');
+                if (generationPath) generationPath.classList.add('active');
+                
+                // Activate water ascii generating animation
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) waterAscii.classList.add('generating');
+
+                // Update generate button
+                const btn = document.getElementById('generateBtn');
+                if (btn) {
+                    btn.classList.add('generating');
+                    btn.innerHTML = `Generating...<div class="button-subtitle">...</div>`;
+                }
+            }
+
+            hideGeneratingState() {
+                // Remove generating state from sound bars
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach(bar => {
+                    bar.classList.remove('generating');
+                });
+                
+                // Hide generation animations
+                const generationPath = document.getElementById('generationPath');
+                if (generationPath) generationPath.classList.remove('active');
+                
+                // Remove water ascii generating state
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) waterAscii.classList.remove('generating');
+                
+                // Reset generate button
+                const btn = document.getElementById('generateBtn');
+                if (btn) {
+                    btn.classList.remove('generating');
+                    btn.innerHTML = `Generate<div class="button-subtitle">G</div>`;
+                }
+            }
+
+            displayElliot(elliotData) {
+                this.currentElliot = elliotData;
+
+                // Create success pulse in sound bars
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.style.background = 'var(--gold)';
+                        setTimeout(() => {
+                            bar.style.background = bar.classList.contains('active') ? 'var(--amber)' : '#ddd';
+                        }, 200);
+                    }, index * 50);
+                });
+
+                // Show success message in console
+                console.log('Generated Elliot:', elliotData);
+            }
+
+            showError() {
+                console.error('Generation failed');
+            }
+
+            randomizeTraits() {
+                // Clear current selection
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.querySelectorAll('.trait-toggle').forEach(toggle => {
+                    toggle.classList.remove('active');
+                });
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.classList.remove('active');
+                    bar.style.height = '8px';
+                });
+                this.selectedTraits.clear();
+
+                // Get all available traits
+                const allTraits = Array.from(document.querySelectorAll('.soundbar')).map(bar => bar.dataset.trait);
+                
+                // Randomly select 3-6 traits
+                const count = 3 + Math.floor(Math.random() * 4);
+                const selectedTraits = [];
+                
+                while (selectedTraits.length < count && selectedTraits.length < allTraits.length) {
+                    const randomTrait = allTraits[Math.floor(Math.random() * allTraits.length)];
+                    if (!selectedTraits.includes(randomTrait)) {
+                        selectedTraits.push(randomTrait);
+                        this.selectedTraits.add(randomTrait);
+                    }
+                }
+
+                // Update UI elements for selected traits
+                selectedTraits.forEach(trait => {
+                    // Update sound bar
+                    const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                    if (soundbar) {
+                        soundbar.classList.add('active');
+                    }
+                    
+                    // Update toggle if exists
+                    const toggle = document.querySelector(`[data-trait="${trait}"]`);
+                    if (toggle && toggle.classList.contains('trait-toggle')) {
+                        toggle.classList.add('active');
+                    }
+                    
+                    // Update option if exists
+                    const option = document.querySelector(`[data-dimension="${trait}"]`);
+                    if (option) {
+                        option.classList.add('selected');
+                    }
+                });
+
+                this.updateTraitDisplay();
+            }
+
+            resetTraits() {
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.querySelectorAll('.trait-toggle').forEach(toggle => {
+                    toggle.classList.remove('active');
+                });
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.classList.remove('active');
+                    bar.style.height = '8px';
+                });
+                
+                this.selectedTraits.clear();
+                this.selectedTraits.add('energy');
+                this.selectedTraits.add('collaborative');
+                
+                // Reset to default selections
+                const energyOption = document.querySelector('[data-dimension="energy"]');
+                const collabOption = document.querySelector('[data-dimension="collaborative"]');
+                const energyToggle = document.querySelector('[data-trait="energy"]');
+                const energyBar = document.querySelector('.soundbar[data-trait="energy"]');
+                const collabBar = document.querySelector('.soundbar[data-trait="collaborative"]');
+                
+                if (energyOption) energyOption.classList.add('selected');
+                if (collabOption) collabOption.classList.add('selected');
+                if (energyToggle) energyToggle.classList.add('active');
+                if (energyBar) energyBar.classList.add('active');
+                if (collabBar) collabBar.classList.add('active');
+                
+                this.updateTraitDisplay();
+            }
+
+            saveElliot() {
+                if (this.currentElliot) {
+                    const data = JSON.stringify(this.currentElliot, null, 2);
+                    console.log('Saved Elliot:', data);
+                    
+                    // Visual feedback
+                    const btn = document.getElementById('saveBtn');
+                    if (btn) {
+                        const original = btn.innerHTML;
+                        btn.innerHTML = `Saved!<div class="button-subtitle">✓</div>`;
+                        setTimeout(() => {
+                            btn.innerHTML = original;
+                        }, 1500);
+                    }
+
+                    // Try to copy to clipboard
+                    try {
+                        navigator.clipboard.writeText(data);
+                        console.log('Elliot data copied to clipboard');
+                    } catch (err) {
+                        console.log('Clipboard access not available');
+                    }
+                } else {
+                    console.log('No Elliot to save - generate one first!');
+                }
+            }
+        }
+
+        // Initialize trait selector when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Only initialize if trait selector elements exist
+            if (document.querySelector('.trait-selector-container')) {
+                new ElliotGenerator();
+            }
         });
     </script>
 

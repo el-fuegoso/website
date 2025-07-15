@@ -1,0 +1,32 @@
+
+# Essays Big5 Dataset Instructions
+
+The essays-big5 dataset can be loaded directly from Hugging Face:
+
+## Installation
+
+First, install the required library:
+```bash
+pip install datasets
+```
+
+## Usage
+
+```python
+from datasets import load_dataset
+ds = load_dataset("jingjietan/essays-big5")
+```
+
+## Alternative Download
+
+1. Visit: https://huggingface.co/datasets/jingjietan/essays-big5
+2. Download the dataset files manually
+3. Place in data/ directory as essays_big5_raw.csv
+4. Run this script again
+
+## Expected Format
+
+The dataset should contain:
+- text/essay column with text content
+- Big Five personality scores (openness, conscientiousness, extraversion, agreeableness, neuroticism)
+- Scores should be normalized between 0 and 1

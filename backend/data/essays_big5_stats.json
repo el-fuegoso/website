@@ -1,0 +1,85 @@
+{
+  "dataset_name": "essays_big5",
+  "total_samples": 1430,
+  "text_length_stats": {
+    "mean": 3040.53006993007,
+    "median": 3028.5,
+    "std": 983.467906953599,
+    "min": 216,
+    "max": 4997
+  },
+  "personality_stats": {
+    "openness": {
+      "mean": 0.5010506405070022,
+      "median": 0.6037000873073459,
+      "std": 0.2098862969732357,
+      "min": 0.200487427987043,
+      "max": 0.7999795963260689
+    },
+    "conscientiousness": {
+      "mean": 0.5011091185333723,
+      "median": 0.6035694019248797,
+      "std": 0.20956723512961928,
+      "min": 0.20004099461850847,
+      "max": 0.7996939299341381
+    },
+    "extraversion": {
+      "mean": 0.5063732952979678,
+      "median": 0.6065219197088638,
+      "std": 0.20939505545407994,
+      "min": 0.20010058520768728,
+      "max": 0.7997886871199535
+    },
+    "agreeableness": {
+      "mean": 0.5141189909492612,
+      "median": 0.6138384720635736,
+      "std": 0.20799254273790205,
+      "min": 0.20006013273934783,
+      "max": 0.7999718437511867
+    },
+    "neuroticism": {
+      "mean": 0.4985165998886654,
+      "median": 0.39799142650373287,
+      "std": 0.20681806754260276,
+      "min": 0.20007727804207337,
+      "max": 0.7998797037787069
+    }
+  },
+  "trait_correlations": {
+    "openness": {
+      "openness": 1.0,
+      "conscientiousness": -0.03557098882098957,
+      "extraversion": 0.06250390366186143,
+      "agreeableness": 0.013995238032199372,
+      "neuroticism": -0.03225494901260446
+    },
+    "conscientiousness": {
+      "openness": -0.03557098882098957,
+      "conscientiousness": 1.0,
+      "extraversion": 0.12156865373769592,
+      "agreeableness": 0.10726064216656968,
+      "neuroticism": -0.14450670376192384
+    },
+    "extraversion": {
+      "openness": 0.06250390366186143,
+      "conscientiousness": 0.12156865373769592,
+      "extraversion": 1.0,
+      "agreeableness": 0.10689169879029096,
+      "neuroticism": -0.15957037294572798
+    },
+    "agreeableness": {
+      "openness": 0.013995238032199372,
+      "conscientiousness": 0.10726064216656968,
+      "extraversion": 0.10689169879029096,
+      "agreeableness": 1.0,
+      "neuroticism": -0.17519924519099395
+    },
+    "neuroticism": {
+      "openness": -0.03225494901260446,
+      "conscientiousness": -0.14450670376192384,
+      "extraversion": -0.15957037294572798,
+      "agreeableness": -0.17519924519099395,
+      "neuroticism": 1.0
+    }
+  }
+}

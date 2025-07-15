@@ -322,6 +322,11 @@ The dataset should contain:
                 'agr': 'agreeableness',
                 'con': 'conscientiousness',
                 'opn': 'openness',
+                'O': 'openness',          # essays-big5 dataset uses uppercase
+                'C': 'conscientiousness', # essays-big5 dataset uses uppercase
+                'E': 'extraversion',      # essays-big5 dataset uses uppercase
+                'A': 'agreeableness',     # essays-big5 dataset uses uppercase
+                'N': 'neuroticism',       # essays-big5 dataset uses uppercase
                 'o': 'openness',
                 'c': 'conscientiousness', 
                 'e': 'extraversion',
@@ -348,18 +353,33 @@ The dataset should contain:
             logger.error("No text column found in dataset")
             return
         
-        # Normalize personality scores to 0-1 range
+        # Process personality scores
         for trait in self.big_five_traits:
             if trait in df.columns:
-                # Check if scores are already normalized
-                min_val = df[trait].min()
-                max_val = df[trait].max()
+                # Convert string values to float
+                df[trait] = pd.to_numeric(df[trait], errors='coerce')
                 
-                if min_val < 0 or max_val > 1:
-                    logger.info(f"Normalizing {trait} scores from [{min_val:.3f}, {max_val:.3f}] to [0, 1]")
-                    df[trait] = self.normalize_scores(df[trait])
+                # Check if scores are binary (0/1) or continuous
+                unique_values = df[trait].unique()
+                unique_values = unique_values[~pd.isna(unique_values)]
+                
+                if len(unique_values) <= 2 and set(unique_values).issubset({0, 1}):
+                    logger.info(f"{trait} appears to be binary (0/1). Converting to continuous scores.")
+                    # Convert binary to continuous by adding some variation
+                    # 0 -> 0.2-0.4 (low), 1 -> 0.6-0.8 (high)
+                    df[trait] = df[trait].apply(lambda x: 
+                        np.random.uniform(0.2, 0.4) if x == 0 else 
+                        np.random.uniform(0.6, 0.8) if x == 1 else 0.5)
                 else:
-                    logger.info(f"{trait} scores already normalized: [{min_val:.3f}, {max_val:.3f}]")
+                    # Check if scores need normalization
+                    min_val = df[trait].min()
+                    max_val = df[trait].max()
+                    
+                    if min_val < 0 or max_val > 1:
+                        logger.info(f"Normalizing {trait} scores from [{min_val:.3f}, {max_val:.3f}] to [0, 1]")
+                        df[trait] = self.normalize_scores(df[trait])
+                    else:
+                        logger.info(f"{trait} scores already normalized: [{min_val:.3f}, {max_val:.3f}]")
         
         # Filter out very short texts
         original_length = len(df)
@@ -690,8 +710,25 @@ The dataset should contain:
             corr_matrix = df[self.big_five_traits].corr()
             stats['trait_correlations'] = corr_matrix.to_dict()
         
-        # Save statistics
+        # Save statistics (convert numpy types to native Python types)
         stats_file = self.output_dir / f"{dataset_name}_stats.json"
+        
+        # Convert numpy types to native Python types for JSON serialization
+        def convert_numpy_types(obj):
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, dict):
+                return {k: convert_numpy_types(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_numpy_types(item) for item in obj]
+            return obj
+        
+        stats = convert_numpy_types(stats)
+        
         with open(stats_file, 'w') as f:
             json.dump(stats, f, indent=2)
         

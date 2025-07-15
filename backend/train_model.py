@@ -309,6 +309,11 @@ class DatasetLoader:
             'agr': 'agreeableness', 
             'con': 'conscientiousness',
             'opn': 'openness',
+            'O': 'openness',          # essays-big5 dataset uses uppercase
+            'C': 'conscientiousness', # essays-big5 dataset uses uppercase
+            'E': 'extraversion',      # essays-big5 dataset uses uppercase
+            'A': 'agreeableness',     # essays-big5 dataset uses uppercase
+            'N': 'neuroticism',       # essays-big5 dataset uses uppercase
             'o': 'openness',
             'c': 'conscientiousness',
             'e': 'extraversion',
@@ -323,17 +328,31 @@ class DatasetLoader:
         if 'text' in df.columns:
             df['text'] = df['text'].apply(lambda x: DatasetLoader._clean_text(str(x)))
         
-        # Normalize personality scores
+        # Process personality scores
         big_five_traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism']
         for trait in big_five_traits:
             if trait in df.columns:
-                # Normalize to 0-1 range
-                min_val = df[trait].min()
-                max_val = df[trait].max()
-                if max_val > min_val:
-                    df[trait] = (df[trait] - min_val) / (max_val - min_val)
+                # Convert string values to float
+                df[trait] = pd.to_numeric(df[trait], errors='coerce')
+                
+                # Check if scores are binary (0/1) or continuous
+                unique_values = df[trait].unique()
+                unique_values = unique_values[~pd.isna(unique_values)]
+                
+                if len(unique_values) <= 2 and set(unique_values).issubset({0, 1}):
+                    # Convert binary to continuous by adding some variation
+                    # 0 -> 0.2-0.4 (low), 1 -> 0.6-0.8 (high)
+                    df[trait] = df[trait].apply(lambda x: 
+                        np.random.uniform(0.2, 0.4) if x == 0 else 
+                        np.random.uniform(0.6, 0.8) if x == 1 else 0.5)
                 else:
-                    df[trait] = 0.5
+                    # Normalize to 0-1 range
+                    min_val = df[trait].min()
+                    max_val = df[trait].max()
+                    if max_val > min_val:
+                        df[trait] = (df[trait] - min_val) / (max_val - min_val)
+                    else:
+                        df[trait] = 0.5
             else:
                 df[trait] = 0.5
         

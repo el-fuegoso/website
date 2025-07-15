@@ -2450,11 +2450,7 @@
         // Simplified initialization - removed old terminal experience system
         // Now using trait selector interface with backend integration
         
-        // Chat functionality (keeping for future backend integration)
-        let globalChatUI = null;
-        let globalConversationManager = null;
-        let chatInitialized = false;
-        
+        // Single function to initialize chat system
         function ensureChatInitialized() {
             if (chatInitialized && globalChatUI && globalConversationManager) {
                 return { chatUI: globalChatUI, conversationManager: globalConversationManager };
@@ -2479,294 +2475,1240 @@
             return null;
         }
 
+        function initializeTerminalExperience() {
+            if (TerminalQuestionnaire.hasCompletedExperience()) {
+                // User has already completed the experience, go directly to chat
+                initializeConversation();
+            } else {
+                // Show terminal questionnaire
+                terminalQuestionnaire = new TerminalQuestionnaire();
+                terminalQuestionnaire.show();
+            }
+        }
+
+        function initializeConversation() {
+            // Use centralized chat initialization
+            const chat = ensureChatInitialized();
+            if (!chat) return;
+            
+            // Show the chat UI
+            chat.chatUI.show();
+            
+            // Get user data for personalized greeting
+            const userData = TerminalQuestionnaire.getUserData();
+            if (userData && userData.userName) {
+                // Add a personalized welcome message with safe property access
+                let welcomeMessage = `Welcome back, ${userData.userName}! 🌟`;
+                
+                if (userData.analysis && userData.analysis.dominantTrait) {
+                    welcomeMessage += ` Based on our chat, I know you're ${userData.analysis.dominantTrait}. What would you like to explore today?`;
+                } else {
+                    welcomeMessage += ` What would you like to explore today?`;
+                }
+                
+                chat.chatUI.addMessage(welcomeMessage, 'assistant');
+            }
+        }
+
         // Navigation handlers
         document.addEventListener('DOMContentLoaded', function() {
-            // Meet Your El button handler (now goes to trait selector)
+
+            // Meet Your El button handler
             const meetYourElBtn = document.getElementById('meetYourElBtn');
             if (meetYourElBtn) {
                 meetYourElBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Scroll to trait selector section
-                    const traitSection = document.getElementById('build-your-el');
-                    if (traitSection) {
-                        traitSection.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    initializeTerminalExperience();
                 });
             }
         });
 
-        // Enhanced Touch Gesture System for Mobile
-        class TouchGestureManager {
-            constructor() {
-                this.startX = 0;
-                this.startY = 0;
-                this.startTime = 0;
-                this.threshold = 50; // minimum swipe distance
-                this.timeThreshold = 300; // maximum swipe time
-                this.setupGestures();
-                this.showMobileHints();
+        // Development helpers and shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Reset user data (Ctrl+Shift+R)
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                if (confirm('Reset terminal experience data? This will clear all stored user information.')) {
+                    TerminalQuestionnaire.clearUserData();
+                    location.reload();
+                }
             }
             
-            setupGestures() {
-                const heroContainer = document.querySelector('.hero-container');
-                let isDragging = false;
-                let isGestureActive = false;
-                let startTouchX = 0;
-                let startTouchY = 0;
-                let lastTouchX = 0;
-                let lastTouchY = 0;
+            // Quick avatar test (Ctrl+Shift+T)
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                showQuickAvatarTest();
+            }
+            
+            // Quick chat reset (Ctrl+Shift+C) 
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                if (confirm('Reset chat and start fresh conversation?')) {
+                    resetChatExperience();
+                }
+            }
+            
+            // Debug API connection (Ctrl+Shift+D)
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                e.preventDefault();
+                debugApiConnection();
+            }
+        });
+
+        function showQuickAvatarTest() {
+            const testKeywords = prompt(`Quick Avatar Test - Enter keywords separated by commas:
+            
+Examples:
+• technical, leadership, startup
+• creative, innovation, design  
+• collaborative, team, communication
+• adventure, risk, exploration
+
+Your keywords:`);
+            
+            if (!testKeywords) return;
+            
+            generateQuickAvatar(testKeywords);
+        }
+
+        async function generateQuickAvatar(keywords) {
+            try {
+                // Create mock responses based on keywords
+                const mockResponses = generateMockResponses(keywords);
                 
-                // Touch start
-                heroContainer.addEventListener('touchstart', (e) => {
-                    if (e.touches.length === 1) {
-                        const touch = e.touches[0];
-                        startTouchX = touch.clientX;
-                        startTouchY = touch.clientY;
-                        lastTouchX = touch.clientX;
-                        lastTouchY = touch.clientY;
-                        this.startTime = Date.now();
-                        isGestureActive = true;
-                        isDragging = false;
-                    }
-                }, { passive: true });
-                
-                // Touch move
-                heroContainer.addEventListener('touchmove', (e) => {
-                    if (isGestureActive && e.touches.length === 1) {
-                        const touch = e.touches[0];
-                        const deltaX = touch.clientX - startTouchX;
-                        const deltaY = touch.clientY - startTouchY;
-                        
-                        // Check if horizontal swipe
-                        if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) {
-                            isDragging = true;
-                            e.preventDefault(); // Prevent scrolling
-                        }
-                        
-                        lastTouchX = touch.clientX;
-                        lastTouchY = touch.clientY;
-                    }
-                }, { passive: false });
-                
-                // Touch end
-                heroContainer.addEventListener('touchend', (e) => {
-                    if (isGestureActive && isDragging) {
-                        const deltaX = lastTouchX - startTouchX;
-                        const deltaY = lastTouchY - startTouchY;
-                        const deltaTime = Date.now() - this.startTime;
-                        
-                        // Check for valid swipe
-                        if (Math.abs(deltaX) > this.threshold && 
-                            deltaTime < this.timeThreshold && 
-                            Math.abs(deltaX) > Math.abs(deltaY)) {
-                            
-                            if (deltaX > 0) {
-                                // Swipe right - previous artifact
-                                this.handleSwipe('right');
-                            } else {
-                                // Swipe left - next artifact
-                                this.handleSwipe('left');
-                            }
-                        }
-                    }
+                // Initialize components if needed
+                if (!window.testAnalyzer) {
+                    window.testAnalyzer = new AdvancedPersonalityAnalyzer();
+                    window.testAvatarService = new ClaudeAvatarService();
+                    window.testAvatarDisplay = new AvatarDisplay();
                     
-                    isGestureActive = false;
-                    isDragging = false;
-                }, { passive: true });
-            }
-            
-            handleSwipe(direction) {
-                // Trigger artifact change
-                if (direction === 'left') {
-                    changeEverything();
-                } else if (direction === 'right') {
-                    // Go to previous artifact
-                    currentArtifact = currentArtifact > 0 ? currentArtifact - 1 : artifacts.length - 1;
-                    artifacts[currentArtifact]();
-                    updateTitle();
+                    // Server-side API key handling - no client setup needed
                 }
                 
-                // Show swipe feedback
-                this.showSwipeFeedback(direction);
+                // Generate personality analysis
+                const personalityData = window.testAnalyzer.generatePersonalityInsights(mockResponses, 'QuickTest');
+                
+                // Debug: Log personality analysis results
+                console.log('Personality Analysis Debug:', {
+                    keywords: keywords,
+                    responses: mockResponses,
+                    scores: personalityData.scores,
+                    archetype: personalityData.archetype.archetype.name,
+                    confidence: personalityData.archetype.confidence,
+                    reasoning: personalityData.archetype.reasoning
+                });
+                
+                // API key is now handled server-side, so we can proceed directly
+                
+                // Show loading indicator
+                showQuickLoadingIndicator();
+                
+                // Generate avatar with Claude
+                const avatarData = await window.testAvatarService.generateAvatar(
+                    personalityData,
+                    { responses: mockResponses },
+                    personalityData.archetype
+                );
+                
+                // Hide loading indicator
+                hideQuickLoadingIndicator();
+                
+                // Set the avatar for chat conversations
+                window.setGeneratedAvatarForChat(avatarData);
+                
+                // Show avatar results
+                window.testAvatarDisplay.show(avatarData, personalityData, () => {
+                    console.log('Quick test avatar closed');
+                });
+                
+            } catch (error) {
+                hideQuickLoadingIndicator();
+                console.error('Quick avatar test failed:', error);
+                alert(`Avatar generation failed: ${error.message}`);
+            }
+        }
+
+        function generateMockResponses(keywords) {
+            const keywordList = keywords.toLowerCase().split(',').map(k => k.trim());
+            
+            // Generate responses that include the keywords naturally
+            const responses = {
+                question_0: `I'm a professional who works with ${keywordList.slice(0, 2).join(' and ')} in my daily role`,
+                question_1: `I'm passionate about ${keywordList.slice(0, 3).join(', ')} and building solutions that incorporate these elements`,
+                question_2: `I'd love to meet someone who revolutionized ${keywordList[0] || 'technology'} and discuss ${keywordList.slice(1, 3).join(' and ')}`,
+                question_3: `I want to make an impact through ${keywordList.join(', ')} and help others succeed in these areas`
+            };
+            
+            return responses;
+        }
+
+        function showQuickPersonalityResults(personalityData, keywords) {
+            const archetype = personalityData.archetype.archetype;
+            const message = `Quick Test Results for keywords: "${keywords}"
+
+🎭 Archetype: ${archetype.name}
+🎯 Confidence: ${Math.round(archetype.confidence * 100)}%
+📊 Top Traits: ${personalityData.dominantTraits.map(t => t.trait).join(', ')}
+
+${personalityData.personalityOverview}
+
+To generate full Claude avatar, set up API key in the terminal experience or test suite.`;
+
+            alert(message);
+        }
+
+        function showQuickLoadingIndicator() {
+            if (document.getElementById('quickTestLoader')) return;
+            
+            const loader = document.createElement('div');
+            loader.id = 'quickTestLoader';
+            loader.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #1a1a1a;
+                color: #00ff88;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+                z-index: 10001;
+                border: 2px solid #00ff88;
+                box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+            `;
+            loader.innerHTML = `
+                🤖 Generating Avatar...
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Quick Test Mode (Ctrl+Shift+T)
+                </div>
+            `;
+            
+            document.body.appendChild(loader);
+        }
+
+        function hideQuickLoadingIndicator() {
+            const loader = document.getElementById('quickTestLoader');
+            if (loader) {
+                loader.remove();
+            }
+        }
+
+        function resetChatExperience() {
+            // Clear all stored data
+            localStorage.removeItem('terminal_user_data');
+            sessionStorage.removeItem('terminal_session');
+            localStorage.removeItem('terminal_analytics');
+            
+            // Close any open terminals or avatars
+            const existingTerminal = document.querySelector('.terminal-questionnaire');
+            if (existingTerminal) {
+                existingTerminal.remove();
             }
             
-            showSwipeFeedback(direction) {
-                const feedback = document.createElement('div');
-                feedback.className = `swipe-feedback ${direction}`;
-                feedback.innerHTML = direction === 'left' ? '👈' : '👉';
-                feedback.style.cssText = `
+            const existingAvatar = document.querySelector('.avatar-display-overlay');
+            if (existingAvatar) {
+                existingAvatar.remove();
+            }
+            
+            // Close any chat interfaces
+            if (window.chatUI && typeof window.chatUI.hide === 'function') {
+                window.chatUI.hide();
+            }
+            
+            // Show success message
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #00ff88;
+                color: #1a1a1a;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                z-index: 10002;
+                box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+            `;
+            notification.textContent = '✅ Chat experience reset - Ready for fresh start!';
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+            
+            console.log('Chat experience reset completed');
+        }
+
+        async function debugApiConnection() {
+            if (!confirm('Test avatar generation system? This will verify the local template-based generation.')) {
+                return;
+            }
+            
+            try {
+                showQuickLoadingIndicator();
+                
+                // Test local avatar generation instead of API
+                const testService = new ClaudeAvatarService();
+                const data = await testService.testConnection();
+                hideQuickLoadingIndicator();
+                
+                if (data.success) {
+                    alert(`✅ Connection Successful!
+
+Message: ${data.message}
+Model: ${data.model}
+Response: ${data.response}
+
+Your API key is working correctly!`);
+                } else {
+                    alert(`❌ Connection Failed
+
+Error: ${data.error}
+Details: ${data.details || 'No additional details'}
+
+Debug Info:
+${JSON.stringify(data.debug || {}, null, 2)}`);
+                }
+                
+            } catch (error) {
+                hideQuickLoadingIndicator();
+                alert(`❌ Network Error: ${error.message}`);
+            }
+        }
+
+        // Show keyboard shortcuts on load (development mode)
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1') || window.location.hostname.includes('vercel.app')) {
+            setTimeout(() => {
+                console.log(`
+🚀 Development Shortcuts Available:
+• Ctrl+Shift+R - Reset terminal experience data
+• Ctrl+Shift+C - Reset chat and start fresh
+• Ctrl+Shift+T - Quick avatar test with keywords (local generation)
+• Ctrl+Shift+D - Test avatar generation system
+
+Example quick test keywords:
+- technical, leadership, startup
+- creative, innovation, design
+- collaborative, team, communication
+- adventure, risk, exploration
+
+Avatar generation now uses reliable local templates - no API needed!
+                `);
+            }, 2000);
+        }
+
+        // Function to set generated avatar for chat conversations
+        window.setGeneratedAvatarForChat = function(avatarData) {
+            try {
+                // Use centralized chat initialization
+                const chat = ensureChatInitialized();
+                if (!chat) return;
+                
+                const { chatUI, conversationManager } = chat;
+                
+                // Set the avatar data in the Claude client
+                conversationManager.client.setAvatarData(avatarData);
+                
+                // Update chat UI to show avatar
+                chatUI.updateAvatarDisplay(avatarData);
+                
+                console.log(`🎭 Avatar "${avatarData.name}" is now active for chat conversations!`);
+                
+                // Show notification to user
+                const notification = document.createElement('div');
+                notification.style.cssText = `
                     position: fixed;
-                    top: 50%;
-                    ${direction === 'left' ? 'right: 20px;' : 'left: 20px;'}
-                    transform: translateY(-50%);
-                    font-size: 2rem;
-                    pointer-events: none;
-                    z-index: 1000;
-                    opacity: 0.8;
-                    animation: swipe-feedback 0.6s ease-out;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--accent-color);
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-size: 14px;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
                 `;
+                notification.textContent = `🎭 ${avatarData.name} is ready to chat!`;
+                document.body.appendChild(notification);
                 
-                document.body.appendChild(feedback);
-                
-                // Remove after animation
+                // Fade in and out
+                setTimeout(() => notification.style.opacity = '1', 100);
                 setTimeout(() => {
-                    feedback.remove();
-                }, 600);
+                    notification.style.opacity = '0';
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Failed to set avatar for chat:', error);
             }
-            
-            showMobileHints() {
-                // Show swipe hints on mobile
-                if (window.innerWidth <= 768) {
-                    const hints = document.createElement('div');
-                    hints.className = 'mobile-hints';
-                    hints.innerHTML = `
-                        <div class="hint">← Swipe to explore →</div>
-                        <div class="hint">Tap title to change</div>
-                    `;
-                    hints.style.cssText = `
-                        position: fixed;
-                        bottom: 20px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        text-align: center;
-                        color: rgba(51, 51, 51, 0.6);
-                        font-size: 0.8rem;
-                        z-index: 999;
-                        pointer-events: none;
-                    `;
+        };
+
+        // Load stored avatar on page load
+        window.addEventListener('load', function() {
+            // Use centralized chat initialization and load stored avatar
+            const chat = ensureChatInitialized();
+            if (chat) {
+                const { conversationManager } = chat;
+                if (conversationManager.client.loadStoredAvatar()) {
+                    console.log('🎭 Stored avatar loaded for chat conversations');
+                }
+            }
+        });
+
+        // Chat circle functionality
+        function initializeChatCircle() {
+            const chatCircle = document.querySelector('.chat-circle');
+            if (chatCircle) {
+                chatCircle.addEventListener('click', function() {
+                    initializeTerminalExperience();
+                });
+            }
+        }
+
+        // Initialize chat circle when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChatCircle();
+        });
+    </script>
+
+    <!-- Trait Selector JavaScript -->
+    <script>
+        // Terminal interface class
+        class Terminal {
+            constructor() {
+                this.output = document.getElementById('terminalOutput');
+                this.input = document.getElementById('terminalInput');
+                this.isProcessing = false;
+                this.conversationHistory = [];
+                this.init();
+            }
+
+            init() {
+                if (!this.input) return; // Guard against missing elements
+                
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isProcessing) {
+                        this.processInput();
+                    }
+                });
+            }
+
+            async processInput() {
+                const userInput = this.input.value.trim();
+                if (!userInput) return;
+
+                this.isProcessing = true;
+                this.addToOutput(`<span class="terminal-user">elliot@localhost ~ % ${userInput}</span>`);
+                this.input.value = '';
+                this.showLoading();
+
+                try {
+                    // Build conversation context
+                    this.conversationHistory.push({
+                        role: 'user',
+                        content: userInput
+                    });
+
+                    let response = await this.generateFallbackResponse(userInput);
+
+                    this.hideLoading();
+                    this.addToOutput(`<span class="terminal-ai">elliot@localhost ~ % ${response}</span>`);
                     
-                    document.body.appendChild(hints);
+                    this.conversationHistory.push({
+                        role: 'assistant',
+                        content: response
+                    });
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.addToOutput(`<span style="color: #ff6b6b;">ERROR: ${error.message}</span>`);
+                } finally {
+                    this.isProcessing = false;
+                    this.addPrompt();
+                }
+            }
+
+            async generateFallbackResponse(userInput) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const responses = [
+                    "Analyzing your requirements... I see you're looking for someone with those specific qualities. What role would they be filling on your team?",
+                    "Interesting combination of traits! Are you building a startup team or looking for someone for an established company?",
+                    "Got it. Processing your persona requirements... Would you say this Elliot needs to be more collaborative or more independent?",
+                    "Those are solid requirements. Let me know if you want me to generate a persona based on what you've described, or if you'd like to refine the traits further.",
+                    "Understanding your needs... It sounds like you need someone who can balance technical skills with people skills. Anything else I should factor in?"
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            showLoading() {
+                this.addToOutput(`<span class="terminal-loading">elliot@localhost ~ % Processing...</span>`);
+            }
+
+            hideLoading() {
+                const loadingElements = this.output.querySelectorAll('.terminal-loading');
+                loadingElements.forEach(el => el.remove());
+            }
+
+            addToOutput(html) {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                this.output.appendChild(div);
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+
+            addPrompt() {
+                this.addToOutput(`<span class="terminal-prompt">elliot@localhost ~ % _</span>`);
+            }
+        }
+
+        // Water ASCII Animation Class
+        class WaterASCII {
+            constructor() {
+                this.frame = 0;
+                this.characters = '~≈≋⋿⊰⊱◟◝';
+                this.rows = 30;
+                this.cols = 60;
+                this.centerPos = { x: 0.5, y: 0.5 };
+                this.charactersLength = this.characters.length;
+                this.charLengthDivide4 = this.charactersLength / 4;
+                this.piTimes2 = Math.PI * 2;
+                this.lastUpdate = 0;
+                this.animationId = null;
+                this.container = null;
+                this.init();
+            }
+
+            init() {
+                this.container = document.getElementById('asciiContent');
+                if (this.container) {
+                    this.startAnimation();
+                }
+            }
+
+            startAnimation() {
+                const animate = (currentTime) => {
+                    this.lastUpdate += 16;
+                    if (this.lastUpdate > 166) {
+                        this.frame += 1;
+                        this.generateAscii();
+                        this.lastUpdate = 0;
+                    }
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                this.animationId = requestAnimationFrame(animate);
+            }
+
+            stopAnimation() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            }
+
+            generateAscii() {
+                if (!this.container) return;
+
+                const rowsArray = [];
+                const frameDiv4 = this.frame / 6.7;
+                const frameDiv5 = this.frame / 8.3;
+                const frameDiv8 = this.frame / 13.3;
+                
+                for (let y = 0; y < this.rows; y++) {
+                    const yDivRows = y / this.rows;
+                    const yDiv5 = y / 5;
+                    const yDiv3 = y / 3;
+                    let rowString = '';
+                    let rowOpacity = 1;
                     
-                    // Auto-hide hints after 3 seconds
+                    for (let x = 0; x < this.cols; x++) {
+                        const xDivCols = x / this.cols;
+                        const xDiv3 = x / 3;
+                        const xDiv4 = x / 4;
+                        
+                        const dx = xDivCols - this.centerPos.x;
+                        const dy = yDivRows - this.centerPos.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const distTimes10 = dist * 10;
+                        const distTimes5 = dist * 5;
+
+                        const wave = Math.sin(xDiv3 + yDiv5 + frameDiv4 + distTimes10) + 
+                                    Math.cos(xDiv4 - yDiv3 - frameDiv5) +
+                                    Math.sin(frameDiv8 + xDivCols * this.piTimes2);
+
+                        const charValue = (wave + 2) * this.charLengthDivide4 + distTimes5;
+                        const charIndex = Math.floor(Math.abs(charValue)) % this.charactersLength;
+                        
+                        const opacity = Math.max(0.2, Math.min(0.8, 1 - dist + Math.sin(wave) / 3));
+                        
+                        if (x === 0) rowOpacity = opacity;
+                        else rowOpacity = (rowOpacity + opacity) / 2;
+                        
+                        rowString += this.characters[charIndex];
+                    }
+                    
+                    rowsArray.push({ text: rowString, opacity: rowOpacity });
+                }
+
+                this.container.innerHTML = rowsArray.map(row => 
+                    `<div style="opacity: ${row.opacity}; margin: 0; line-height: 1;">${row.text}</div>`
+                ).join('');
+            }
+        }
+
+        class ElliotGenerator {
+            constructor() {
+                this.selectedTraits = new Set(['energy', 'collaborative']);
+                this.isGenerating = false;
+                this.currentElliot = null;
+                this.waterAscii = null;
+                this.terminal = null;
+                this.init();
+            }
+
+            init() {
+                // Initialize ASCII animation if container exists
+                if (document.getElementById('asciiContent')) {
+                    this.waterAscii = new WaterASCII();
+                }
+                
+                // Initialize terminal if elements exist
+                if (document.getElementById('terminalInput')) {
+                    this.terminal = new Terminal();
+                }
+
+                // Add event listeners for trait options
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.addEventListener('click', (e) => this.toggleTrait(e));
+                });
+
+                // Add event listeners for trait toggles
+                document.querySelectorAll('.trait-toggle').forEach(toggle => {
+                    toggle.addEventListener('click', (e) => this.toggleTraitSwitch(e));
+                });
+
+                // Add event listeners for sound bars
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.addEventListener('click', (e) => this.toggleSoundbar(e));
+                });
+
+                // Add event listeners for action buttons
+                const generateBtn = document.getElementById('generateBtn');
+                const randomBtn = document.getElementById('randomBtn');
+                const resetBtn = document.getElementById('resetBtn');
+                const saveBtn = document.getElementById('saveBtn');
+
+                if (generateBtn) generateBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.generateElliot();
+                });
+                if (randomBtn) randomBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.randomizeTraits();
+                });
+                if (resetBtn) resetBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.resetTraits();
+                });
+                if (saveBtn) saveBtn.addEventListener('click', () => {
+                    this.triggerSoundbarPulse();
+                    this.saveElliot();
+                });
+
+                // Add click handler for water ascii
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) {
+                    waterAscii.addEventListener('click', () => this.generateElliot());
+                }
+
+                // Advanced dropdown functionality
+                const advancedToggle = document.getElementById('advancedToggle');
+                if (advancedToggle) {
+                    advancedToggle.addEventListener('click', () => this.toggleAdvancedDropdown());
+                }
+
+                // Terminal mode functionality
+                const terminalModeBtn = document.getElementById('terminalModeBtn');
+                const backToTraits = document.getElementById('backToTraits');
+                
+                if (terminalModeBtn) {
+                    terminalModeBtn.addEventListener('click', () => this.enterTerminalMode());
+                }
+                if (backToTraits) {
+                    backToTraits.addEventListener('click', () => this.exitTerminalMode());
+                }
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    // Only if we're not in an input field
+                    if (e.target.tagName === 'INPUT') return;
+                    
+                    if (e.key === 'g' || e.key === 'G') {
+                        e.preventDefault();
+                        this.triggerSoundbarPulse();
+                        this.generateElliot();
+                    } else if (e.key === 'r' || e.key === 'R') {
+                        e.preventDefault();
+                        this.triggerSoundbarPulse();
+                        this.randomizeTraits();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        this.triggerSoundbarPulse();
+                        this.resetTraits();
+                    }
+                });
+
+                // Initialize display
+                this.updateTraitDisplay();
+                
+                // Ensure default soundbars are properly activated
+                setTimeout(() => {
+                    const energyBar = document.querySelector('.soundbar[data-trait="energy"]');
+                    const collabBar = document.querySelector('.soundbar[data-trait="collaborative"]');
+                    if (energyBar) energyBar.classList.add('active');
+                    if (collabBar) collabBar.classList.add('active');
+                    this.updateTraitDisplay();
+                }, 100);
+            }
+
+            toggleAdvancedDropdown() {
+                const toggle = document.getElementById('advancedToggle');
+                const content = document.getElementById('advancedContent');
+                const grid = document.querySelector('.trait-selector-grid');
+                if (!toggle || !content) return;
+                
+                if (content.classList.contains('show')) {
+                    content.classList.remove('show');
+                    toggle.textContent = '▶ Advanced';
+                    if (grid) grid.classList.remove('expanded');
+                } else {
+                    content.classList.add('show');
+                    toggle.textContent = '▼ Advanced';
+                    if (grid) grid.classList.add('expanded');
+                }
+            }
+
+            enterTerminalMode() {
+                const panel = document.getElementById('traitPanel');
+                if (panel) {
+                    panel.classList.add('flipped');
+                    
                     setTimeout(() => {
-                        hints.style.opacity = '0';
-                        hints.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => hints.remove(), 500);
-                    }, 3000);
+                        const terminalInput = document.getElementById('terminalInput');
+                        if (terminalInput) terminalInput.focus();
+                    }, 400);
+                }
+            }
+
+            exitTerminalMode() {
+                const panel = document.getElementById('traitPanel');
+                if (panel) {
+                    panel.classList.remove('flipped');
+                }
+            }
+
+            toggleSoundbar(e) {
+                const bar = e.currentTarget;
+                const trait = bar.dataset.trait;
+                
+                if (this.selectedTraits.has(trait)) {
+                    this.selectedTraits.delete(trait);
+                } else {
+                    this.selectedTraits.add(trait);
+                }
+                
+                // Update corresponding UI elements
+                const toggle = document.querySelector(`[data-trait="${trait}"]`);
+                if (toggle && toggle.classList.contains('trait-toggle')) {
+                    toggle.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+                
+                const option = document.querySelector(`[data-dimension="${trait}"]`);
+                if (option) {
+                    option.classList.toggle('selected', this.selectedTraits.has(trait));
+                }
+                
+                this.updateTraitDisplay();
+            }
+
+            toggleTrait(e) {
+                const option = e.currentTarget;
+                const trait = option.dataset.dimension;
+
+                if (option.classList.contains('selected')) {
+                    option.classList.remove('selected');
+                    this.selectedTraits.delete(trait);
+                } else {
+                    option.classList.add('selected');
+                    this.selectedTraits.add(trait);
+                }
+
+                // Update corresponding sound bar
+                const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                if (soundbar) {
+                    soundbar.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+
+                this.updateTraitDisplay();
+            }
+
+            toggleTraitSwitch(e) {
+                const toggle = e.currentTarget;
+                const trait = toggle.dataset.trait;
+                
+                toggle.classList.toggle('active');
+                
+                if (toggle.classList.contains('active')) {
+                    this.selectedTraits.add(trait);
+                } else {
+                    this.selectedTraits.delete(trait);
+                }
+                
+                // Update corresponding sound bar
+                const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                if (soundbar) {
+                    soundbar.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+                
+                // Update corresponding trait option
+                const option = document.querySelector(`[data-dimension="${trait}"]`);
+                if (option) {
+                    option.classList.toggle('selected', this.selectedTraits.has(trait));
+                }
+                
+                this.updateTraitDisplay();
+            }
+
+            updateTraitDisplay() {
+                // Update selection count
+                const count = this.selectedTraits.size;
+                const selectionCount = document.querySelector('.selection-count');
+                const traitCount = document.getElementById('traitCount');
+                
+                if (selectionCount) selectionCount.textContent = `${count}/18`;
+                if (traitCount) traitCount.textContent = `${count} trait${count !== 1 ? 's' : ''}`;
+
+                // Update sound bars based on selected traits
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach(bar => {
+                    const trait = bar.dataset.trait;
+                    const isActive = this.selectedTraits.has(trait);
+                    
+                    bar.classList.toggle('active', isActive);
+                    
+                    // Set height based on trait and activity
+                    if (isActive) {
+                        const defaultHeight = getComputedStyle(bar).getPropertyValue('--default-height') || '20px';
+                        bar.style.height = defaultHeight;
+                        bar.style.setProperty('--bar-height', defaultHeight);
+                        const pulseHeight = parseInt(defaultHeight) + 15 + 'px';
+                        bar.style.setProperty('--pulse-height', pulseHeight);
+                    } else {
+                        bar.style.height = '8px';
+                    }
+                });
+
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) {
+                    if (count > 0) {
+                        waterAscii.classList.add('active');
+                    } else {
+                        waterAscii.classList.remove('active');
+                    }
+                }
+
+                // Trigger pulse animation for active bars
+                this.triggerSoundbarPulse();
+
+                // Update possibilities label based on trait count
+                const possibilities = count > 0 ? Math.pow(2, Math.min(count, 10)) : '∞';
+                const possibilitiesLabel = document.querySelector('.possibilities-label');
+                if (possibilitiesLabel) {
+                    possibilitiesLabel.textContent = `${possibilities} combination${possibilities !== 1 ? 's' : ''}`;
+                }
+            }
+
+            triggerSoundbarPulse() {
+                const soundbars = document.querySelectorAll('.soundbar.active');
+                soundbars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.classList.add('pulse');
+                        setTimeout(() => {
+                            bar.classList.remove('pulse');
+                        }, 400);
+                    }, index * 30);
+                });
+            }
+
+            async generateElliot() {
+                if (this.isGenerating) return;
+
+                this.isGenerating = true;
+                this.showGeneratingState();
+
+                try {
+                    const elliotData = await this.generateDemoElliot();
+                    this.displayElliot(elliotData);
+                } catch (error) {
+                    console.error('Generation failed:', error);
+                    this.showError();
+                } finally {
+                    this.isGenerating = false;
+                    this.hideGeneratingState();
+                }
+            }
+
+            async generateDemoElliot() {
+                await new Promise(resolve => setTimeout(resolve, 2500));
+
+                const variants = [
+                    {
+                        name: "Elliot the Creator",
+                        title: "Creative AI Builder",
+                        description: "Builds AI with artistic flair",
+                        avatar: "🎨",
+                        traits: ["Creative", "Builder", "Visionary"]
+                    },
+                    {
+                        name: "Elliot the Connector",
+                        title: "Empathetic Product Lead",
+                        description: "Bridges teams with understanding",
+                        avatar: "🤝",
+                        traits: ["Empathetic", "Leader", "Collaborator"]
+                    },
+                    {
+                        name: "Elliot the Innovator",
+                        title: "Strategic Builder",
+                        description: "Architecting the future",
+                        avatar: "⚡",
+                        traits: ["Strategic", "Innovative", "Technical"]
+                    },
+                    {
+                        name: "Elliot the Analyzer",
+                        title: "Data-Driven Strategist",
+                        description: "Turns data into decisions",
+                        avatar: "🔬",
+                        traits: ["Analytical", "Precise", "Methodical"]
+                    },
+                    {
+                        name: "Elliot the Catalyst",
+                        title: "High-Energy Transformer",
+                        description: "Energizes teams to achieve more",
+                        avatar: "🚀",
+                        traits: ["Energetic", "Motivational", "Dynamic"]
+                    }
+                ];
+
+                // Select based on traits if possible
+                const selectedTraits = Array.from(this.selectedTraits);
+                if (selectedTraits.includes('energy')) {
+                    return variants[4]; // Catalyst
+                } else if (selectedTraits.includes('analytical')) {
+                    return variants[3]; // Analyzer
+                } else if (selectedTraits.includes('innovation')) {
+                    return variants[2]; // Innovator
+                } else if (selectedTraits.includes('collaborative')) {
+                    return variants[1]; // Connector
+                } else {
+                    return variants[0]; // Creator
+                }
+            }
+
+            showGeneratingState() {
+                // Activate all sound bars for generation
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach(bar => {
+                    bar.classList.add('generating');
+                });
+                
+                // Show generation path
+                const generationPath = document.getElementById('generationPath');
+                if (generationPath) generationPath.classList.add('active');
+                
+                // Activate water ascii generating animation
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) waterAscii.classList.add('generating');
+
+                // Update generate button
+                const btn = document.getElementById('generateBtn');
+                if (btn) {
+                    btn.classList.add('generating');
+                    btn.innerHTML = `Generating...<div class="button-subtitle">...</div>`;
+                }
+            }
+
+            hideGeneratingState() {
+                // Remove generating state from sound bars
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach(bar => {
+                    bar.classList.remove('generating');
+                });
+                
+                // Hide generation animations
+                const generationPath = document.getElementById('generationPath');
+                if (generationPath) generationPath.classList.remove('active');
+                
+                // Remove water ascii generating state
+                const waterAscii = document.getElementById('waterAscii');
+                if (waterAscii) waterAscii.classList.remove('generating');
+                
+                // Reset generate button
+                const btn = document.getElementById('generateBtn');
+                if (btn) {
+                    btn.classList.remove('generating');
+                    btn.innerHTML = `Generate<div class="button-subtitle">G</div>`;
+                }
+            }
+
+            displayElliot(elliotData) {
+                this.currentElliot = elliotData;
+
+                // Create success pulse in sound bars
+                const soundbars = document.querySelectorAll('.soundbar');
+                soundbars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.style.background = 'var(--gold)';
+                        setTimeout(() => {
+                            bar.style.background = bar.classList.contains('active') ? 'var(--amber)' : '#ddd';
+                        }, 200);
+                    }, index * 50);
+                });
+
+                // Show success message in console
+                console.log('Generated Elliot:', elliotData);
+            }
+
+            showError() {
+                console.error('Generation failed');
+            }
+
+            randomizeTraits() {
+                // Clear current selection
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.querySelectorAll('.trait-toggle').forEach(toggle => {
+                    toggle.classList.remove('active');
+                });
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.classList.remove('active');
+                    bar.style.height = '8px';
+                });
+                this.selectedTraits.clear();
+
+                // Get all available traits
+                const allTraits = Array.from(document.querySelectorAll('.soundbar')).map(bar => bar.dataset.trait);
+                
+                // Randomly select 3-6 traits
+                const count = 3 + Math.floor(Math.random() * 4);
+                const selectedTraits = [];
+                
+                while (selectedTraits.length < count && selectedTraits.length < allTraits.length) {
+                    const randomTrait = allTraits[Math.floor(Math.random() * allTraits.length)];
+                    if (!selectedTraits.includes(randomTrait)) {
+                        selectedTraits.push(randomTrait);
+                        this.selectedTraits.add(randomTrait);
+                    }
+                }
+
+                // Update UI elements for selected traits
+                selectedTraits.forEach(trait => {
+                    // Update sound bar
+                    const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                    if (soundbar) {
+                        soundbar.classList.add('active');
+                    }
+                    
+                    // Update toggle if exists
+                    const toggle = document.querySelector(`[data-trait="${trait}"]`);
+                    if (toggle && toggle.classList.contains('trait-toggle')) {
+                        toggle.classList.add('active');
+                    }
+                    
+                    // Update option if exists
+                    const option = document.querySelector(`[data-dimension="${trait}"]`);
+                    if (option) {
+                        option.classList.add('selected');
+                    }
+                });
+
+                this.updateTraitDisplay();
+            }
+
+            resetTraits() {
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                document.querySelectorAll('.trait-toggle').forEach(toggle => {
+                    toggle.classList.remove('active');
+                });
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.classList.remove('active');
+                    bar.style.height = '8px';
+                });
+                
+                this.selectedTraits.clear();
+                this.selectedTraits.add('energy');
+                this.selectedTraits.add('collaborative');
+                
+                // Reset to default selections
+                const energyOption = document.querySelector('[data-dimension="energy"]');
+                const collabOption = document.querySelector('[data-dimension="collaborative"]');
+                const energyToggle = document.querySelector('[data-trait="energy"]');
+                const energyBar = document.querySelector('.soundbar[data-trait="energy"]');
+                const collabBar = document.querySelector('.soundbar[data-trait="collaborative"]');
+                
+                if (energyOption) energyOption.classList.add('selected');
+                if (collabOption) collabOption.classList.add('selected');
+                if (energyToggle) energyToggle.classList.add('active');
+                if (energyBar) energyBar.classList.add('active');
+                if (collabBar) collabBar.classList.add('active');
+                
+                this.updateTraitDisplay();
+            }
+
+            saveElliot() {
+                if (this.currentElliot) {
+                    const data = JSON.stringify(this.currentElliot, null, 2);
+                    console.log('Saved Elliot:', data);
+                    
+                    // Visual feedback
+                    const btn = document.getElementById('saveBtn');
+                    if (btn) {
+                        const original = btn.innerHTML;
+                        btn.innerHTML = `Saved!<div class="button-subtitle">✓</div>`;
+                        setTimeout(() => {
+                            btn.innerHTML = original;
+                        }, 1500);
+                    }
+
+                    // Try to copy to clipboard
+                    try {
+                        navigator.clipboard.writeText(data);
+                        console.log('Elliot data copied to clipboard');
+                    } catch (err) {
+                        console.log('Clipboard access not available');
+                    }
+                } else {
+                    console.log('No Elliot to save - generate one first!');
                 }
             }
         }
-        
-        // Initialize touch gestures
-        window.addEventListener('load', () => {
-            new TouchGestureManager();
-        });
-        
-        // Add swipe feedback animation
-        const swipeStyle = document.createElement('style');
-        swipeStyle.textContent = `
-            @keyframes swipe-feedback {
-                0% { transform: translateY(-50%) scale(0.5); opacity: 0; }
-                50% { transform: translateY(-50%) scale(1.2); opacity: 1; }
-                100% { transform: translateY(-50%) scale(1); opacity: 0; }
-            }
-            
-            .mobile-hints .hint {
-                margin: 2px 0;
-                animation: fade-in-out 4s ease-in-out;
-            }
-            
-            @keyframes fade-in-out {
-                0%, 100% { opacity: 0; }
-                20%, 80% { opacity: 0.6; }
-            }
-        `;
-        document.head.appendChild(swipeStyle);
-        
-        // Chat circle functionality
-        const chatCircle = document.createElement('div');
-        chatCircle.className = 'chat-circle';
-        chatCircle.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-            </svg>
-        `;
-        
-        chatCircle.addEventListener('click', () => {
-            const chat = ensureChatInitialized();
-            if (chat) {
-                chat.chatUI.show();
+
+        // Initialize trait selector when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Only initialize if trait selector elements exist
+            if (document.querySelector('.trait-selector-container')) {
+                new ElliotGenerator();
             }
         });
-        
-        document.body.appendChild(chatCircle);
-        
-        // Chat circle styles
-        const chatStyle = document.createElement('style');
-        chatStyle.textContent = `
+    </script>
+
+    <!-- Chat Circle -->
+    <div class="chat-circle" title="Start Chat Experience">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 12H16M8 8H16M8 16H13M7 4V2.5C7 2.22386 7.22386 2 7.5 2H16.5C16.7761 2 17 2.22386 17 2.5V4M7 4H17M7 4C5.89543 4 5 4.89543 5 6V18C5 19.1046 5.89543 20 7 20H17C18.1046 20 19 19.1046 19 18V6C19 4.89543 18.1046 4 17 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <style>
+        .chat-circle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all var(--transition-speed) ease;
+            z-index: 1000;
+            color: white;
+        }
+
+        .chat-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+            background: var(--text-color);
+        }
+
+        .chat-circle svg {
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .chat-circle:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Pulse animation for attention */
+        .chat-circle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: var(--accent-color);
+            animation: pulse-ring 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            70% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
             .chat-circle {
-                position: fixed;
-                bottom: 30px;
-                right: 30px;
+                bottom: 20px;
+                right: 20px;
                 width: 60px;
                 height: 60px;
-                background: var(--accent-color);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                z-index: 1000;
-                transition: all 0.3s ease;
-                color: white;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            }
-            
-            .chat-circle:hover {
-                transform: scale(1.1);
-                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
             
             .chat-circle svg {
-                width: 24px;
-                height: 24px;
+                width: 28px;
+                height: 28px;
             }
             
+            /* Ensure better touch targets */
             .chat-circle::before {
-                content: '';
-                position: absolute;
-                top: -2px;
-                left: -2px;
-                right: -2px;
-                bottom: -2px;
-                border-radius: 50%;
-                background: var(--accent-color);
-                opacity: 0.3;
-                animation: pulse-ring 2s infinite;
+                animation: pulse-ring 3s infinite;
             }
-            
-            @keyframes pulse-ring {
-                0% {
-                    transform: scale(0.8);
-                    opacity: 0.8;
-                }
-                50% {
-                    transform: scale(1.2);
-                    opacity: 0.4;
-                }
-                100% {
-                    transform: scale(1.5);
-                    opacity: 0;
-                }
+        }
+        
+        @media (max-width: 480px) {
+            .chat-circle {
+                bottom: 16px;
+                right: 16px;
+                width: 56px;
+                height: 56px;
             }
-            
-            /* Mobile optimizations */
-            @media (max-width: 768px) {
-                .chat-circle {
-                    bottom: 20px;
-                    right: 20px;
-                    width: 56px;
-                    height: 56px;
-                }
-                
-                .chat-circle svg {
-                    width: 20px;
-                    height: 20px;
-                }
-            }
-        `;
-        document.head.appendChild(chatStyle);
-    </script>    <!-- Main Application JavaScript -->
+        }
+    </style>
+    
+    <!-- Main Application JavaScript -->
     <script src="js/main.js"></script>
     <script src="js/trait-selector.js"></script>
     

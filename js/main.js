@@ -1,32 +1,6 @@
 // Main Website JavaScript - Performance monitoring and artifact management
 
-// Configuration object
-const CONFIG = {
-    artifacts: {
-        hankies: { 
-            resolution: window.innerWidth < 768 ? 16 : 32, 
-            animationSpeed: 0.0013 
-        },
-        particles: { 
-            count: window.innerWidth < 768 ? 15000 : 45000, 
-            opacity: 0.4 
-        },
-        ascii: {
-            width: window.innerWidth < 768 ? 45 : 65,
-            height: window.innerWidth < 768 ? 45 : 65
-        },
-        metamorphosis: {
-            numLines: window.innerWidth < 768 ? 60 : 120,
-            lineSegments: window.innerWidth < 768 ? 90 : 180
-        },
-        sineWaves: {
-            layers: window.innerWidth < 768 ? 40 : 80,
-            points: window.innerWidth < 768 ? 100 : 200
-        }
-    },
-    transitions: { duration: 1200, delay: 150 },
-    titles: ["ELLIOT LEE", "PRODUCT MANAGER", "BUILDER", "ACCOUNT MANAGER", "HUMAN"]
-};
+// CONFIG object is defined in the inline script block in index.html
 
 // Performance monitoring configuration
 const PERFORMANCE_CONFIG = {

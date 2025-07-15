@@ -117,9 +117,37 @@ class Terminal {
     }
 
     async generateFinalQuestResponse() {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${this.extractKeyTraits()}. Let me generate a personalized recommendation for you.`;
+        try {
+            // Send quest responses to backend for analysis
+            const response = await fetch('/api/quest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    responses: this.userResponses,
+                    questions: this.questions
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${data.key_traits || this.extractKeyTraits()}. 
+
+Here's my analysis:
+• ${data.insights ? data.insights.join('\n• ') : 'Analysis complete'}
+
+Your personality profile shows: ${data.personality_summary || 'Balanced traits across multiple dimensions'}`;
+        } catch (error) {
+            console.error('Error connecting to personality analyzer:', error);
+            // Fallback to local analysis
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${this.extractKeyTraits()}. Let me generate a personalized recommendation for you.`;
+        }
     }
 
     extractKeyTraits() {
@@ -144,8 +172,42 @@ class Terminal {
     }
 
     async generateElliotResponse(userInput) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
+        try {
+            // Determine the mode based on input
+            let mode = 'conversation';
+            if (userInput.length > 100 && (userInput.includes('requirements') || userInput.includes('experience') || userInput.includes('responsible'))) {
+                mode = 'job_description';
+            }
+            
+            // Send to backend for analysis
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: userInput,
+                    mode: mode,
+                    context: this.conversationHistory
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            return data.response || this.getFallbackResponse(userInput);
+        } catch (error) {
+            console.error('Error connecting to personality analyzer:', error);
+            // Fallback to local analysis
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            return this.getFallbackResponse(userInput);
+        }
+    }
+    
+    getFallbackResponse(userInput) {
         // Check if it's a job description
         if (userInput.length > 100 && (userInput.includes('requirements') || userInput.includes('experience') || userInput.includes('responsible'))) {
             return this.analyzeJobDescription(userInput);

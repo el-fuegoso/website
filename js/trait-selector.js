@@ -1,13 +1,24 @@
 // Trait Selector JavaScript - Interactive avatar generation interface
 
-// Terminal interface class
+// Terminal interface class - Claude Code style with Elliot
 class Terminal {
     constructor() {
         this.output = document.getElementById('terminalOutput');
         this.input = document.getElementById('terminalInput');
         this.isProcessing = false;
         this.conversationHistory = [];
+        this.questMode = false;
+        this.currentQuestion = 0;
+        this.userResponses = [];
         this.init();
+        
+        // Questions for quest mode
+        this.questions = [
+            "What's your name, and what do you do for work?",
+            "What's something you've been working on lately that you're genuinely excited about?",
+            "If you could have dinner with anyone (dead or alive), who would it be and what would you want to talk about?",
+            "What kind of impact do you hope to make in your work or the world?"
+        ];
     }
 
     init() {
@@ -25,21 +36,32 @@ class Terminal {
         if (!userInput) return;
 
         this.isProcessing = true;
-        this.addToOutput(`<span class="terminal-user">elliot@localhost ~ % ${userInput}</span>`);
+        this.addToOutput(`<span class="terminal-user">user@terminal ~ % ${userInput}</span>`);
         this.input.value = '';
         this.showLoading();
 
         try {
+            // Check for special commands
+            if (userInput.toLowerCase() === 'quest') {
+                this.startQuestMode();
+                return;
+            }
+
             // Build conversation context
             this.conversationHistory.push({
                 role: 'user',
                 content: userInput
             });
 
-            let response = await this.generateFallbackResponse(userInput);
+            let response;
+            if (this.questMode) {
+                response = await this.handleQuestResponse(userInput);
+            } else {
+                response = await this.generateElliotResponse(userInput);
+            }
 
             this.hideLoading();
-            this.addToOutput(`<span class="terminal-ai">elliot@localhost ~ % ${response}</span>`);
+            this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % ${response}</span>`);
             
             this.conversationHistory.push({
                 role: 'assistant',
@@ -55,22 +77,98 @@ class Terminal {
         }
     }
 
-    async generateFallbackResponse(userInput) {
+    startQuestMode() {
+        this.questMode = true;
+        this.currentQuestion = 0;
+        this.userResponses = [];
+        
+        this.hideLoading();
+        this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % Perfect! Let's dive into the guided flow.</span>`);
+        this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % I'll ask you ${this.questions.length} questions to understand what kind of El you need.</span>`);
+        this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % </span>`);
+        this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % ${this.questions[0]}</span>`);
+        this.addPrompt();
+    }
+
+    async handleQuestResponse(userInput) {
+        this.userResponses.push(userInput);
+        
+        if (this.currentQuestion < this.questions.length - 1) {
+            // Move to next question
+            this.currentQuestion++;
+            const followUp = await this.generateFollowUp(userInput, this.currentQuestion - 1);
+            return `${followUp} \n\nNext question: ${this.questions[this.currentQuestion]}`;
+        } else {
+            // Final question answered
+            this.questMode = false;
+            return await this.generateFinalQuestResponse();
+        }
+    }
+
+    async generateFollowUp(response, questionIndex) {
+        const followUps = [
+            "Nice to meet you! That sounds like interesting work.",
+            "That's awesome - passion projects often lead to the best insights.",
+            "Fascinating choice! Great conversations usually reveal character.",
+            "That's a meaningful vision - impact-driven people tend to be great collaborators."
+        ];
+        
+        return followUps[questionIndex] || "Thanks for sharing that insight.";
+    }
+
+    async generateFinalQuestResponse() {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${this.extractKeyTraits()}. Let me generate a personalized recommendation for you.`;
+    }
+
+    extractKeyTraits() {
+        // Simple trait extraction from responses
+        const allText = this.userResponses.join(' ').toLowerCase();
+        const traits = [];
+        
+        if (allText.includes('technical') || allText.includes('engineer') || allText.includes('code')) {
+            traits.push('technical expertise');
+        }
+        if (allText.includes('team') || allText.includes('collaborate') || allText.includes('people')) {
+            traits.push('collaboration');
+        }
+        if (allText.includes('creative') || allText.includes('design') || allText.includes('art')) {
+            traits.push('creativity');
+        }
+        if (allText.includes('lead') || allText.includes('manage') || allText.includes('direct')) {
+            traits.push('leadership');
+        }
+        
+        return traits.length > 0 ? traits.join(' and ') : 'multiple perspectives';
+    }
+
+    async generateElliotResponse(userInput) {
         await new Promise(resolve => setTimeout(resolve, 1500));
         
+        // Check if it's a job description
+        if (userInput.length > 100 && (userInput.includes('requirements') || userInput.includes('experience') || userInput.includes('responsible'))) {
+            return this.analyzeJobDescription(userInput);
+        }
+        
+        // General conversation responses
         const responses = [
-            "Analyzing your requirements... I see you're looking for someone with those specific qualities. What role would they be filling on your team?",
-            "Interesting combination of traits! Are you building a startup team or looking for someone for an established company?",
-            "Got it. Processing your persona requirements... Would you say this Elliot needs to be more collaborative or more independent?",
-            "Those are solid requirements. Let me know if you want me to generate a persona based on what you've described, or if you'd like to refine the traits further.",
-            "Understanding your needs... It sounds like you need someone who can balance technical skills with people skills. Anything else I should factor in?"
+            "I hear you! Based on what you're describing, it sounds like you need an El who can adapt to different situations. What's the main challenge you're trying to solve?",
+            "Interesting perspective. Tell me more about the context - is this for a specific project or a longer-term role?",
+            "Got it. I'm picking up on some key themes here. What would success look like with the right El on your team?",
+            "That makes sense. From what you're sharing, I can see a few different personality directions we could explore. Any particular working style preferences?",
+            "Understanding your needs... It sounds like you're looking for someone who can balance different skills. What's most important - the technical side or the people side?"
         ];
         
         return responses[Math.floor(Math.random() * responses.length)];
     }
 
+    analyzeJobDescription(jd) {
+        return "I can see this is a detailed role description. Let me parse through the key requirements... Based on this JD, I'm seeing needs for someone who can handle both strategic thinking and hands-on execution. Want me to break down what kind of El personality would fit best?";
+    }
+
     showLoading() {
-        this.addToOutput(`<span class="terminal-loading">elliot@localhost ~ % Processing...</span>`);
+        this.addToOutput(`<span class="terminal-loading">elliot@terminal ~ % Thinking...</span>`);
     }
 
     hideLoading() {
@@ -86,7 +184,7 @@ class Terminal {
     }
 
     addPrompt() {
-        this.addToOutput(`<span class="terminal-prompt">elliot@localhost ~ % _</span>`);
+        this.addToOutput(`<span class="terminal-prompt">elliot@terminal ~ % _</span>`);
     }
 }
 

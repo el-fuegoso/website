@@ -562,12 +562,14 @@
 }
 
 .terminal-user {
-    color: #98d982;
+    color: #61dafb;
+    font-weight: 500;
 }
 
 .terminal-ai {
     color: #ffffff;
     margin-bottom: 8px;
+    line-height: 1.6;
 }
 
 .terminal-input-container {
@@ -600,8 +602,9 @@
 }
 
 .terminal-loading {
-    color: #61dafb;
+    color: #f39c12;
     animation: terminal-blink 1s infinite;
+    font-style: italic;
 }
 
 @keyframes terminal-blink {

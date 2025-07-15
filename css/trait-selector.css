@@ -551,10 +551,15 @@
     padding: 0 16px;
     color: #ffffff;
     font-size: 12px;
+    text-align: left !important;
     line-height: 1.5;
     overflow-y: auto;
     margin-bottom: 12px;
     min-height: 0;
+}
+
+.terminal-output > div {
+    text-align: left !important;
 }
 
 .terminal-prompt {

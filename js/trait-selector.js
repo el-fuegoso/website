@@ -39,18 +39,18 @@ class Terminal {
         this.addToOutput(`<span style="color: #ffb000; text-shadow: 0 0 10px rgba(255, 176, 0, 0.3);">* Welcome to El's world</span>`);
         this.addToOutput('');
         
-        // Add ELLIOT ASCII art with animation delay
+        // Add ELLIOT ASCII art with animation delay using proper ASCII characters
         const elliotLines = [
-            '███████ ██      ██      ██  ██████  ████████',
-            '██      ██      ██      ██ ██    ██    ██   ',
-            '█████   ██      ██      ██ ██    ██    ██   ',
-            '██      ██      ██      ██ ██    ██    ██   ',
-            '███████ ███████ ███████ ██  ██████     ██   '
+            'EEEEEEE LL      LL      II   OOOOOO  TTTTTTTT',
+            'EE      LL      LL      II  OO    OO    TT   ',
+            'EEEEE   LL      LL      II  OO    OO    TT   ',
+            'EE      LL      LL      II  OO    OO    TT   ',
+            'EEEEEEE LLLLLLL LLLLLLL II   OOOOOO     TT   '
         ];
         
         elliotLines.forEach((line, index) => {
             setTimeout(() => {
-                this.addToOutput(`<span style="color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.3); font-family: monospace; letter-spacing: 1px;">${line}</span>`);
+                this.addToOutput(`<span style="color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.3); font-family: 'Courier New', monospace; letter-spacing: 2px; white-space: pre;">${line}</span>`);
             }, index * 150);
         });
         
@@ -59,7 +59,7 @@ class Terminal {
             this.addToOutput('');
             this.addToOutput(`<span style="color: #666666;">════════════════════════════════════════════════════════════</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-size: 1.2em; text-transform: uppercase; letter-spacing: 2px;">PERSONA GENERATOR v1.0</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-size: 1.1em; font-weight: bold;">PERSONA GENERATOR v1.0</span>`);
             this.addToOutput(`<span style="color: #666666;">────────────────────────</span>`);
             this.addToOutput('');
             this.addToOutput(`<span style="color: #55ff55;"><strong>Instructions:</strong></span>`);

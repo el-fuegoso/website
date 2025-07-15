@@ -47,7 +47,7 @@ import seaborn as sns
 from transformers import (
     AutoTokenizer, AutoModel, AutoConfig,
     TrainingArguments, Trainer, 
-    EarlyStoppingCallback, IntervalStrategy
+    EarlyStoppingCallback
 )
 from transformers.optimization import get_linear_schedule_with_warmup
 
@@ -103,6 +103,26 @@ class TrainingConfig:
     
     # Reproducibility
     seed: int = 42
+    
+    def to_json_string(self):
+        """Convert config to JSON string for compatibility with transformers"""
+        config_dict = {}
+        for key, value in self.__dict__.items():
+            if isinstance(value, (str, int, float, bool, list, dict)):
+                config_dict[key] = value
+            else:
+                config_dict[key] = str(value)
+        return json.dumps(config_dict, indent=2)
+    
+    def to_dict(self):
+        """Convert config to dictionary for compatibility with transformers"""
+        config_dict = {}
+        for key, value in self.__dict__.items():
+            if isinstance(value, (str, int, float, bool, list, dict)):
+                config_dict[key] = value
+            else:
+                config_dict[key] = str(value)
+        return config_dict
 
 class PersonalityDataset(Dataset):
     """Dataset class for personality prediction"""
@@ -554,7 +574,7 @@ class PersonalityTrainer:
             weight_decay=self.config.weight_decay,
             logging_dir=self.config.logs_path,
             logging_steps=self.config.logging_steps,
-            evaluation_strategy=IntervalStrategy.STEPS,
+            eval_strategy="steps",  # Changed from evaluation_strategy
             eval_steps=self.config.eval_steps,
             save_steps=self.config.save_steps,
             load_best_model_at_end=True,
@@ -638,8 +658,16 @@ class PersonalityTrainer:
         tokenizer.save_pretrained(model_path / "tokenizer")
         
         # Save configuration
+        config_dict = {}
+        for key, value in self.config.__dict__.items():
+            # Convert non-serializable values to strings
+            if isinstance(value, (str, int, float, bool, list, dict)):
+                config_dict[key] = value
+            else:
+                config_dict[key] = str(value)
+        
         with open(model_path / "training_config.json", 'w') as f:
-            json.dump(self.config.__dict__, f, indent=2)
+            json.dump(config_dict, f, indent=2)
         
         logger.info(f"Model saved to {model_path}")
     

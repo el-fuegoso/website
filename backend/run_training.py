@@ -46,7 +46,7 @@ def quick_training(num_samples: int = 1000):
     print("⚙️  Step 2: Configuring training...")
     config = TrainingConfig(
         # Model settings
-        model_name="bert-base-uncased",
+        model_name="distilbert-base-uncased",  # Smaller, faster model
         classification_head="linear",
         
         # Dataset settings
@@ -54,22 +54,22 @@ def quick_training(num_samples: int = 1000):
         data_path="data/",
         
         # Training settings
-        batch_size=8,  # Smaller batch for quick training
-        learning_rate=2e-5,
-        num_epochs=3,  # Fewer epochs for quick training
-        max_length=256,  # Shorter sequences for speed
+        batch_size=16,  # Larger batch for efficiency
+        learning_rate=5e-5,  # Higher learning rate for faster convergence
+        num_epochs=1,  # Just 1 epoch for quick test
+        max_length=128,  # Much shorter sequences for speed
         
         # Evaluation settings
-        eval_steps=100,
-        logging_steps=50,
-        save_steps=200,
+        eval_steps=25,  # Evaluate more frequently
+        logging_steps=10,  # Log more frequently
+        save_steps=50,  # Save more frequently
         
         # Paths
         model_save_path="models/",
         logs_path="logs/",
         
         # Early stopping
-        early_stopping_patience=2,
+        early_stopping_patience=1,  # Stop earlier
     )
     
     # Step 3: Train model

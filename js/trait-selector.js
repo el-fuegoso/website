@@ -29,6 +29,47 @@ class Terminal {
                 this.processInput();
             }
         });
+        
+        // Show welcome message and ELLIOT ASCII art on initialization
+        this.showWelcomeMessage();
+    }
+    
+    showWelcomeMessage() {
+        // Add welcome message
+        this.addToOutput(`<span style="color: #ffb000; text-shadow: 0 0 10px rgba(255, 176, 0, 0.3);">* Welcome to El's world</span>`);
+        this.addToOutput('');
+        
+        // Add ELLIOT ASCII art with animation delay
+        const elliotLines = [
+            '███████ ██      ██      ██  ██████  ████████',
+            '██      ██      ██      ██ ██    ██    ██   ',
+            '█████   ██      ██      ██ ██    ██    ██   ',
+            '██      ██      ██      ██ ██    ██    ██   ',
+            '███████ ███████ ███████ ██  ██████     ██   '
+        ];
+        
+        elliotLines.forEach((line, index) => {
+            setTimeout(() => {
+                this.addToOutput(`<span style="color: #00ff41; text-shadow: 0 0 10px rgba(0, 255, 65, 0.3); font-family: monospace; letter-spacing: 1px;">${line}</span>`);
+            }, index * 150);
+        });
+        
+        // Add divider and instructions after ASCII art
+        setTimeout(() => {
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #666666;">════════════════════════════════════════════════════════════</span>`);
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #ffffff; font-size: 1.2em; text-transform: uppercase; letter-spacing: 2px;">PERSONA GENERATOR v1.0</span>`);
+            this.addToOutput(`<span style="color: #666666;">────────────────────────</span>`);
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #55ff55;"><strong>Instructions:</strong></span>`);
+            this.addToOutput(`<span style="color: #55ff55;">• Type 'quest' for guided personality analysis</span>`);
+            this.addToOutput(`<span style="color: #55ff55;">• Or just start talking to explore El personas</span>`);
+            this.addToOutput(`<span style="color: #55ff55;">• Your unique profile will be generated</span>`);
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #666666; font-size: 0.9em;">Ready for input...</span>`);
+            this.addPrompt();
+        }, elliotLines.length * 150 + 300);
     }
 
     async processInput() {
@@ -484,6 +525,12 @@ class ElliotGenerator {
             setTimeout(() => {
                 const terminalInput = document.getElementById('terminalInput');
                 if (terminalInput) terminalInput.focus();
+                
+                // Show welcome message if terminal output is empty
+                const terminalOutput = document.getElementById('terminalOutput');
+                if (terminalOutput && this.terminal && terminalOutput.children.length === 0) {
+                    this.terminal.showWelcomeMessage();
+                }
             }, 400);
         }
     }

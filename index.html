@@ -3744,5 +3744,12 @@ Avatar generation now uses reliable local templates - no API needed!
     <!-- Main Application JavaScript -->
     <script src="js/main.js"></script>
     <script src="js/trait-selector.js"></script>
+    
+    <script>
+        // Initialize the application after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initialize();
+        });
+    </script>
 </body>
 </html>

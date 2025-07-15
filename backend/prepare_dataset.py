@@ -163,6 +163,40 @@ Alternative datasets:
             self.create_essays_instructions()
             return False
     
+    def prepare_essays_big5_dataset(self) -> bool:
+        """Prepare essays-big5 dataset from Hugging Face"""
+        logger.info("Preparing essays-big5 dataset from Hugging Face...")
+        
+        try:
+            # Import datasets library
+            from datasets import load_dataset
+            
+            # Load the dataset
+            logger.info("Loading jingjietan/essays-big5 dataset...")
+            ds = load_dataset("jingjietan/essays-big5")
+            
+            # Convert to pandas DataFrame
+            if 'train' in ds:
+                df = ds['train'].to_pandas()
+            else:
+                # If no train split, use the entire dataset
+                df = ds.to_pandas()
+            
+            logger.info(f"Loaded {len(df)} samples from essays-big5 dataset")
+            
+            # Process the dataset
+            self.process_essays_big5_dataset(df)
+            return True
+            
+        except ImportError:
+            logger.error("datasets library not installed. Install with: pip install datasets")
+            self.create_essays_big5_instructions()
+            return False
+        except Exception as e:
+            logger.error(f"Error preparing essays-big5 dataset: {e}")
+            self.create_essays_big5_instructions()
+            return False
+    
     def create_essays_instructions(self):
         """Create instructions for manually downloading Essays dataset"""
         instructions = """
@@ -190,6 +224,47 @@ Steps:
             f.write(instructions)
         
         logger.info("Created Essays download instructions in data/ESSAYS_INSTRUCTIONS.txt")
+    
+    def create_essays_big5_instructions(self):
+        """Create instructions for essays-big5 dataset"""
+        instructions = """
+# Essays Big5 Dataset Instructions
+
+The essays-big5 dataset can be loaded directly from Hugging Face:
+
+## Installation
+
+First, install the required library:
+```bash
+pip install datasets
+```
+
+## Usage
+
+```python
+from datasets import load_dataset
+ds = load_dataset("jingjietan/essays-big5")
+```
+
+## Alternative Download
+
+1. Visit: https://huggingface.co/datasets/jingjietan/essays-big5
+2. Download the dataset files manually
+3. Place in data/ directory as essays_big5_raw.csv
+4. Run this script again
+
+## Expected Format
+
+The dataset should contain:
+- text/essay column with text content
+- Big Five personality scores (openness, conscientiousness, extraversion, agreeableness, neuroticism)
+- Scores should be normalized between 0 and 1
+"""
+        
+        with open(self.output_dir / "ESSAYS_BIG5_INSTRUCTIONS.txt", 'w') as f:
+            f.write(instructions)
+        
+        logger.info("Created essays-big5 instructions in data/ESSAYS_BIG5_INSTRUCTIONS.txt")
     
     def process_essays_dataset(self):
         """Process Essays dataset into standard format"""
@@ -223,6 +298,104 @@ Steps:
         
         # Create dataset statistics
         self.create_dataset_stats(df, "essays")
+    
+    def process_essays_big5_dataset(self, df: pd.DataFrame):
+        """Process essays-big5 dataset into standard format"""
+        logger.info("Processing essays-big5 dataset...")
+        
+        # Print column names to understand structure
+        logger.info(f"Dataset columns: {df.columns.tolist()}")
+        
+        # Check for expected columns
+        expected_columns = ['text', 'openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism']
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        
+        if missing_columns:
+            logger.warning(f"Missing expected columns: {missing_columns}")
+            # Try to map common alternative column names
+            column_mapping = {
+                'essay': 'text',
+                'TEXT': 'text',
+                'content': 'text',
+                'ext': 'extraversion',
+                'neu': 'neuroticism',
+                'agr': 'agreeableness',
+                'con': 'conscientiousness',
+                'opn': 'openness',
+                'o': 'openness',
+                'c': 'conscientiousness', 
+                'e': 'extraversion',
+                'a': 'agreeableness',
+                'n': 'neuroticism'
+            }
+            
+            # Apply column mapping
+            df = df.rename(columns=column_mapping)
+            
+            # Check again for missing columns
+            missing_columns = [col for col in expected_columns if col not in df.columns]
+            if missing_columns:
+                logger.error(f"Still missing columns after mapping: {missing_columns}")
+                # Create default values for missing columns
+                for col in missing_columns:
+                    if col != 'text':
+                        df[col] = 0.5  # Default neutral value
+        
+        # Clean text column
+        if 'text' in df.columns:
+            df['text'] = df['text'].apply(self.clean_text)
+        else:
+            logger.error("No text column found in dataset")
+            return
+        
+        # Normalize personality scores to 0-1 range
+        for trait in self.big_five_traits:
+            if trait in df.columns:
+                # Check if scores are already normalized
+                min_val = df[trait].min()
+                max_val = df[trait].max()
+                
+                if min_val < 0 or max_val > 1:
+                    logger.info(f"Normalizing {trait} scores from [{min_val:.3f}, {max_val:.3f}] to [0, 1]")
+                    df[trait] = self.normalize_scores(df[trait])
+                else:
+                    logger.info(f"{trait} scores already normalized: [{min_val:.3f}, {max_val:.3f}]")
+        
+        # Filter out very short texts
+        original_length = len(df)
+        df = df[df['text'].str.len() > 50]
+        logger.info(f"Filtered out {original_length - len(df)} texts shorter than 50 characters")
+        
+        # Remove outliers
+        df = self.remove_outliers(df)
+        
+        # Ensure we have all required columns
+        for trait in self.big_five_traits:
+            if trait not in df.columns:
+                logger.warning(f"Missing {trait} column, setting to default 0.5")
+                df[trait] = 0.5
+        
+        # Select only the required columns
+        final_columns = ['text'] + self.big_five_traits
+        df = df[final_columns]
+        
+        # Save processed dataset
+        output_file = self.output_dir / "essays_big5_dataset.csv"
+        df.to_csv(output_file, index=False)
+        
+        logger.info(f"Processed essays-big5 dataset saved to {output_file}")
+        logger.info(f"Final dataset size: {len(df)} samples")
+        
+        # Print sample statistics
+        logger.info("\nSample statistics:")
+        logger.info(f"Text length - Mean: {df['text'].str.len().mean():.1f}, Median: {df['text'].str.len().median():.1f}")
+        for trait in self.big_five_traits:
+            mean_score = df[trait].mean()
+            std_score = df[trait].std()
+            logger.info(f"{trait.capitalize()} - Mean: {mean_score:.3f}, Std: {std_score:.3f}")
+        
+        # Create dataset statistics
+        self.create_dataset_stats(df, "essays_big5")
     
     def convert_mbti_to_big_five(self, df: pd.DataFrame) -> pd.DataFrame:
         """Convert MBTI types to Big Five personality traits"""
@@ -538,7 +711,7 @@ def main():
     """Main function"""
     parser = argparse.ArgumentParser(description="Prepare datasets for personality prediction")
     
-    parser.add_argument("--dataset", type=str, choices=["pandora", "essays", "all"],
+    parser.add_argument("--dataset", type=str, choices=["pandora", "essays", "essays_big5", "all"],
                        help="Dataset to prepare")
     parser.add_argument("--create_synthetic", action="store_true",
                        help="Create synthetic dataset")
@@ -561,8 +734,12 @@ def main():
         success = preparer.prepare_pandora_dataset()
     elif args.dataset == "essays":
         success = preparer.prepare_essays_dataset()
+    elif args.dataset == "essays_big5":
+        success = preparer.prepare_essays_big5_dataset()
     elif args.dataset == "all":
-        success = preparer.prepare_pandora_dataset() and preparer.prepare_essays_dataset()
+        success = (preparer.prepare_pandora_dataset() and 
+                  preparer.prepare_essays_dataset() and 
+                  preparer.prepare_essays_big5_dataset())
     
     if success:
         print("\n✅ Dataset preparation completed successfully!")

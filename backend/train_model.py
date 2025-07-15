@@ -75,7 +75,7 @@ class TrainingConfig:
     gradient_accumulation_steps: int = 1
     
     # Dataset configuration
-    dataset_name: str = "pandora"
+    dataset_name: str = "essays_big5"
     train_split: float = 0.8
     val_split: float = 0.1
     test_split: float = 0.1
@@ -245,6 +245,123 @@ class DatasetLoader:
         return texts, personality_scores
     
     @staticmethod
+    def load_essays_big5_dataset(data_path: str) -> Tuple[List[str], List[List[float]]]:
+        """Load essays-big5 dataset from Hugging Face"""
+        logger.info("Loading essays-big5 dataset...")
+        
+        # Check if processed dataset exists
+        essays_big5_file = Path(data_path) / "essays_big5_dataset.csv"
+        if not essays_big5_file.exists():
+            logger.info("Processed essays-big5 dataset not found. Attempting to download and process...")
+            
+            try:
+                # Try to download and process the dataset
+                from datasets import load_dataset
+                
+                # Load the dataset
+                logger.info("Loading jingjietan/essays-big5 dataset from Hugging Face...")
+                ds = load_dataset("jingjietan/essays-big5")
+                
+                # Convert to pandas DataFrame
+                if 'train' in ds:
+                    df = ds['train'].to_pandas()
+                else:
+                    df = ds.to_pandas()
+                
+                # Process the dataframe
+                df = DatasetLoader._process_essays_big5_dataframe(df)
+                
+                # Save processed dataset
+                df.to_csv(essays_big5_file, index=False)
+                logger.info(f"Downloaded and processed essays-big5 dataset saved to {essays_big5_file}")
+                
+            except ImportError:
+                logger.error("datasets library not installed. Install with: pip install datasets")
+                logger.error("Or prepare the dataset manually with: python prepare_dataset.py --dataset essays_big5")
+                sys.exit(1)
+            except Exception as e:
+                logger.error(f"Error downloading essays-big5 dataset: {e}")
+                logger.error("Please prepare the dataset manually with: python prepare_dataset.py --dataset essays_big5")
+                sys.exit(1)
+        
+        # Load processed dataset
+        df = pd.read_csv(essays_big5_file)
+        
+        # Extract text and personality scores
+        texts = df['text'].tolist()
+        personality_scores = df[['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism']].values.tolist()
+        
+        logger.info(f"Loaded {len(texts)} samples from essays-big5 dataset")
+        return texts, personality_scores
+    
+    @staticmethod
+    def _process_essays_big5_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+        """Process essays-big5 dataframe into standard format"""
+        import re
+        
+        # Column mapping for common variations
+        column_mapping = {
+            'essay': 'text',
+            'TEXT': 'text',
+            'content': 'text',
+            'ext': 'extraversion',
+            'neu': 'neuroticism',
+            'agr': 'agreeableness', 
+            'con': 'conscientiousness',
+            'opn': 'openness',
+            'o': 'openness',
+            'c': 'conscientiousness',
+            'e': 'extraversion',
+            'a': 'agreeableness',
+            'n': 'neuroticism'
+        }
+        
+        # Apply column mapping
+        df = df.rename(columns=column_mapping)
+        
+        # Clean text
+        if 'text' in df.columns:
+            df['text'] = df['text'].apply(lambda x: DatasetLoader._clean_text(str(x)))
+        
+        # Normalize personality scores
+        big_five_traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism']
+        for trait in big_five_traits:
+            if trait in df.columns:
+                # Normalize to 0-1 range
+                min_val = df[trait].min()
+                max_val = df[trait].max()
+                if max_val > min_val:
+                    df[trait] = (df[trait] - min_val) / (max_val - min_val)
+                else:
+                    df[trait] = 0.5
+            else:
+                df[trait] = 0.5
+        
+        # Filter short texts
+        df = df[df['text'].str.len() > 50]
+        
+        # Select required columns
+        final_columns = ['text'] + big_five_traits
+        df = df[final_columns]
+        
+        return df
+    
+    @staticmethod
+    def _clean_text(text: str) -> str:
+        """Clean text data"""
+        if pd.isna(text):
+            return ""
+        
+        text = str(text)
+        # Remove URLs
+        text = re.sub(r'http\S+', '', text)
+        # Remove extra whitespace
+        text = re.sub(r'\s+', ' ', text)
+        text = text.strip()
+        
+        return text
+    
+    @staticmethod
     def load_custom_dataset(data_path: str) -> Tuple[List[str], List[List[float]]]:
         """Load custom dataset"""
         logger.info("Loading custom dataset...")
@@ -363,6 +480,8 @@ class PersonalityTrainer:
         """Load dataset based on configuration"""
         if self.config.dataset_name == "pandora":
             return DatasetLoader.load_pandora_dataset(self.config.data_path)
+        elif self.config.dataset_name == "essays_big5":
+            return DatasetLoader.load_essays_big5_dataset(self.config.data_path)
         elif self.config.dataset_name == "custom":
             return DatasetLoader.load_custom_dataset(self.config.data_path)
         elif self.config.dataset_name == "synthetic":
@@ -610,8 +729,8 @@ def main():
                        help="Type of classification head")
     
     # Dataset arguments
-    parser.add_argument("--dataset", type=str, default="synthetic",
-                       choices=["pandora", "custom", "synthetic"],
+    parser.add_argument("--dataset", type=str, default="essays_big5",
+                       choices=["pandora", "essays_big5", "custom", "synthetic"],
                        help="Dataset to use for training")
     parser.add_argument("--data_path", type=str, default="data/",
                        help="Path to dataset")

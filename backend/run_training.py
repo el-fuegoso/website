@@ -107,6 +107,8 @@ def full_training():
         datasets.append("pandora")
     if (data_dir / "essays_dataset.csv").exists():
         datasets.append("essays")
+    if (data_dir / "essays_big5_dataset.csv").exists():
+        datasets.append("essays_big5")
     if (data_dir / "synthetic_dataset.csv").exists():
         datasets.append("synthetic")
     if (data_dir / "custom_dataset.csv").exists():

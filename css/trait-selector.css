@@ -551,6 +551,7 @@
     padding: 0 16px;
     color: #ffffff;
     font-size: 12px;
+    font-family: 'Roboto Mono', monospace !important;
     text-align: left !important;
     line-height: 1.5;
     overflow-y: auto;
@@ -560,6 +561,8 @@
 
 .terminal-output > div {
     text-align: left !important;
+    font-family: 'Roboto Mono', monospace !important;
+    color: #ffffff !important;
 }
 
 .terminal-prompt {
@@ -567,12 +570,14 @@
 }
 
 .terminal-user {
-    color: #61dafb;
+    color: #ffffff;
+    font-family: 'Roboto Mono', monospace !important;
     font-weight: 500;
 }
 
 .terminal-ai {
     color: #ffffff;
+    font-family: 'Roboto Mono', monospace !important;
     margin-bottom: 8px;
     line-height: 1.6;
 }

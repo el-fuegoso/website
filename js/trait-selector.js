@@ -740,6 +740,10 @@ class ElliotGenerator {
             return variants[2]; // Innovator
         } else if (selectedTraits.includes('collaborative')) {
             return variants[1]; // Connector
+        } else if (selectedTraits.includes('cooperative')) {
+            return variants[1]; // Connector (similar to collaborative)
+        } else if (selectedTraits.includes('calm')) {
+            return variants[3]; // Analyzer (calm, methodical approach)
         } else {
             return variants[0]; // Creator
         }

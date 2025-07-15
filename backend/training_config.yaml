@@ -1,0 +1,193 @@
+# Training Configuration for Personality Prediction Model
+# =======================================================
+
+# Model Configuration
+model:
+  name: "bert-base-uncased"  # Options: bert-base-uncased, roberta-base, distilbert-base-uncased
+  max_length: 512
+  hidden_size: 768
+  num_labels: 5  # Big Five personality traits
+  dropout: 0.1
+  freeze_embeddings: false
+
+# Classification Head Configuration
+classification_head:
+  type: "linear"  # Options: linear, bilstm, attention
+  hidden_dim: 256  # For non-linear heads
+  num_layers: 2    # For LSTM/attention heads
+
+# Training Configuration
+training:
+  batch_size: 16
+  learning_rate: 2e-5
+  num_epochs: 10
+  warmup_steps: 500
+  weight_decay: 0.01
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  
+  # Optimization
+  optimizer: "adamw"  # Options: adamw, adam, sgd
+  scheduler: "linear_warmup"  # Options: linear_warmup, cosine, constant
+  
+  # Early stopping
+  early_stopping_patience: 3
+  early_stopping_metric: "eval_loss"
+  early_stopping_mode: "min"
+
+# Dataset Configuration
+dataset:
+  name: "synthetic"  # Options: pandora, essays, synthetic, custom
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  
+  # Data preprocessing
+  min_text_length: 50
+  max_text_length: 5000
+  remove_outliers: true
+  normalize_scores: true
+
+# Evaluation Configuration
+evaluation:
+  strategy: "steps"  # Options: steps, epoch, no
+  steps: 500
+  metrics: ["mse", "mae", "r2", "pearson"]
+  
+  # Validation
+  eval_accumulation_steps: 1
+  prediction_loss_only: false
+
+# Logging Configuration
+logging:
+  steps: 100
+  level: "INFO"
+  log_predictions: true
+  log_model_graph: true
+  
+  # Tensorboard
+  tensorboard_dir: "logs/tensorboard"
+  
+  # Weights & Biases (optional)
+  wandb:
+    enabled: false
+    project: "personality-prediction"
+    entity: null
+    tags: ["bert", "big-five", "personality"]
+
+# Checkpointing Configuration
+checkpointing:
+  save_steps: 1000
+  save_total_limit: 3
+  save_strategy: "steps"  # Options: steps, epoch, no
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+
+# Paths Configuration
+paths:
+  data_dir: "data/"
+  model_output_dir: "models/"
+  logs_dir: "logs/"
+  cache_dir: "cache/"
+  
+  # Specific dataset paths
+  pandora_dataset: "data/pandora_dataset.csv"
+  essays_dataset: "data/essays_dataset.csv"
+  synthetic_dataset: "data/synthetic_dataset.csv"
+  custom_dataset: "data/custom_dataset.csv"
+
+# Hardware Configuration
+hardware:
+  device: "auto"  # Options: auto, cpu, cuda, mps
+  mixed_precision: true
+  dataloader_num_workers: 4
+  pin_memory: true
+  
+  # For multi-GPU training
+  distributed_training: false
+  local_rank: -1
+
+# Reproducibility Configuration
+reproducibility:
+  seed: 42
+  deterministic: true
+  benchmark: false
+
+# Advanced Configuration
+advanced:
+  # Regularization
+  label_smoothing: 0.0
+  layer_norm_eps: 1e-12
+  
+  # Architecture modifications
+  use_attention_pooling: false
+  use_weighted_loss: false
+  
+  # Data augmentation
+  text_augmentation: false
+  augmentation_probability: 0.1
+  
+  # Hyperparameter tuning
+  hyperparameter_search: false
+  num_trials: 50
+  
+  # Model compression
+  quantization: false
+  distillation: false
+
+# Personality Trait Specific Settings
+personality_traits:
+  openness:
+    weight: 1.0
+    description: "Openness to experience"
+  
+  conscientiousness:
+    weight: 1.0
+    description: "Conscientiousness"
+  
+  extraversion:
+    weight: 1.0
+    description: "Extraversion"
+  
+  agreeableness:
+    weight: 1.0
+    description: "Agreeableness"
+  
+  neuroticism:
+    weight: 1.0
+    description: "Neuroticism (Emotional Stability)"
+
+# Deployment Configuration
+deployment:
+  model_format: "pytorch"  # Options: pytorch, onnx, tensorrt
+  optimization_level: "O2"  # Options: O0, O1, O2, O3
+  
+  # Model serving
+  api_framework: "flask"  # Options: flask, fastapi, django
+  max_batch_size: 32
+  max_sequence_length: 512
+  
+  # Performance monitoring
+  enable_monitoring: true
+  log_predictions: false
+  
+# Experiment Configuration
+experiment:
+  name: "personality-prediction-v1"
+  description: "Big Five personality prediction using BERT"
+  tags: ["bert", "personality", "big-five"]
+  
+  # Versioning
+  version: "1.0.0"
+  author: "Elliot Lee"
+  
+  # Notes
+  notes: |
+    Training a personality prediction model using BERT-base-uncased
+    with a linear classification head for Big Five personality traits.
+    
+    Expected performance:
+    - MSE: < 0.05
+    - R²: > 0.6
+    - Training time: ~30 minutes on GPU

@@ -734,8 +734,6 @@ class ElliotGenerator {
         const selectedTraits = Array.from(this.selectedTraits);
         if (selectedTraits.includes('energy')) {
             return variants[4]; // Catalyst
-        } else if (selectedTraits.includes('analytical')) {
-            return variants[3]; // Analyzer
         } else if (selectedTraits.includes('innovation')) {
             return variants[2]; // Innovator
         } else if (selectedTraits.includes('collaborative')) {

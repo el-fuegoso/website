@@ -170,6 +170,146 @@ def generate_avatar():
             "status": "error"
         }), 500
 
+@app.route('/api/analyze_traits', methods=['POST'])
+def analyze_ui_traits():
+    """
+    Analyze personality from UI trait selections and find matching character
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'traits' not in data:
+            return jsonify({
+                "error": "Missing 'traits' field in request",
+                "status": "error"
+            }), 400
+            
+        selected_traits = data.get('traits', {})
+        user_name = data.get('user_name', 'User')
+        
+        logger.info(f"Analyzing UI traits for {user_name}: {list(selected_traits.keys())}")
+
+        # Use mock analysis if analyzer isn't available, otherwise use real analysis
+        if analyzer is None:
+            # Simple mock analysis based on traits
+            from personality_analyzer.utils import map_ui_traits_to_big_five, find_best_character_match
+            from personality_analyzer.character_data import get_all_characters
+            
+            user_big_five = map_ui_traits_to_big_five(selected_traits)
+            characters = get_all_characters()
+            char_name, char_data, similarity = find_best_character_match(user_big_five, characters)
+            
+            analysis = {
+                "status": "success",
+                "analysis_type": "ui_traits_mock",
+                "user_name": user_name,
+                "selected_traits": selected_traits,
+                "big_five_scores": user_big_five,
+                "matched_character": {
+                    "name": char_name,
+                    "data": char_data,
+                    "similarity_score": similarity,
+                    "match_confidence": "High" if similarity > 0.8 else "Medium" if similarity > 0.6 else "Low"
+                },
+                "completion_status": "complete",
+                "note": "Using trait-based analysis (model not available)"
+            }
+        else:
+            # Use full analyzer
+            analysis = analyzer.analyze_ui_traits(selected_traits, user_name)
+            analysis["status"] = "success"
+        
+        return jsonify(analysis)
+
+    except Exception as e:
+        logger.error(f"Error in analyze_ui_traits: {e}")
+        logger.error(traceback.format_exc())
+        return jsonify({
+            "error": f"Trait analysis failed: {str(e)}",
+            "status": "error"
+        }), 500
+
+@app.route('/api/characters', methods=['GET'])
+def get_characters():
+    """
+    Get all available AI character profiles
+    """
+    try:
+        if analyzer:
+            character_data = analyzer.get_all_character_profiles()
+        else:
+            # Fallback to direct import
+            from personality_analyzer.character_data import get_all_characters
+            characters = get_all_characters()
+            character_data = {
+                "characters": characters,
+                "character_count": len(characters),
+                "character_names": list(characters.keys())
+            }
+        
+        return jsonify({
+            "status": "success",
+            **character_data
+        })
+
+    except Exception as e:
+        logger.error(f"Error in get_characters: {e}")
+        return jsonify({
+            "error": f"Failed to retrieve characters: {str(e)}",
+            "status": "error"
+        }), 500
+
+@app.route('/api/match_character', methods=['POST'])
+def match_character():
+    """
+    Find best matching character for given text or traits
+    """
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                "error": "No data provided",
+                "status": "error"
+            }), 400
+        
+        # Check if we have text or traits
+        user_text = data.get('text')
+        selected_traits = data.get('traits')
+        mode = data.get('mode', 'general')
+        
+        if not user_text and not selected_traits:
+            return jsonify({
+                "error": "Either 'text' or 'traits' must be provided",
+                "status": "error"
+            }), 400
+        
+        if analyzer is None:
+            # Use mock analysis for traits only
+            if selected_traits:
+                return analyze_ui_traits()
+            else:
+                return jsonify({
+                    "error": "Text analysis requires model (not available). Please use trait selection instead.",
+                    "status": "error"
+                }), 503
+        
+        # Use real analyzer
+        if user_text:
+            analysis = analyzer.get_character_match_for_text(user_text, mode)
+        else:
+            analysis = analyzer.analyze_ui_traits(selected_traits, data.get('user_name', 'User'))
+        
+        analysis["status"] = "success"
+        return jsonify(analysis)
+
+    except Exception as e:
+        logger.error(f"Error in match_character: {e}")
+        return jsonify({
+            "error": f"Character matching failed: {str(e)}",
+            "status": "error"
+        }), 500
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
@@ -187,9 +327,23 @@ def internal_error(error):
 if __name__ == '__main__':
     print("🚀 Starting Elliot Personality Analyzer API...")
     print("📊 Available endpoints:")
-    print("   GET  /              - Health check")
-    print("   POST /api/analyze   - General text analysis")
-    print("   POST /api/quest     - Quest response analysis")
+    print("   GET  /                    - Health check")
+    print("   POST /api/analyze         - General text analysis")
+    print("   POST /api/quest           - Quest response analysis")
+    print("   POST /api/analyze_traits  - UI trait analysis & character matching")
+    print("   POST /api/match_character - Find matching character (text or traits)")
+    print("   GET  /api/characters      - Get all available characters")
     print("   POST /api/generate_avatar - Avatar generation")
+    print("")
+    print("🎭 Loaded AI Characters:")
+    try:
+        if analyzer:
+            characters = analyzer.get_all_character_profiles()
+            for name in characters.get("character_names", []):
+                print(f"   • {name}")
+        else:
+            print("   • Character loading pending model initialization...")
+    except Exception as e:
+        print(f"   • Error loading characters: {e}")
     
     app.run(debug=True, host='0.0.0.0', port=5001)

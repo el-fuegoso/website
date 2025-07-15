@@ -7,6 +7,8 @@ and providing explainable AI insights.
 
 from typing import Dict, List, Any, Tuple
 import logging
+import numpy as np
+from scipy.spatial.distance import cosine
 
 logger = logging.getLogger(__name__)
 
@@ -389,3 +391,208 @@ def generate_xai_insights(text: str, scores: Dict[str, float], features: Dict[st
         insights.append("Questioning language indicates curiosity")
     
     return " • ".join(insights) if insights else "Analysis based on overall language patterns and word choice."
+
+def map_ui_traits_to_big_five(selected_traits: Dict[str, bool]) -> Dict[str, float]:
+    """
+    Converts selected UI traits into a Big Five personality profile (0-1 scale).
+    
+    Args:
+        selected_traits: Dictionary of trait names to boolean selection status
+        
+    Returns:
+        Dictionary with Big Five scores (0-1 scale)
+    """
+    # Initialize Big Five scores to neutral baseline (0.5)
+    big_five_scores = {
+        "Openness": 0.5,
+        "Conscientiousness": 0.5, 
+        "Extraversion": 0.5,
+        "Agreeableness": 0.5,
+        "Neuroticism": 0.5
+    }
+    
+    # Trait mappings with weights (can be adjusted based on psychological research)
+    trait_mappings = {
+        "Innovation": {"Openness": 0.3, "Conscientiousness": 0.1},
+        "Analytical": {"Openness": 0.2, "Conscientiousness": 0.25},
+        "High Energy": {"Extraversion": 0.3, "Neuroticism": -0.1},
+        "Intense Focus": {"Conscientiousness": 0.3, "Neuroticism": -0.05},
+        "Cooperative": {"Agreeableness": 0.3, "Extraversion": 0.1},
+        "Calm Under Pressure": {"Neuroticism": -0.3, "Conscientiousness": 0.1},
+        "Creative": {"Openness": 0.25},
+        "Social": {"Extraversion": 0.25, "Agreeableness": 0.1},
+        "Organized": {"Conscientiousness": 0.25},
+        "Empathetic": {"Agreeableness": 0.25, "Openness": 0.1},
+        "Adventurous": {"Openness": 0.2, "Extraversion": 0.15},
+        "Disciplined": {"Conscientiousness": 0.25, "Neuroticism": -0.1}
+    }
+    
+    # Apply trait effects
+    for trait_name, is_selected in selected_traits.items():
+        if is_selected and trait_name in trait_mappings:
+            for big_five_trait, weight in trait_mappings[trait_name].items():
+                big_five_scores[big_five_trait] += weight
+    
+    # Clamp scores to valid range [0, 1]
+    for trait in big_five_scores:
+        big_five_scores[trait] = max(0.0, min(1.0, big_five_scores[trait]))
+    
+    return big_five_scores
+
+def calculate_similarity(user_profile: Dict[str, float], character_profile: Dict[str, float]) -> float:
+    """
+    Calculates the cosine similarity between a user's Big Five profile
+    and an AI character's Big Five profile.
+    
+    Args:
+        user_profile: User's Big Five scores (0-1 scale)
+        character_profile: Character's Big Five scores (1-5 scale, converted internally)
+        
+    Returns:
+        Similarity score (0-1, higher = more similar)
+    """
+    # Convert character profile from 1-5 scale to 0-1 scale
+    char_scores_converted = {
+        "Openness": (character_profile.get("O", 3) - 1) / 4,
+        "Conscientiousness": (character_profile.get("C", 3) - 1) / 4,
+        "Extraversion": (character_profile.get("E", 3) - 1) / 4,
+        "Agreeableness": (character_profile.get("A", 3) - 1) / 4,
+        "Neuroticism": (character_profile.get("N", 3) - 1) / 4
+    }
+    
+    # Create vectors for similarity calculation
+    user_vec = np.array([
+        user_profile.get("Openness", 0.5),
+        user_profile.get("Conscientiousness", 0.5),
+        user_profile.get("Extraversion", 0.5),
+        user_profile.get("Agreeableness", 0.5),
+        user_profile.get("Neuroticism", 0.5)
+    ])
+    
+    char_vec = np.array([
+        char_scores_converted["Openness"],
+        char_scores_converted["Conscientiousness"],
+        char_scores_converted["Extraversion"],
+        char_scores_converted["Agreeableness"],
+        char_scores_converted["Neuroticism"]
+    ])
+    
+    # Ensure vectors are not zero vectors
+    if np.linalg.norm(user_vec) == 0 or np.linalg.norm(char_vec) == 0:
+        return 0.0
+    
+    # Calculate cosine similarity (1 - cosine distance)
+    similarity = 1 - cosine(user_vec, char_vec)
+    
+    # Ensure result is in valid range [0, 1]
+    return max(0.0, min(1.0, similarity))
+
+def find_best_character_match(user_profile: Dict[str, float], all_characters: Dict[str, Dict]) -> Tuple[str, Dict, float]:
+    """
+    Finds the AI character with the highest personality similarity to the user.
+    
+    Args:
+        user_profile: User's Big Five personality scores (0-1 scale)
+        all_characters: Dictionary of character data from character_data.py
+        
+    Returns:
+        Tuple of (character_name, character_data, similarity_score)
+    """
+    best_match_name = None
+    best_match_data = None
+    highest_similarity = -1.0
+    
+    for char_name, char_data in all_characters.items():
+        similarity = calculate_similarity(user_profile, char_data)
+        
+        if similarity > highest_similarity:
+            highest_similarity = similarity
+            best_match_name = char_name
+            best_match_data = char_data
+    
+    return best_match_name, best_match_data, highest_similarity
+
+def get_personality_insights(user_profile: Dict[str, float], selected_traits: Dict[str, bool]) -> Dict[str, Any]:
+    """
+    Generate personality insights based on Big Five scores and selected traits.
+    
+    Args:
+        user_profile: User's Big Five scores
+        selected_traits: UI traits selected by user
+        
+    Returns:
+        Dictionary with personality insights and recommendations
+    """
+    insights = {
+        "personality_summary": "",
+        "working_style_tips": [],
+        "collaboration_tips": [],
+        "growth_areas": [],
+        "trait_explanations": {}
+    }
+    
+    # Generate personality summary
+    dominant_traits = []
+    for trait, score in user_profile.items():
+        if score > 0.6:
+            dominant_traits.append(f"High {trait}")
+        elif score < 0.4:
+            if trait == "Neuroticism":
+                dominant_traits.append("High Emotional Stability")
+            else:
+                dominant_traits.append(f"Low {trait}")
+    
+    insights["personality_summary"] = f"Your personality profile shows: {', '.join(dominant_traits) if dominant_traits else 'Balanced traits across all dimensions'}"
+    
+    # Generate working style tips
+    if user_profile.get("Conscientiousness", 0.5) > 0.6:
+        insights["working_style_tips"].append("Leverage your natural organization skills with structured project management tools")
+    
+    if user_profile.get("Openness", 0.5) > 0.6:
+        insights["working_style_tips"].append("Seek out creative challenges and opportunities to innovate")
+    
+    if user_profile.get("Extraversion", 0.5) > 0.6:
+        insights["working_style_tips"].append("Maximize your energy through regular team interactions and collaborative work")
+    
+    # Generate collaboration tips
+    if user_profile.get("Agreeableness", 0.5) > 0.6:
+        insights["collaboration_tips"].append("Your natural empathy makes you excellent at building team consensus")
+    
+    if user_profile.get("Neuroticism", 0.5) < 0.4:
+        insights["collaboration_tips"].append("Your emotional stability helps you be a calming presence during stressful projects")
+    
+    # Generate growth areas
+    if user_profile.get("Openness", 0.5) < 0.4:
+        insights["growth_areas"].append("Consider exploring new approaches and being more open to creative solutions")
+    
+    if user_profile.get("Conscientiousness", 0.5) < 0.4:
+        insights["growth_areas"].append("Focus on developing better organizational habits and follow-through")
+    
+    # Explain trait connections
+    for trait_name, is_selected in selected_traits.items():
+        if is_selected:
+            insights["trait_explanations"][trait_name] = get_trait_explanation(trait_name, user_profile)
+    
+    return insights
+
+def get_trait_explanation(trait_name: str, user_profile: Dict[str, float]) -> str:
+    """
+    Explain how a selected trait connects to Big Five personality dimensions.
+    
+    Args:
+        trait_name: Name of the selected trait
+        user_profile: User's Big Five scores
+        
+    Returns:
+        Explanation string
+    """
+    explanations = {
+        "Innovation": f"Your Innovation score reflects high Openness ({user_profile.get('Openness', 0.5):.2f}), indicating creativity and intellectual curiosity.",
+        "Analytical": f"Your Analytical nature shows in both Openness ({user_profile.get('Openness', 0.5):.2f}) and Conscientiousness ({user_profile.get('Conscientiousness', 0.5):.2f}), combining curiosity with systematic thinking.",
+        "High Energy": f"Your High Energy reflects strong Extraversion ({user_profile.get('Extraversion', 0.5):.2f}) and emotional stability.",
+        "Intense Focus": f"Your Intense Focus indicates high Conscientiousness ({user_profile.get('Conscientiousness', 0.5):.2f}) and emotional stability under pressure.",
+        "Cooperative": f"Your Cooperative nature shows high Agreeableness ({user_profile.get('Agreeableness', 0.5):.2f}), indicating you value harmony and teamwork.",
+        "Calm Under Pressure": f"Your ability to stay Calm Under Pressure reflects low Neuroticism ({user_profile.get('Neuroticism', 0.5):.2f}), showing excellent emotional regulation."
+    }
+    
+    return explanations.get(trait_name, f"Your {trait_name} trait contributes to your overall personality profile.")

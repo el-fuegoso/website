@@ -11,8 +11,10 @@ from .preprocessing import preprocess_text
 from .model_loader import load_personality_model, load_tokenizer
 from .utils import (
     interpret_scores, generate_avatar_traits, create_default_avatar,
-    generate_xai_insights, get_big_five_traits
+    generate_xai_insights, get_big_five_traits, map_ui_traits_to_big_five,
+    find_best_character_match, get_personality_insights
 )
+from .character_data import get_all_characters
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +52,10 @@ class PersonalityAnalyzer:
         
         # Cache for conversation context
         self.conversation_cache = {}
+        
+        # Load character database
+        self.characters = get_all_characters()
+        logger.info(f"Loaded {len(self.characters)} AI characters for matching")
         
     def analyze_text(self, text: str, mode: str = 'general', 
                     context: List[Dict[str, str]] = None) -> Tuple[Dict[str, Any], str, Dict[str, Any]]:
@@ -322,6 +328,149 @@ class PersonalityAnalyzer:
         from datetime import datetime
         return datetime.now().isoformat()
     
+    def analyze_ui_traits(self, selected_traits: Dict[str, bool], user_name: str = "User") -> Dict[str, Any]:
+        """
+        Analyze personality from UI trait selections and find matching character
+        
+        Args:
+            selected_traits: Dictionary of trait names to selection status
+            user_name: User's name for personalization
+            
+        Returns:
+            Complete analysis with matched character
+        """
+        try:
+            logger.info(f"Analyzing UI traits for {user_name}: {list(selected_traits.keys())}")
+            
+            # Convert UI traits to Big Five scores
+            user_big_five = map_ui_traits_to_big_five(selected_traits)
+            
+            # Find best matching character
+            char_name, char_data, similarity = find_best_character_match(user_big_five, self.characters)
+            
+            # Generate personality insights
+            insights = get_personality_insights(user_big_five, selected_traits)
+            
+            # Interpret Big Five scores
+            interpreted_scores = interpret_scores(user_big_five)
+            
+            # Generate avatar data
+            avatar_data = generate_avatar_traits(user_big_five, {'user_name': user_name})
+            
+            return {
+                "analysis_type": "ui_traits",
+                "user_name": user_name,
+                "selected_traits": selected_traits,
+                "big_five_scores": user_big_five,
+                "interpreted_scores": interpreted_scores,
+                "matched_character": {
+                    "name": char_name,
+                    "data": char_data,
+                    "similarity_score": similarity,
+                    "match_confidence": "High" if similarity > 0.8 else "Medium" if similarity > 0.6 else "Low"
+                },
+                "personality_insights": insights,
+                "avatar_data": avatar_data,
+                "completion_status": "complete"
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error in analyze_ui_traits: {e}")
+            return {
+                "error": str(e),
+                "completion_status": "failed",
+                "user_name": user_name
+            }
+    
+    def get_character_match_for_text(self, text: str, mode: str = 'general') -> Dict[str, Any]:
+        """
+        Analyze text and find best matching character
+        
+        Args:
+            text: Input text to analyze
+            mode: Analysis mode
+            
+        Returns:
+            Text analysis with character matching
+        """
+        try:
+            # First get personality analysis from text
+            personality_scores, explanation, avatar_data = self.analyze_text(text, mode)
+            
+            # Convert interpreted scores back to raw scores for matching
+            raw_scores = {}
+            for trait, data in personality_scores.items():
+                raw_scores[trait] = data.get('score', 0.5)
+            
+            # Find best matching character
+            char_name, char_data, similarity = find_best_character_match(raw_scores, self.characters)
+            
+            return {
+                "analysis_type": "text_with_character_match",
+                "personality_analysis": personality_scores,
+                "explanation": explanation,
+                "avatar_data": avatar_data,
+                "matched_character": {
+                    "name": char_name,
+                    "data": char_data,
+                    "similarity_score": similarity,
+                    "match_confidence": "High" if similarity > 0.8 else "Medium" if similarity > 0.6 else "Low"
+                },
+                "completion_status": "complete"
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error in get_character_match_for_text: {e}")
+            return {
+                "error": str(e),
+                "completion_status": "failed"
+            }
+    
+    def create_mock_analysis(self, selected_traits: Dict[str, bool] = None, user_name: str = "User") -> Dict[str, Any]:
+        """
+        Create mock personality analysis when model isn't available
+        
+        Args:
+            selected_traits: UI traits if available
+            user_name: User's name
+            
+        Returns:
+            Mock analysis results
+        """
+        try:
+            logger.info(f"Creating mock analysis for {user_name}")
+            
+            if selected_traits:
+                # Use UI traits for mock analysis
+                return self.analyze_ui_traits(selected_traits, user_name)
+            else:
+                # Create a balanced mock profile
+                mock_traits = {
+                    "High Energy": True,
+                    "Cooperative": True,
+                    "Analytical": False,
+                    "Innovation": False,
+                    "Intense Focus": False,
+                    "Calm Under Pressure": True
+                }
+                return self.analyze_ui_traits(mock_traits, user_name)
+                
+        except Exception as e:
+            logger.error(f"❌ Error in create_mock_analysis: {e}")
+            return {
+                "error": str(e),
+                "completion_status": "failed",
+                "user_name": user_name
+            }
+    
+    def get_all_character_profiles(self) -> Dict[str, Any]:
+        """Get all available character profiles for display"""
+        return {
+            "characters": self.characters,
+            "character_count": len(self.characters),
+            "character_names": list(self.characters.keys())
+        }
+    
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about the loaded model"""
         return {
@@ -329,5 +478,7 @@ class PersonalityAnalyzer:
             "model_path": self.model_path,
             "tokenizer_name": getattr(self.tokenizer, 'tokenizer_name', 'Unknown'),
             "supported_traits": get_big_five_traits(),
-            "analysis_modes": ['general', 'quest', 'conversation', 'jd']
+            "analysis_modes": ['general', 'quest', 'conversation', 'jd'],
+            "character_count": len(self.characters),
+            "available_characters": list(self.characters.keys())
         }

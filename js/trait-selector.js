@@ -119,7 +119,7 @@ class Terminal {
     async generateFinalQuestResponse() {
         try {
             // Send quest responses to backend for analysis
-            const response = await fetch('/api/quest', {
+            const response = await fetch('http://localhost:5001/api/quest', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -180,7 +180,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             }
             
             // Send to backend for analysis
-            const response = await fetch('/api/analyze', {
+            const response = await fetch('http://localhost:5001/api/analyze', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

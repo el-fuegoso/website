@@ -192,4 +192,4 @@ if __name__ == '__main__':
     print("   POST /api/quest     - Quest response analysis")
     print("   POST /api/generate_avatar - Avatar generation")
     
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

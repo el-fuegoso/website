@@ -237,13 +237,103 @@ class ChatUI {
 
     handleSendMessage() {
         const message = this.messageInput.value.trim();
-        if (!message || !this.onSendMessage) return;
+        if (!message) return;
         
         this.messageInput.value = '';
         this.adjustTextareaHeight();
         this.updateSendButton();
         
-        this.onSendMessage(message);
+        // Handle character chat if context is set
+        if (this.characterContext) {
+            this.sendCharacterMessage(message);
+        } else if (this.onSendMessage) {
+            this.onSendMessage(message);
+        }
+    }
+
+    async sendCharacterMessage(message) {
+        // Add user message to chat
+        this.addMessage(message, 'user');
+        
+        // Show typing indicator
+        this.showTypingIndicator(true);
+        
+        try {
+            // Get conversation history
+            const conversationHistory = this.getConversationHistory();
+            
+            // Send to backend
+            const response = await fetch('http://localhost:5001/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    character_name: this.characterContext.name,
+                    character_context: this.characterContext,
+                    conversation_history: conversationHistory
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Add character response
+                this.addCharacterMessage(data.response.message);
+            } else {
+                throw new Error(data.error || 'Chat request failed');
+            }
+            
+        } catch (error) {
+            console.error('Chat error:', error);
+            this.addCharacterMessage(
+                `Sorry, I'm having trouble connecting right now. ${error.message || 'Please try again.'}`
+            );
+        } finally {
+            this.showTypingIndicator(false);
+        }
+    }
+
+    addCharacterMessage(content) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message ai-message';
+        
+        // Use character avatar if available
+        const avatar = this.currentAvatar ? 
+            this.generateAvatarHTML(this.currentAvatar) : 
+            this.avatarGenerator.generateClaudeAvatar();
+        
+        messageElement.innerHTML = `
+            <div class="message-avatar">${avatar}</div>
+            <div class="message-content">
+                <div class="message-text">${this.formatMessage(content)}</div>
+                <div class="message-timestamp">${this.formatTimestamp(new Date())}</div>
+            </div>
+        `;
+        
+        this.messageContainer.appendChild(messageElement);
+        this.scrollToBottom();
+        return messageElement;
+    }
+
+    getConversationHistory() {
+        const messages = this.messageContainer.querySelectorAll('.message');
+        const history = [];
+        
+        messages.forEach(messageEl => {
+            const isUser = messageEl.classList.contains('user');
+            const messageText = messageEl.querySelector('.message-text');
+            
+            if (messageText && messageText.textContent.trim()) {
+                history.push({
+                    role: isUser ? 'user' : 'assistant',
+                    content: messageText.textContent.trim()
+                });
+            }
+        });
+        
+        return history;
     }
 
     addMessage(content, role = 'user') {
@@ -385,6 +475,76 @@ class ChatUI {
         if (welcomeAvatarElement) {
             welcomeAvatarElement.innerHTML = this.generateAvatarHTML(avatarData);
         }
+    }
+
+    initializeChatWithCharacter(characterName, characterData) {
+        console.log(`Initializing chat with ${characterName}`, characterData);
+        
+        // Create avatar data format expected by chat UI
+        const avatarData = {
+            name: characterName,
+            title: characterData.title,
+            description: characterData.description,
+            personality: characterData.personality,
+            expertise: characterData.expertise,
+            conversationStarters: [
+                `Hey there! I'm ${characterName}. ${characterData.description} What are you working on today?`
+            ]
+        };
+        
+        // Clear any existing messages
+        if (this.isInitialized && this.messageContainer) {
+            this.messageContainer.innerHTML = '';
+        }
+        
+        // Update avatar display
+        this.updateAvatarDisplay(avatarData);
+        
+        // Add character introduction message
+        this.addCharacterIntroMessage(avatarData);
+        
+        // Set up character-specific context for backend
+        this.characterContext = {
+            name: characterName,
+            personality: characterData.personality,
+            expertise: characterData.expertise,
+            communicationStyle: this.getCharacterCommunicationStyle(characterName)
+        };
+        
+        console.log('Character context set:', this.characterContext);
+    }
+
+    addCharacterIntroMessage(avatarData) {
+        if (!this.isInitialized) return;
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message ai-message';
+        messageElement.innerHTML = `
+            <div class="message-avatar">${this.generateAvatarHTML(avatarData)}</div>
+            <div class="message-content">
+                <div class="message-text">${avatarData.conversationStarters[0]}</div>
+                <div class="message-timestamp">${new Date().toLocaleTimeString()}</div>
+            </div>
+        `;
+        
+        this.messageContainer.appendChild(messageElement);
+        this.scrollToBottom();
+    }
+
+    getCharacterCommunicationStyle(characterName) {
+        const styles = {
+            "TheBuilder": "Energetic and pragmatic, uses engineering metaphors, slightly chaotic but solutions-focused",
+            "TheDetective": "Methodical and analytical, asks probing questions, loves solving mysteries",
+            "GrumpyOldManEl": "Experienced but cantankerous, offers wisdom with grumbling, traditional approach",
+            "PirateEl": "Adventurous with nautical metaphors, bold and risk-taking, leadership-oriented",
+            "GymBroEl": "Motivational with fitness metaphors, disciplined and goal-oriented, encouraging",
+            "FreakyEl": "Experimental and boundary-pushing, unconventional thinking, creative exploration",
+            "CoffeeAddictEl": "High-energy and intense, coffee-obsessed, deadline-driven personality",
+            "ConspiracyEl": "Paranoid and pattern-seeking, sees connections everywhere, deep analytical thinking",
+            "AGIEl": "Logical and adaptive, occasionally breaks character, alternates between robotic and human"
+        };
+        
+        return styles[characterName] || "Balanced and helpful, adapts communication style to user needs";
     }
 }
 

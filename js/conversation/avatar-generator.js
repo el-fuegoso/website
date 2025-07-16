@@ -260,11 +260,15 @@ class AvatarGenerator {
         // Get character data for context
         const characterData = this.getCharacterDataForChat(characterName);
         
-        // Check if chat modal/system exists
-        if (typeof window.ChatUI !== 'undefined' && window.chatUI) {
-            // Use existing chat system
+        // Initialize chat UI if not already done
+        if (typeof window.ChatUI !== 'undefined') {
+            if (!window.chatUI) {
+                window.chatUI = new window.ChatUI();
+            }
+            
+            // Initialize chat with character
             window.chatUI.initializeChatWithCharacter(characterName, characterData);
-            window.chatUI.showModal();
+            window.chatUI.show();
         } else if (typeof window.ConversationManager !== 'undefined') {
             // Alternative: use conversation manager
             const conversationManager = new window.ConversationManager();

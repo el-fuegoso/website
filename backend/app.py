@@ -317,6 +317,60 @@ def not_found(error):
         "status": "error"
     }), 404
 
+@app.route('/api/chat', methods=['POST'])
+def chat_with_character():
+    """
+    Chat endpoint for character conversations
+    Accepts: message, character_name, character_context, conversation_history
+    Returns: character response
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'message' not in data:
+            return jsonify({
+                "error": "Missing 'message' field in request",
+                "status": "error"
+            }), 400
+            
+        user_message = data.get('message', '')
+        character_name = data.get('character_name', 'TheBuilder')
+        character_context = data.get('character_context', {})
+        conversation_history = data.get('conversation_history', [])
+        
+        if not user_message.strip():
+            return jsonify({
+                "error": "Message cannot be empty",
+                "status": "error"
+            }), 400
+
+        logger.info(f"Chat request for {character_name}: {user_message[:100]}...")
+
+        # Import Claude API for character chat
+        from personality_analyzer.claude_chat import generate_character_response
+        
+        response = generate_character_response(
+            user_message=user_message,
+            character_name=character_name,
+            character_context=character_context,
+            conversation_history=conversation_history
+        )
+        
+        return jsonify({
+            "status": "success",
+            "response": response,
+            "character_name": character_name,
+            "timestamp": response.get("timestamp")
+        })
+
+    except Exception as e:
+        logger.error(f"Error in chat_with_character: {e}")
+        logger.error(traceback.format_exc())
+        return jsonify({
+            "error": f"Chat failed: {str(e)}",
+            "status": "error"
+        }), 500
+
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({
@@ -334,6 +388,7 @@ if __name__ == '__main__':
     print("   POST /api/match_character - Find matching character (text or traits)")
     print("   GET  /api/characters      - Get all available characters")
     print("   POST /api/generate_avatar - Avatar generation")
+    print("   POST /api/chat            - Character chat conversations")
     print("")
     print("🎭 Loaded AI Characters:")
     try:

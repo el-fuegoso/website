@@ -157,7 +157,7 @@ class Terminal {
     async generateFinalQuestResponse() {
         try {
             // Send quest responses to backend for analysis
-            const response = await fetch('http://localhost:5001/api/quest', {
+            const response = await fetch('/api/claude', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -223,7 +223,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             }
             
             // Send to backend for analysis
-            const response = await fetch('http://localhost:5001/api/analyze', {
+            const response = await fetch('/api/claude', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -318,7 +318,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                 // Fallback: try to analyze text for character matching
                 if (userText) {
                     try {
-                        const matchResponse = await fetch('http://localhost:5001/api/match_character', {
+                        const matchResponse = await fetch('/api/claude', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -792,7 +792,7 @@ class ElliotGenerator {
 
             try {
                 // Call backend API for personality analysis
-                const response = await fetch('http://localhost:5001/api/analyze_traits', {
+                const response = await fetch('/api/claude', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

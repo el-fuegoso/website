@@ -262,8 +262,8 @@ class ChatUI {
             // Get conversation history
             const conversationHistory = this.getConversationHistory();
             
-            // Send to backend
-            const response = await fetch('http://localhost:5001/api/chat', {
+            // Send to backend - use chat API endpoint
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -185,9 +185,9 @@ class ChatUI {
     }
 
     generateAvatarHTML(avatarData) {
-        // For now, generate a styled avatar based on archetype
-        const archetype = avatarData.metadata?.archetype || 'TheBuilder';
-        const archetypeEmoji = this.getArchetypeEmoji(archetype);
+        // For now, generate a styled avatar based on character name
+        const characterName = avatarData.name || 'TheBuilder';
+        const archetypeEmoji = this.getArchetypeEmoji(characterName);
         
         return `
             <div class="avatar-circle" title="${avatarData.name} - ${avatarData.title}">

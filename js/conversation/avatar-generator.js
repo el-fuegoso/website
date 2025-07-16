@@ -219,8 +219,8 @@ class AvatarGenerator {
             return `
                 <div class="avatar-placeholder" style="background-color: ${avatarData.placeholderColor}">
                     <span class="placeholder-initial">${avatarData.placeholderInitial}</span>
-                    <div class="placeholder-label">
-                        ${avatarData.source === 'error' ? 'Generation Failed' : 'Set API Key to Generate'}
+                    <div class="placeholder-label" style="display: none;">
+                        ${avatarData.source === 'error' ? 'Generation Failed' : ''}
                     </div>
                 </div>
             `;

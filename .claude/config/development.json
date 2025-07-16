@@ -1,0 +1,35 @@
+{
+  "environment": "development",
+  "extends": "settings.json",
+  "overrides": {
+    "defaults": {
+      "max_tokens_per_session": 75000,
+      "context_window_warning": 60000,
+      "auto_clear_threshold": 70000,
+      "verbose_logging": true
+    },
+    "security": {
+      "audit_logging": true,
+      "permission_validation": false,
+      "secret_scanning": false
+    },
+    "quality_gates": {
+      "require_tests": false,
+      "require_documentation": false,
+      "require_type_checking": false,
+      "require_security_scan": false
+    },
+    "workflows": {
+      "auto_commit_formatting": false,
+      "auto_generate_docs": false,
+      "auto_run_tests": false,
+      "quality_check_on_save": false
+    },
+    "debugging": {
+      "verbose_command_output": true,
+      "trace_token_usage": true,
+      "log_context_switches": true,
+      "preserve_temp_files": true
+    }
+  }
+}

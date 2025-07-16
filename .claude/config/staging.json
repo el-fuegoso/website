@@ -1,0 +1,38 @@
+{
+  "environment": "staging",
+  "extends": "settings.json",
+  "overrides": {
+    "defaults": {
+      "max_tokens_per_session": 60000,
+      "context_window_warning": 45000,
+      "auto_clear_threshold": 55000,
+      "verbose_logging": true
+    },
+    "security": {
+      "audit_logging": true,
+      "permission_validation": true,
+      "secret_scanning": true,
+      "require_auth": false
+    },
+    "quality_gates": {
+      "require_tests": true,
+      "require_documentation": true,
+      "require_type_checking": true,
+      "require_security_scan": true,
+      "require_performance_check": false
+    },
+    "workflows": {
+      "auto_commit_formatting": true,
+      "auto_generate_docs": true,
+      "auto_run_tests": true,
+      "quality_check_on_save": true,
+      "auto_deploy": true
+    },
+    "testing": {
+      "run_integration_tests": true,
+      "run_e2e_tests": true,
+      "performance_testing": true,
+      "load_testing": false
+    }
+  }
+}

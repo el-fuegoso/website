@@ -1,0 +1,37 @@
+{
+  "environment": "production",
+  "extends": "settings.json",
+  "overrides": {
+    "defaults": {
+      "max_tokens_per_session": 40000,
+      "context_window_warning": 30000,
+      "auto_clear_threshold": 35000,
+      "verbose_logging": false
+    },
+    "security": {
+      "audit_logging": true,
+      "permission_validation": true,
+      "secret_scanning": true,
+      "require_auth": true
+    },
+    "quality_gates": {
+      "require_tests": true,
+      "require_documentation": true,
+      "require_type_checking": true,
+      "require_security_scan": true,
+      "require_performance_check": true
+    },
+    "workflows": {
+      "auto_commit_formatting": true,
+      "auto_generate_docs": true,
+      "auto_run_tests": true,
+      "quality_check_on_save": true,
+      "auto_deploy": false
+    },
+    "monitoring": {
+      "performance_tracking": true,
+      "error_reporting": true,
+      "usage_analytics": true
+    }
+  }
+}

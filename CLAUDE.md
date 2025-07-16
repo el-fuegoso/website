@@ -1,4 +1,63 @@
 
+# Claude Code Modular Framework
+
+This project uses the Claude Code Modular Framework for enhanced productivity and systematic development workflows.
+
+## Framework Overview
+
+The modular framework provides:
+- **Token Optimization**: Reduces context overhead by 50-80% through progressive disclosure
+- **Modular Commands**: 20+ production-ready commands for project management, development, testing, and deployment
+- **Environment Configuration**: Layered configuration management for development, staging, and production
+- **Security-First Design**: Built-in security scanning, audit logging, and permission validation
+
+## Available Commands
+
+### Project Management
+- `/project:create-feature` - Full-stack feature development workflow
+- `/project:setup-environment` - Complete development environment initialization
+- `/project:scaffold-component` - Generate new UI components with tests and documentation
+
+### Development
+- `/development:code-review` - Comprehensive code review with security and performance analysis
+- `/development:debug-issue` - Systematic debugging and issue resolution
+- `/development:refactor-code` - Safe code refactoring with validation
+
+### Testing
+- `/testing:run-tests` - Execute comprehensive test suites with coverage analysis
+- `/testing:generate-tests` - Automatically generate test suites for components and services
+
+### Deployment
+- `/deployment:deploy-staging` - Deploy to staging with validation and rollback capabilities
+
+### Documentation
+- `/documentation:generate-docs` - Generate comprehensive API and component documentation
+
+## Configuration
+
+The framework uses environment-specific configurations:
+- **Development**: `.claude/config/development.json` - Relaxed validation for faster development
+- **Staging**: `.claude/config/staging.json` - Full testing with deployment automation
+- **Production**: `.claude/config/production.json` - Maximum security and validation
+
+## Usage Examples
+
+```bash
+# Create a new feature with full workflow
+/project:create-feature user-authentication --type=service --framework=express
+
+# Review code with security focus
+/development:code-review --security-focus --branch=feature/user-auth
+
+# Run comprehensive tests with coverage
+/testing:run-tests --coverage --type=integration
+
+# Deploy to staging environment
+/deployment:deploy-staging --branch=release/v2.1.0
+```
+
+---
+
 # Frontend Design Guidelines
 
 ## Styling Principles

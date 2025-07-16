@@ -35,3 +35,36 @@ coverage/
 .idea/
 *.swp
 *.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Backend specific
+/backend/logs/
+/backend/models/
+*.log
+*.out
+
+# Claude Code modular framework
+.claude/local/
+.claude/cache/
+.claude/temp/
+
+# Backup files
+*.backup
+*.bak
+
+# Temporary files
+tmp/
+temp/
+.tmp/

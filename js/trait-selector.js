@@ -1300,8 +1300,8 @@ class ElliotGenerator {
         // Clear canvas
         ctx.clearRect(0, 0, 120, 120);
         
-        // Traits in order (clockwise from top)
-        const traits = ['Openness', 'Extraversion', 'Agreeableness', 'Neuroticism', 'Conscientiousness'];
+        // Traits in OCEAN order (clockwise from top)
+        const traits = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
         const angles = traits.map((_, i) => (i * 2 * Math.PI / 5) - Math.PI / 2);
         
         // Draw grid circles
@@ -1367,7 +1367,7 @@ class ElliotGenerator {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        const labels = ['O', 'E', 'A', 'N', 'C']; // Short labels
+        const labels = ['O', 'C', 'E', 'A', 'N']; // Short labels in OCEAN order
         for (let i = 0; i < 5; i++) {
             const labelRadius = radius + 12;
             const x = centerX + labelRadius * Math.cos(angles[i]);

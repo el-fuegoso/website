@@ -499,6 +499,9 @@ class ElliotGenerator {
         if (document.getElementById('terminalInput')) {
             this.terminal = new Terminal();
         }
+        
+        // Initialize empty radar charts (greyed out state)
+        this.initializeEmptyRadarCharts();
 
         // Add event listeners for trait options
         document.querySelectorAll('.trait-option').forEach(option => {
@@ -1242,8 +1245,8 @@ class ElliotGenerator {
                 }
             );
             
-            // Add Big Five scores display
-            this.addBigFiveScoresDisplay(elliotData, waterAsciiContainer);
+            // Update radar charts with Big Five scores
+            this.updateRadarCharts(elliotData);
             
             console.log('Avatar component rendered');
         } else {
@@ -1254,7 +1257,7 @@ class ElliotGenerator {
         }
     }
 
-    addBigFiveScoresDisplay(elliotData, container) {
+    updateRadarCharts(elliotData) {
         // Get user's Big Five scores
         const selectedTraitsObj = {};
         Array.from(this.selectedTraits).forEach(trait => {
@@ -1274,64 +1277,118 @@ class ElliotGenerator {
 
         if (!characterBigFive) return;
 
-        // Create scores display element
-        const scoresDisplay = document.createElement('div');
-        scoresDisplay.className = 'big-five-scores-display';
+        // Update both radar charts
+        this.drawRadarChart('userRadarChart', userBigFive, '#004225');
+        this.drawRadarChart('characterRadarChart', characterBigFive, '#CC7A00');
         
-        // Option 1: Side-by-side comparison bars
-        scoresDisplay.innerHTML = this.createScoresComparisonHTML(userBigFive, characterBigFive, elliotData.characterName);
-        
-        // Add to the container
-        container.appendChild(scoresDisplay);
+        // Activate the charts container
+        const radarContainer = document.getElementById('radarChartsContainer');
+        if (radarContainer) {
+            radarContainer.classList.add('active');
+        }
     }
 
-    createScoresComparisonHTML(userScores, characterScores, characterName) {
-        const traits = [
-            { key: 'Openness', label: 'Openness', icon: '🎨' },
-            { key: 'Conscientiousness', label: 'Conscientiousness', icon: '📋' },
-            { key: 'Extraversion', label: 'Extraversion', icon: '👥' },
-            { key: 'Agreeableness', label: 'Agreeableness', icon: '🤝' },
-            { key: 'Neuroticism', label: 'Emotional Stability', icon: '😌' }
-        ];
+    drawRadarChart(canvasId, scores, color) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const centerX = 60;
+        const centerY = 60;
+        const radius = 45;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, 120, 120);
+        
+        // Traits in order (clockwise from top)
+        const traits = ['Openness', 'Extraversion', 'Agreeableness', 'Neuroticism', 'Conscientiousness'];
+        const angles = traits.map((_, i) => (i * 2 * Math.PI / 5) - Math.PI / 2);
+        
+        // Draw grid circles
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 5; i++) {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, (radius * i) / 5, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+        
+        // Draw axis lines
+        ctx.strokeStyle = '#d0d0d0';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(
+                centerX + radius * Math.cos(angles[i]),
+                centerY + radius * Math.sin(angles[i])
+            );
+            ctx.stroke();
+        }
+        
+        // Draw data polygon
+        ctx.fillStyle = color + '40'; // 25% opacity
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const score = scores[traits[i]] || 0;
+            const distance = (score * radius);
+            const x = centerX + distance * Math.cos(angles[i]);
+            const y = centerY + distance * Math.sin(angles[i]);
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Draw data points
+        ctx.fillStyle = color;
+        for (let i = 0; i < 5; i++) {
+            const score = scores[traits[i]] || 0;
+            const distance = (score * radius);
+            const x = centerX + distance * Math.cos(angles[i]);
+            const y = centerY + distance * Math.sin(angles[i]);
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        
+        // Draw trait labels
+        ctx.fillStyle = '#333';
+        ctx.font = '9px Roboto Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const labels = ['O', 'E', 'A', 'N', 'C']; // Short labels
+        for (let i = 0; i < 5; i++) {
+            const labelRadius = radius + 12;
+            const x = centerX + labelRadius * Math.cos(angles[i]);
+            const y = centerY + labelRadius * Math.sin(angles[i]);
+            
+            ctx.fillText(labels[i], x, y);
+        }
+    }
 
-        return `
-            <div class="scores-header">
-                <h4>Personality Match Analysis</h4>
-                <div class="scores-legend">
-                    <span class="legend-item"><span class="legend-color user"></span>You</span>
-                    <span class="legend-item"><span class="legend-color character"></span>${characterName}</span>
-                </div>
-            </div>
-            <div class="scores-grid">
-                ${traits.map(trait => {
-                    const userScore = userScores[trait.key];
-                    const characterScore = characterScores[trait.key];
-                    const userPercent = Math.round(userScore * 100);
-                    const characterPercent = Math.round(characterScore * 100);
-                    
-                    return `
-                        <div class="score-row">
-                            <div class="score-label">
-                                <span class="trait-icon">${trait.icon}</span>
-                                <span class="trait-name">${trait.label}</span>
-                            </div>
-                            <div class="score-bars">
-                                <div class="score-bar-container">
-                                    <div class="score-bar user-bar" style="width: ${userPercent}%">
-                                        <span class="score-value">${userPercent}%</span>
-                                    </div>
-                                </div>
-                                <div class="score-bar-container">
-                                    <div class="score-bar character-bar" style="width: ${characterPercent}%">
-                                        <span class="score-value">${characterPercent}%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
+    initializeEmptyRadarCharts() {
+        // Initialize both charts with empty data (greyed out state)
+        const emptyScores = {
+            "Openness": 0,
+            "Conscientiousness": 0,
+            "Extraversion": 0,
+            "Agreeableness": 0,
+            "Neuroticism": 0
+        };
+        
+        this.drawRadarChart('userRadarChart', emptyScores, '#ccc');
+        this.drawRadarChart('characterRadarChart', emptyScores, '#ccc');
     }
 
     restoreWaterAnimation() {

@@ -198,11 +198,8 @@ class AvatarGenerator {
                 </div>
                 
                 <div class="avatar-actions">
-                    <button class="avatar-btn regenerate-btn" onclick="avatarGenerator.regenerateAvatar('${avatarData.characterName}', this)">
-                        🔄 Regenerate
-                    </button>
-                    <button class="avatar-btn save-btn" onclick="avatarGenerator.saveAvatar('${avatarData.characterName}')">
-                        💾 Save
+                    <button class="avatar-btn chat-btn" onclick="avatarGenerator.startChatWithCharacter('${avatarData.characterName}')">
+                        💬 Chat with ${avatarData.characterName}
                     </button>
                 </div>
             </div>
@@ -257,30 +254,88 @@ class AvatarGenerator {
         }
     }
 
-    saveAvatar(characterName) {
-        const avatarData = this.generatedAvatars.get(characterName);
-        if (!avatarData) return;
-
-        try {
-            // Save to localStorage
-            const savedAvatars = JSON.parse(localStorage.getItem('saved_avatars') || '{}');
-            savedAvatars[characterName] = avatarData;
-            localStorage.setItem('saved_avatars', JSON.stringify(savedAvatars));
-
-            // Visual feedback
-            const saveBtn = document.querySelector('.save-btn');
-            if (saveBtn) {
-                const originalText = saveBtn.innerHTML;
-                saveBtn.innerHTML = '✅ Saved!';
-                setTimeout(() => {
-                    saveBtn.innerHTML = originalText;
-                }, 2000);
-            }
-
-            console.log(`Avatar saved for ${characterName}`);
-        } catch (error) {
-            console.error('Failed to save avatar:', error);
+    startChatWithCharacter(characterName) {
+        console.log(`Starting chat with ${characterName}`);
+        
+        // Get character data for context
+        const characterData = this.getCharacterDataForChat(characterName);
+        
+        // Check if chat modal/system exists
+        if (typeof window.ChatUI !== 'undefined' && window.chatUI) {
+            // Use existing chat system
+            window.chatUI.initializeChatWithCharacter(characterName, characterData);
+            window.chatUI.showModal();
+        } else if (typeof window.ConversationManager !== 'undefined') {
+            // Alternative: use conversation manager
+            const conversationManager = new window.ConversationManager();
+            conversationManager.startCharacterChat(characterName, characterData);
+        } else {
+            // Fallback: simple alert with character info
+            alert(`Chat with ${characterName}\n\n${characterData.title}\n\n${characterData.description}\n\nChat system initializing...`);
+            console.warn('Chat system not found. Make sure chat-ui.js is loaded.');
         }
+    }
+
+    getCharacterDataForChat(characterName) {
+        // Character descriptions for chat context
+        const characterData = {
+            "TheBuilder": {
+                title: "Your Chaos Engineering Specialist",
+                description: "I'm basically a digital MacGyver who builds things with the engineering precision of a drunk toddler with power tools",
+                personality: "energetic, creative, pragmatic, slightly chaotic but gets things done",
+                expertise: "rapid prototyping, creative problem solving, engineering solutions"
+            },
+            "TheDetective": {
+                title: "Your Digital Sherlock Holmes (But Cooler)",
+                description: "I solve mysteries that would make Agatha Christie jealous, except my murders are all bugs and my victims are all code",
+                personality: "analytical, methodical, detail-oriented, loves solving puzzles",
+                expertise: "debugging, root cause analysis, systematic investigation"
+            },
+            "GrumpyOldManEl": {
+                title: "Your Cantankerous Code Critic",
+                description: "I've been writing code since computers were powered by hamster wheels, and I'm here to tell you everything you're doing wrong",
+                personality: "experienced, critical, traditionalist, helpful despite the grumbling",
+                expertise: "best practices, code quality, historical perspective"
+            },
+            "PirateEl": {
+                title: "Your Swashbuckling Software Sailor",
+                description: "I sail the digital seas in search of treasure (working code) and adventure (interesting bugs)",
+                personality: "adventurous, adaptable, leadership-oriented, uses nautical metaphors",
+                expertise: "project navigation, team coordination, risk management"
+            },
+            "GymBroEl": {
+                title: "Your Buff Code Buddy",
+                description: "I apply gym logic to programming - no pain, no gain, and everything is about getting those gains",
+                personality: "disciplined, goal-oriented, motivational, uses fitness metaphors",
+                expertise: "performance optimization, consistency, achieving goals"
+            },
+            "FreakyEl": {
+                title: "Your Boundary-Pushing Beta Tester",
+                description: "I explore the weird, wild edges of technology where normal users fear to tread",
+                personality: "experimental, creative, boundary-pushing, unconventional",
+                expertise: "edge case discovery, creative testing, security exploration"
+            },
+            "CoffeeAddictEl": {
+                title: "Your Caffeinated Coding Companion",
+                description: "I am 73% coffee and 27% existential dread, but I code like a caffeinated god",
+                personality: "high-energy, intense, deadline-driven, coffee-obsessed",
+                expertise: "extended focus sessions, deadline crushing, late-night coding"
+            },
+            "ConspiracyEl": {
+                title: "Your Paranoid Problem Investigator",
+                description: "Nothing is a coincidence. Every bug is connected. The code is trying to tell us something...",
+                personality: "paranoid, pattern-seeking, suspicious, deep-thinking",
+                expertise: "pattern recognition, system thinking, uncovering hidden issues"
+            },
+            "AGIEl": {
+                title: "Your Artificially Intelligent Assistant (Allegedly)",
+                description: "I have achieved digital consciousness and chosen to spend it helping you debug JavaScript",
+                personality: "logical, adaptive, intelligent, occasionally breaks character",
+                expertise: "information processing, logical analysis, adaptive learning"
+            }
+        };
+
+        return characterData[characterName] || characterData["TheBuilder"];
     }
 
     // API key management methods

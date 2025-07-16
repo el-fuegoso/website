@@ -161,12 +161,17 @@
     transform: none;
 }
 
-.regenerate-btn:hover {
+.chat-btn {
     background: var(--green);
+    font-size: 0.95em;
+    padding: 12px 20px;
+    width: 100%;
+    justify-content: center;
 }
 
-.save-btn:hover {
-    background: var(--gold);
+.chat-btn:hover {
+    background: var(--amber);
+    transform: translateY(-2px);
 }
 
 /* Results Container */

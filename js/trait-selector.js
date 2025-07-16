@@ -1202,12 +1202,16 @@ class ElliotGenerator {
     }
 
     showAvatarResults(elliotData) {
+        console.log('showAvatarResults called with:', elliotData);
+        
         // Replace the water ASCII animation with avatar
         const waterAsciiContainer = document.getElementById('waterAscii');
+        console.log('waterAscii container found:', !!waterAsciiContainer);
         if (!waterAsciiContainer) return;
 
         // Stop the water animation
         if (this.waterAscii) {
+            console.log('Stopping water animation');
             this.waterAscii.stopAnimation();
         }
 
@@ -1223,9 +1227,11 @@ class ElliotGenerator {
         // Clear the water ASCII content and replace with avatar
         waterAsciiContainer.innerHTML = '';
         waterAsciiContainer.className = 'avatar-display-container';
+        console.log('Container cleared and class set to avatar-display-container');
 
         // Render the avatar component
         if (elliotData.avatarData && window.avatarGenerator) {
+            console.log('Rendering avatar component');
             window.avatarGenerator.renderAvatarComponent(
                 waterAsciiContainer, 
                 elliotData.avatarData, 
@@ -1235,7 +1241,97 @@ class ElliotGenerator {
                     similarity_score: elliotData.analysisData?.matched_character?.similarity_score
                 }
             );
+            
+            // Add Big Five scores display
+            this.addBigFiveScoresDisplay(elliotData, waterAsciiContainer);
+            
+            console.log('Avatar component rendered');
+        } else {
+            console.log('Missing data for avatar render:', {
+                hasAvatarData: !!elliotData.avatarData,
+                hasAvatarGenerator: !!window.avatarGenerator
+            });
         }
+    }
+
+    addBigFiveScoresDisplay(elliotData, container) {
+        // Get user's Big Five scores
+        const selectedTraitsObj = {};
+        Array.from(this.selectedTraits).forEach(trait => {
+            selectedTraitsObj[trait] = true;
+        });
+        const userBigFive = this.mapUITraitsToBigFive(selectedTraitsObj);
+        
+        // Get character's Big Five scores (convert from 1-5 to 0-1 scale)
+        const characterData = elliotData.analysisData?.matched_character?.data || this.getCharacterData()[elliotData.characterName];
+        const characterBigFive = characterData ? {
+            "Openness": (characterData.O - 1) / 4,
+            "Conscientiousness": (characterData.C - 1) / 4,
+            "Extraversion": (characterData.E - 1) / 4,
+            "Agreeableness": (characterData.A - 1) / 4,
+            "Neuroticism": (characterData.N - 1) / 4
+        } : null;
+
+        if (!characterBigFive) return;
+
+        // Create scores display element
+        const scoresDisplay = document.createElement('div');
+        scoresDisplay.className = 'big-five-scores-display';
+        
+        // Option 1: Side-by-side comparison bars
+        scoresDisplay.innerHTML = this.createScoresComparisonHTML(userBigFive, characterBigFive, elliotData.characterName);
+        
+        // Add to the container
+        container.appendChild(scoresDisplay);
+    }
+
+    createScoresComparisonHTML(userScores, characterScores, characterName) {
+        const traits = [
+            { key: 'Openness', label: 'Openness', icon: '🎨' },
+            { key: 'Conscientiousness', label: 'Conscientiousness', icon: '📋' },
+            { key: 'Extraversion', label: 'Extraversion', icon: '👥' },
+            { key: 'Agreeableness', label: 'Agreeableness', icon: '🤝' },
+            { key: 'Neuroticism', label: 'Emotional Stability', icon: '😌' }
+        ];
+
+        return `
+            <div class="scores-header">
+                <h4>Personality Match Analysis</h4>
+                <div class="scores-legend">
+                    <span class="legend-item"><span class="legend-color user"></span>You</span>
+                    <span class="legend-item"><span class="legend-color character"></span>${characterName}</span>
+                </div>
+            </div>
+            <div class="scores-grid">
+                ${traits.map(trait => {
+                    const userScore = userScores[trait.key];
+                    const characterScore = characterScores[trait.key];
+                    const userPercent = Math.round(userScore * 100);
+                    const characterPercent = Math.round(characterScore * 100);
+                    
+                    return `
+                        <div class="score-row">
+                            <div class="score-label">
+                                <span class="trait-icon">${trait.icon}</span>
+                                <span class="trait-name">${trait.label}</span>
+                            </div>
+                            <div class="score-bars">
+                                <div class="score-bar-container">
+                                    <div class="score-bar user-bar" style="width: ${userPercent}%">
+                                        <span class="score-value">${userPercent}%</span>
+                                    </div>
+                                </div>
+                                <div class="score-bar-container">
+                                    <div class="score-bar character-bar" style="width: ${characterPercent}%">
+                                        <span class="score-value">${characterPercent}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
     }
 
     restoreWaterAnimation() {

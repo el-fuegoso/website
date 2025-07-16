@@ -267,6 +267,125 @@
     padding: 8px 14px;
 }
 
+/* Big Five Scores Display */
+.big-five-scores-display {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    border: 2px solid var(--amber);
+    max-width: 400px;
+    width: 100%;
+}
+
+.scores-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.scores-header h4 {
+    color: var(--green);
+    margin: 0 0 8px 0;
+    font-size: 1.1em;
+}
+
+.scores-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 0.9em;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.legend-color.user {
+    background: var(--green);
+}
+
+.legend-color.character {
+    background: var(--amber);
+}
+
+.scores-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.score-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.score-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.trait-icon {
+    font-size: 1.1em;
+}
+
+.trait-name {
+    flex: 1;
+}
+
+.score-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.score-bar-container {
+    background: #f0f0f0;
+    border-radius: 10px;
+    height: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-bar {
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    transition: width 0.8s ease-out;
+    position: relative;
+}
+
+.user-bar {
+    background: linear-gradient(90deg, var(--green), #006b3a);
+    color: white;
+}
+
+.character-bar {
+    background: linear-gradient(90deg, var(--amber), var(--gold));
+    color: white;
+}
+
+.score-value {
+    font-size: 0.75em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
 @keyframes slideInUp {
     from {
         opacity: 0;
@@ -381,12 +500,13 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    height: 650px;
-    transition: height 0.3s ease;
+    min-height: 650px;
+    height: auto;
+    transition: min-height 0.3s ease;
 }
 
 .trait-selector-grid.expanded {
-    height: 750px;
+    min-height: 750px;
 }
 
 /* Left Panel - Trait Selection with flip capability */
@@ -418,9 +538,10 @@
     height: 100%;
     backface-visibility: hidden;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     flex-direction: column;
+    min-height: 600px;
 }
 
 .trait-panel-front {
@@ -842,11 +963,13 @@
     border-radius: 12px;
     padding: 0;
     height: 100%;
+    min-height: 580px;
     display: flex;
     flex-direction: column;
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Roboto Mono', monospace;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    margin: 8px;
 }
 
 .terminal-titlebar {

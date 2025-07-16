@@ -14,7 +14,7 @@
 .avatar-generator-component {
     background: var(--bg-light);
     border-radius: 12px;
-    padding: 20px;
+    padding: 18px;
     margin: 20px 0;
     border: 2px solid var(--amber);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -206,11 +206,11 @@
     backdrop-filter: blur(10px);
     border: 3px solid var(--gold);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    max-width: 360px;
-    width: 90%;
+    max-width: 325px;
+    width: 80%;
     border-radius: 16px;
     position: relative;
-    margin-bottom: 120px;
+    margin-bottom: 100px;
 }
 
 .avatar-display-container .avatar-generator-component:hover {
@@ -1172,11 +1172,11 @@
 /* Radar Charts */
 .radar-charts-container {
     position: absolute;
-    bottom: -100px;
+    bottom: -80px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 24px;
+    gap: 16px;
     z-index: 3;
     opacity: 0.3;
     transition: opacity 0.3s ease;

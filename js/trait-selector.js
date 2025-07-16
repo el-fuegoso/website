@@ -825,27 +825,50 @@ class ElliotGenerator {
                 console.log('Backend API not available, using demo generation');
             }
 
-            // Fallback to demo generation with avatar
-            const elliotData = await this.generateDemoElliot();
+            // Fallback to demo generation with proper character matching
+            console.log('Using demo mode with proper Big Five character matching');
             
-            // Generate avatar for demo character
-            console.log('Avatar generator available:', !!window.avatarGenerator);
-            if (window.avatarGenerator) {
-                const characterName = this.mapDemoToCharacterName(elliotData.name);
-                console.log('Generating avatar for character:', characterName);
-                const avatarData = await window.avatarGenerator.generateAvatar(characterName);
+            // Use our character matching logic instead of hardcoded demo
+            const bestMatch = this.findBestCharacterMatch();
+            
+            if (bestMatch && window.avatarGenerator) {
+                console.log('Generating avatar for matched character:', bestMatch.name);
+                const avatarData = await window.avatarGenerator.generateAvatar(bestMatch.name);
                 console.log('Avatar data:', avatarData);
                 
-                // Display with avatar
+                // Display with avatar using real character data
                 this.displayElliotWithAvatar({
-                    ...elliotData,
-                    characterName: characterName,
+                    name: bestMatch.name,
+                    title: bestMatch.data.title,
+                    description: bestMatch.data.description,
+                    characterName: bestMatch.name,
                     avatarData: avatarData,
-                    analysisData: { matched_character: { similarity_score: 0.85 } }
+                    analysisData: { 
+                        matched_character: { 
+                            similarity_score: bestMatch.similarity,
+                            name: bestMatch.name,
+                            data: bestMatch.data
+                        }
+                    }
                 });
             } else {
-                console.log('Avatar generator not available, falling back to normal display');
-                this.displayElliot(elliotData);
+                console.log('Character matching failed, using fallback');
+                // Ultra fallback - just use TheBuilder
+                if (window.avatarGenerator) {
+                    const avatarData = await window.avatarGenerator.generateAvatar('TheBuilder');
+                    const builderData = this.getCharacterData()['TheBuilder'];
+                    this.displayElliotWithAvatar({
+                        name: 'TheBuilder',
+                        title: builderData.title,
+                        description: builderData.description,
+                        characterName: 'TheBuilder',
+                        avatarData: avatarData,
+                        analysisData: { matched_character: { similarity_score: 0.5 } }
+                    });
+                } else {
+                    const elliotData = await this.generateDemoElliot();
+                    this.displayElliot(elliotData);
+                }
             }
             
         } catch (error) {
@@ -857,16 +880,183 @@ class ElliotGenerator {
         }
     }
 
-    mapDemoToCharacterName(demoName) {
-        // Map demo Elliot names to our character names
-        const nameMap = {
-            "Elliot the Creator": "TheBuilder",
-            "Elliot the Connector": "TheConnector", 
-            "Elliot the Innovator": "TheTrailblazer",
-            "Elliot the Analyzer": "TheAnalyst",
-            "Elliot the Catalyst": "TheCatalyst"
+    // Character data from backend (for demo mode when backend unavailable)
+    getCharacterData() {
+        return {
+            "TheBuilder": {
+                "O": 4, "C": 2, "E": 3, "A": 2, "N": 3,
+                "title": "Your Chaos Engineering Specialist",
+                "description": "I'm basically a digital MacGyver who builds things with the engineering precision of a drunk toddler with power tools"
+            },
+            "TheDetective": {
+                "O": 4, "C": 5, "E": 2, "A": 2, "N": 3,
+                "title": "Your Digital Sherlock Holmes (But Cooler)",
+                "description": "I solve mysteries that would make Agatha Christie jealous, except my murders are all bugs and my victims are all code"
+            },
+            "GrumpyOldManEl": {
+                "O": 2, "C": 4, "E": 2, "A": 1, "N": 4,
+                "title": "Your Cantankerous Code Critic",
+                "description": "I've been writing code since computers were powered by hamster wheels, and I'm here to tell you everything you're doing wrong"
+            },
+            "PirateEl": {
+                "O": 4, "C": 3, "E": 4, "A": 3, "N": 2,
+                "title": "Your Swashbuckling Software Sailor",
+                "description": "I sail the digital seas in search of treasure (working code) and adventure (interesting bugs)"
+            },
+            "GymBroEl": {
+                "O": 2, "C": 5, "E": 4, "A": 3, "N": 2,
+                "title": "Your Buff Code Buddy",
+                "description": "I apply gym logic to programming - no pain, no gain, and everything is about getting those gains"
+            },
+            "FreakyEl": {
+                "O": 5, "C": 3, "E": 3, "A": 2, "N": 2,
+                "title": "Your Boundary-Pushing Beta Tester",
+                "description": "I explore the weird, wild edges of technology where normal users fear to tread"
+            },
+            "CoffeeAddictEl": {
+                "O": 3, "C": 4, "E": 3, "A": 2, "N": 4,
+                "title": "Your Caffeinated Coding Companion",
+                "description": "I am 73% coffee and 27% existential dread, but I code like a caffeinated god"
+            },
+            "ConspiracyEl": {
+                "O": 5, "C": 4, "E": 1, "A": 1, "N": 5,
+                "title": "Your Paranoid Problem Investigator",
+                "description": "Nothing is a coincidence. Every bug is connected. The code is trying to tell us something..."
+            },
+            "AGIEl": {
+                "O": 5, "C": 4, "E": 3, "A": 4, "N": 1,
+                "title": "Your Artificially Intelligent Assistant (Allegedly)",
+                "description": "I have achieved digital consciousness and chosen to spend it helping you debug JavaScript"
+            }
         };
-        return nameMap[demoName] || "TheBuilder";
+    }
+
+    // Map UI traits to Big Five scores (from backend utils.py)
+    mapUITraitsToBigFive(selectedTraits) {
+        const bigFiveScores = {
+            "Openness": 0.5,
+            "Conscientiousness": 0.5, 
+            "Extraversion": 0.5,
+            "Agreeableness": 0.5,
+            "Neuroticism": 0.5
+        };
+        
+        const traitMappings = {
+            "innovation": {"Openness": 0.3, "Conscientiousness": 0.1},
+            "energy": {"Extraversion": 0.3, "Neuroticism": -0.1},
+            "intensity": {"Conscientiousness": 0.3, "Neuroticism": -0.05},
+            "cooperative": {"Agreeableness": 0.3, "Extraversion": 0.1},
+            "calm": {"Neuroticism": -0.3, "Conscientiousness": 0.1},
+            "technical": {"Conscientiousness": 0.25, "Openness": 0.1},
+            "creativity": {"Openness": 0.25},
+            "leadership": {"Extraversion": 0.25, "Conscientiousness": 0.1},
+            "collaborative": {"Agreeableness": 0.25, "Extraversion": 0.1},
+            "adventure": {"Openness": 0.2, "Extraversion": 0.15},
+            "mystery": {"Openness": 0.2, "Conscientiousness": 0.15},
+            "discipline": {"Conscientiousness": 0.25, "Neuroticism": -0.1},
+            "curiosity": {"Openness": 0.25},
+            "hustle": {"Extraversion": 0.2, "Conscientiousness": 0.2},
+            "speed": {"Extraversion": 0.15, "Neuroticism": 0.1},
+            "experimental": {"Openness": 0.3},
+            "paranoia": {"Neuroticism": 0.25, "Conscientiousness": 0.1},
+            "procrastination": {"Conscientiousness": -0.3},
+            "futuristic": {"Openness": 0.25, "Conscientiousness": 0.1}
+        };
+        
+        // Apply trait effects
+        for (const [trait, isSelected] of Object.entries(selectedTraits)) {
+            if (isSelected && traitMappings[trait]) {
+                for (const [bigFiveTrait, weight] of Object.entries(traitMappings[trait])) {
+                    bigFiveScores[bigFiveTrait] += weight;
+                }
+            }
+        }
+        
+        // Clamp scores to valid range [0, 1]
+        for (const trait in bigFiveScores) {
+            bigFiveScores[trait] = Math.max(0.0, Math.min(1.0, bigFiveScores[trait]));
+        }
+        
+        return bigFiveScores;
+    }
+
+    // Calculate similarity between user profile and character
+    calculateSimilarity(userProfile, characterProfile) {
+        // Convert character profile from 1-5 scale to 0-1 scale
+        const charScoresConverted = {
+            "Openness": (characterProfile.O - 1) / 4,
+            "Conscientiousness": (characterProfile.C - 1) / 4,
+            "Extraversion": (characterProfile.E - 1) / 4,
+            "Agreeableness": (characterProfile.A - 1) / 4,
+            "Neuroticism": (characterProfile.N - 1) / 4
+        };
+        
+        // Create vectors for similarity calculation
+        const userVec = [
+            userProfile.Openness,
+            userProfile.Conscientiousness,
+            userProfile.Extraversion,
+            userProfile.Agreeableness,
+            userProfile.Neuroticism
+        ];
+        
+        const charVec = [
+            charScoresConverted.Openness,
+            charScoresConverted.Conscientiousness,
+            charScoresConverted.Extraversion,
+            charScoresConverted.Agreeableness,
+            charScoresConverted.Neuroticism
+        ];
+        
+        // Calculate cosine similarity (simplified)
+        let dotProduct = 0;
+        let userMagnitude = 0;
+        let charMagnitude = 0;
+        
+        for (let i = 0; i < 5; i++) {
+            dotProduct += userVec[i] * charVec[i];
+            userMagnitude += userVec[i] * userVec[i];
+            charMagnitude += charVec[i] * charVec[i];
+        }
+        
+        userMagnitude = Math.sqrt(userMagnitude);
+        charMagnitude = Math.sqrt(charMagnitude);
+        
+        if (userMagnitude === 0 || charMagnitude === 0) {
+            return 0;
+        }
+        
+        return Math.max(0, Math.min(1, dotProduct / (userMagnitude * charMagnitude)));
+    }
+
+    // Find best matching character
+    findBestCharacterMatch() {
+        const selectedTraitsObj = {};
+        Array.from(this.selectedTraits).forEach(trait => {
+            selectedTraitsObj[trait] = true;
+        });
+        
+        console.log('Selected traits:', selectedTraitsObj);
+        
+        const userBigFive = this.mapUITraitsToBigFive(selectedTraitsObj);
+        console.log('User Big Five scores:', userBigFive);
+        
+        const characters = this.getCharacterData();
+        let bestMatch = null;
+        let bestSimilarity = -1;
+        
+        for (const [charName, charData] of Object.entries(characters)) {
+            const similarity = this.calculateSimilarity(userBigFive, charData);
+            console.log(`${charName} similarity:`, similarity);
+            
+            if (similarity > bestSimilarity) {
+                bestSimilarity = similarity;
+                bestMatch = { name: charName, data: charData, similarity: similarity };
+            }
+        }
+        
+        console.log('Best match:', bestMatch);
+        return bestMatch;
     }
 
     async generateDemoElliot() {

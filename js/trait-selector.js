@@ -10,6 +10,7 @@ class Terminal {
         this.questMode = false;
         this.currentQuestion = 0;
         this.userResponses = [];
+        this.hasGeneratedAvatar = false;
         this.init();
         
         // Questions for quest mode
@@ -173,12 +174,17 @@ class Terminal {
             
             const data = await response.json();
             
+            // Option B: Generate avatar after terminal analysis
+            await this.generateTerminalAvatar(data);
+            
             return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${data.key_traits || this.extractKeyTraits()}. 
 
 Here's my analysis:
 • ${data.insights ? data.insights.join('\n• ') : 'Analysis complete'}
 
-Your personality profile shows: ${data.personality_summary || 'Balanced traits across multiple dimensions'}`;
+Your personality profile shows: ${data.personality_summary || 'Balanced traits across multiple dimensions'}
+
+🎨 I've also generated a character avatar for you! Check the area below.`;
         } catch (error) {
             console.error('Error connecting to personality analyzer:', error);
             // Fallback to local analysis
@@ -235,6 +241,15 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             
             const data = await response.json();
             
+            // Option B: Check if we should generate an avatar after significant conversation
+            if (this.conversationHistory.length >= 6 && !this.hasGeneratedAvatar) {
+                await this.generateTerminalAvatar(data, userInput);
+                this.hasGeneratedAvatar = true;
+                return `${data.response || this.getFallbackResponse(userInput)}
+
+🎨 Based on our conversation, I've generated a character avatar that matches your profile! Check below the terminal.`;
+            }
+            
             return data.response || this.getFallbackResponse(userInput);
         } catch (error) {
             console.error('Error connecting to personality analyzer:', error);
@@ -284,6 +299,89 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
 
     addPrompt() {
         this.addToOutput(`<span class="terminal-prompt">elliot@terminal ~ % _</span>`);
+    }
+
+    async generateTerminalAvatar(analysisData, userText = null) {
+        try {
+            // Option B: Generate avatar after terminal analysis
+            let characterName = 'TheBuilder'; // Default
+            let characterData = {};
+
+            // Try to extract character match from analysis data
+            if (analysisData && analysisData.matched_character) {
+                characterName = analysisData.matched_character.name;
+                characterData = analysisData.matched_character.data;
+            } else if (analysisData && analysisData.analysis && analysisData.analysis.matched_character) {
+                characterName = analysisData.analysis.matched_character.name;
+                characterData = analysisData.analysis.matched_character.data;
+            } else {
+                // Fallback: try to analyze text for character matching
+                if (userText) {
+                    try {
+                        const matchResponse = await fetch('http://localhost:5001/api/match_character', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                text: userText,
+                                mode: 'conversation'
+                            })
+                        });
+                        
+                        if (matchResponse.ok) {
+                            const matchData = await matchResponse.json();
+                            if (matchData.status === 'success' && matchData.matched_character) {
+                                characterName = matchData.matched_character.name;
+                                characterData = matchData.matched_character.data;
+                            }
+                        }
+                    } catch (matchError) {
+                        console.log('Character matching failed, using default');
+                    }
+                }
+            }
+
+            // Generate avatar and replace water ASCII animation
+            if (window.avatarGenerator) {
+                const avatarData = await window.avatarGenerator.generateAvatar(characterName);
+                
+                // Replace the water ASCII animation with avatar (same as trait selector)
+                const waterAsciiContainer = document.getElementById('waterAscii');
+                if (waterAsciiContainer) {
+                    // Stop any running water animation
+                    if (window.elliotGenerator && window.elliotGenerator.waterAscii) {
+                        window.elliotGenerator.waterAscii.stopAnimation();
+                    }
+
+                    // Hide the matrix label and generation path
+                    const matrixLabel = document.querySelector('.matrix-label');
+                    const generationPath = document.getElementById('generationPath');
+                    const avatarLabel = document.querySelector('.avatar-label');
+                    
+                    if (matrixLabel) matrixLabel.style.display = 'none';
+                    if (generationPath) generationPath.style.display = 'none';
+                    if (avatarLabel) avatarLabel.style.display = 'none';
+
+                    // Clear the water ASCII content and replace with avatar
+                    waterAsciiContainer.innerHTML = '';
+                    waterAsciiContainer.className = 'avatar-display-container';
+
+                    // Render the avatar component
+                    window.avatarGenerator.renderAvatarComponent(
+                        waterAsciiContainer,
+                        avatarData,
+                        {
+                            title: characterData.title || characterName,
+                            description: characterData.description || 'Your matched character profile',
+                            similarity_score: characterData.similarity_score || analysisData?.matched_character?.similarity_score
+                        }
+                    );
+                }
+            }
+        } catch (error) {
+            console.error('Terminal avatar generation failed:', error);
+        }
     }
 }
 
@@ -536,6 +634,11 @@ class ElliotGenerator {
         if (panel) {
             panel.classList.remove('flipped');
         }
+        
+        // Reset terminal avatar generation flag when exiting terminal mode
+        if (this.terminal) {
+            this.terminal.hasGeneratedAvatar = false;
+        }
     }
 
     toggleSoundbar(e) {
@@ -678,8 +781,54 @@ class ElliotGenerator {
         this.showGeneratingState();
 
         try {
+            // Option A: Integrate with backend trait analysis
+            const selectedTraitsObj = {};
+            Array.from(this.selectedTraits).forEach(trait => {
+                selectedTraitsObj[trait] = true;
+            });
+
+            try {
+                // Call backend API for personality analysis
+                const response = await fetch('http://localhost:5001/api/analyze_traits', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        traits: selectedTraitsObj,
+                        user_name: 'User'
+                    })
+                });
+
+                if (response.ok) {
+                    const analysisData = await response.json();
+                    
+                    if (analysisData.status === 'success' && analysisData.matched_character) {
+                        // Generate avatar for matched character
+                        const characterName = analysisData.matched_character.name;
+                        const characterData = analysisData.matched_character.data;
+                        
+                        const avatarData = await window.avatarGenerator.generateAvatar(characterName);
+                        
+                        // Display the result with avatar
+                        this.displayElliotWithAvatar({
+                            ...characterData,
+                            characterName: characterName,
+                            analysisData: analysisData,
+                            avatarData: avatarData
+                        });
+                        
+                        return;
+                    }
+                }
+            } catch (apiError) {
+                console.log('Backend API not available, using demo generation');
+            }
+
+            // Fallback to demo generation
             const elliotData = await this.generateDemoElliot();
             this.displayElliot(elliotData);
+            
         } catch (error) {
             console.error('Generation failed:', error);
             this.showError();
@@ -811,6 +960,87 @@ class ElliotGenerator {
         console.log('Generated Elliot:', elliotData);
     }
 
+    displayElliotWithAvatar(elliotData) {
+        this.currentElliot = elliotData;
+
+        // Create success pulse in sound bars
+        const soundbars = document.querySelectorAll('.soundbar');
+        soundbars.forEach((bar, index) => {
+            setTimeout(() => {
+                bar.style.background = 'var(--gold)';
+                setTimeout(() => {
+                    bar.style.background = bar.classList.contains('active') ? 'var(--amber)' : '#ddd';
+                }, 200);
+            }, index * 50);
+        });
+
+        // Show avatar generation results
+        this.showAvatarResults(elliotData);
+
+        console.log('Generated Elliot with Avatar:', elliotData);
+    }
+
+    showAvatarResults(elliotData) {
+        // Replace the water ASCII animation with avatar
+        const waterAsciiContainer = document.getElementById('waterAscii');
+        if (!waterAsciiContainer) return;
+
+        // Stop the water animation
+        if (this.waterAscii) {
+            this.waterAscii.stopAnimation();
+        }
+
+        // Hide the matrix label and generation path
+        const matrixLabel = document.querySelector('.matrix-label');
+        const generationPath = document.getElementById('generationPath');
+        const avatarLabel = document.querySelector('.avatar-label');
+        
+        if (matrixLabel) matrixLabel.style.display = 'none';
+        if (generationPath) generationPath.style.display = 'none';
+        if (avatarLabel) avatarLabel.style.display = 'none';
+
+        // Clear the water ASCII content and replace with avatar
+        waterAsciiContainer.innerHTML = '';
+        waterAsciiContainer.className = 'avatar-display-container';
+
+        // Render the avatar component
+        if (elliotData.avatarData && window.avatarGenerator) {
+            window.avatarGenerator.renderAvatarComponent(
+                waterAsciiContainer, 
+                elliotData.avatarData, 
+                {
+                    title: elliotData.title || elliotData.characterName,
+                    description: elliotData.description,
+                    similarity_score: elliotData.analysisData?.matched_character?.similarity_score
+                }
+            );
+        }
+    }
+
+    restoreWaterAnimation() {
+        // Restore the water ASCII animation
+        const waterAsciiContainer = document.getElementById('waterAscii');
+        if (!waterAsciiContainer) return;
+
+        // Show the matrix label and generation path
+        const matrixLabel = document.querySelector('.matrix-label');
+        const generationPath = document.getElementById('generationPath');
+        const avatarLabel = document.querySelector('.avatar-label');
+        
+        if (matrixLabel) matrixLabel.style.display = 'block';
+        if (generationPath) generationPath.style.display = 'block';
+        if (avatarLabel) avatarLabel.style.display = 'block';
+
+        // Restore original water ASCII structure
+        waterAsciiContainer.className = 'water-ascii';
+        waterAsciiContainer.innerHTML = '<pre id="asciiContent"></pre>';
+
+        // Restart the water animation
+        if (this.waterAscii) {
+            this.waterAscii = new WaterASCII();
+        }
+    }
+
     showError() {
         console.error('Generation failed');
     }
@@ -897,6 +1127,9 @@ class ElliotGenerator {
         if (energyBar) energyBar.classList.add('active');
         if (collabBar) collabBar.classList.add('active');
         
+        // Restore water animation
+        this.restoreWaterAnimation();
+        
         this.updateTraitDisplay();
     }
 
@@ -932,7 +1165,12 @@ class ElliotGenerator {
 document.addEventListener('DOMContentLoaded', () => {
     // Only initialize if trait selector elements exist
     if (document.querySelector('.trait-selector-container')) {
-        new ElliotGenerator();
+        window.elliotGenerator = new ElliotGenerator();
+    }
+
+    // Initialize global avatar generator
+    if (typeof AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
+        window.avatarGenerator = new AvatarGenerator();
     }
 });
 

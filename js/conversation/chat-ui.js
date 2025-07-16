@@ -492,6 +492,11 @@ class ChatUI {
             ]
         };
         
+        // Ensure chat is initialized
+        if (!this.isInitialized) {
+            this.initialize();
+        }
+        
         // Clear any existing messages
         if (this.isInitialized && this.messageContainer) {
             this.messageContainer.innerHTML = '';

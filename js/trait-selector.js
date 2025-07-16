@@ -825,9 +825,28 @@ class ElliotGenerator {
                 console.log('Backend API not available, using demo generation');
             }
 
-            // Fallback to demo generation
+            // Fallback to demo generation with avatar
             const elliotData = await this.generateDemoElliot();
-            this.displayElliot(elliotData);
+            
+            // Generate avatar for demo character
+            console.log('Avatar generator available:', !!window.avatarGenerator);
+            if (window.avatarGenerator) {
+                const characterName = this.mapDemoToCharacterName(elliotData.name);
+                console.log('Generating avatar for character:', characterName);
+                const avatarData = await window.avatarGenerator.generateAvatar(characterName);
+                console.log('Avatar data:', avatarData);
+                
+                // Display with avatar
+                this.displayElliotWithAvatar({
+                    ...elliotData,
+                    characterName: characterName,
+                    avatarData: avatarData,
+                    analysisData: { matched_character: { similarity_score: 0.85 } }
+                });
+            } else {
+                console.log('Avatar generator not available, falling back to normal display');
+                this.displayElliot(elliotData);
+            }
             
         } catch (error) {
             console.error('Generation failed:', error);
@@ -836,6 +855,18 @@ class ElliotGenerator {
             this.isGenerating = false;
             this.hideGeneratingState();
         }
+    }
+
+    mapDemoToCharacterName(demoName) {
+        // Map demo Elliot names to our character names
+        const nameMap = {
+            "Elliot the Creator": "TheBuilder",
+            "Elliot the Connector": "TheConnector", 
+            "Elliot the Innovator": "TheTrailblazer",
+            "Elliot the Analyzer": "TheAnalyst",
+            "Elliot the Catalyst": "TheCatalyst"
+        };
+        return nameMap[demoName] || "TheBuilder";
     }
 
     async generateDemoElliot() {
@@ -1163,14 +1194,18 @@ class ElliotGenerator {
 
 // Initialize trait selector when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize global avatar generator first
+    console.log('Initializing avatar generator, AvatarGenerator available:', typeof window.AvatarGenerator !== 'undefined');
+    if (typeof window.AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
+        window.avatarGenerator = new window.AvatarGenerator();
+        console.log('Avatar generator initialized:', !!window.avatarGenerator);
+    } else if (typeof window.AvatarGenerator === 'undefined') {
+        console.warn('AvatarGenerator class not found - make sure avatar-generator.js is loaded');
+    }
+
     // Only initialize if trait selector elements exist
     if (document.querySelector('.trait-selector-container')) {
         window.elliotGenerator = new ElliotGenerator();
-    }
-
-    // Initialize global avatar generator
-    if (typeof AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
-        window.avatarGenerator = new AvatarGenerator();
     }
 });
 

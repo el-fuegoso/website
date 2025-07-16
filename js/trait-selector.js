@@ -955,15 +955,15 @@ class ElliotGenerator {
             "leadership": {"Extraversion": 0.25, "Conscientiousness": 0.1},
             "collaborative": {"Agreeableness": 0.25, "Extraversion": 0.1},
             "adventure": {"Openness": 0.2, "Extraversion": 0.15},
-            "mystery": {"Openness": 0.2, "Conscientiousness": 0.15},
+            "empathetic": {"Agreeableness": 0.3},
             "discipline": {"Conscientiousness": 0.25, "Neuroticism": -0.1},
-            "curiosity": {"Openness": 0.25},
+            "harmonious": {"Agreeableness": 0.25, "Neuroticism": -0.1},
             "hustle": {"Extraversion": 0.2, "Conscientiousness": 0.2},
             "speed": {"Extraversion": 0.15, "Neuroticism": 0.1},
             "experimental": {"Openness": 0.3},
             "paranoia": {"Neuroticism": 0.25, "Conscientiousness": 0.1},
-            "procrastination": {"Conscientiousness": -0.3},
-            "futuristic": {"Openness": 0.25, "Conscientiousness": 0.1}
+            "anxious": {"Neuroticism": 0.3},
+            "supportive": {"Agreeableness": 0.25, "Extraversion": 0.1}
         };
         
         // Apply trait effects

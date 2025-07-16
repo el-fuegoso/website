@@ -726,23 +726,24 @@
 
 /* Trait-specific bar heights for visual variety */
 .soundbar[data-trait="energy"] { --default-height: 25px; }
-.soundbar[data-trait="analytical"] { --default-height: 35px; }
 .soundbar[data-trait="intensity"] { --default-height: 28px; }
 .soundbar[data-trait="innovation"] { --default-height: 32px; }
+.soundbar[data-trait="cooperative"] { --default-height: 24px; }
+.soundbar[data-trait="calm"] { --default-height: 20px; }
 .soundbar[data-trait="technical"] { --default-height: 22px; }
 .soundbar[data-trait="creativity"] { --default-height: 30px; }
 .soundbar[data-trait="leadership"] { --default-height: 26px; }
 .soundbar[data-trait="collaborative"] { --default-height: 24px; }
 .soundbar[data-trait="adventure"] { --default-height: 33px; }
-.soundbar[data-trait="mystery"] { --default-height: 29px; }
+.soundbar[data-trait="empathetic"] { --default-height: 27px; }
 .soundbar[data-trait="discipline"] { --default-height: 27px; }
-.soundbar[data-trait="curiosity"] { --default-height: 31px; }
+.soundbar[data-trait="harmonious"] { --default-height: 25px; }
 .soundbar[data-trait="hustle"] { --default-height: 36px; }
 .soundbar[data-trait="speed"] { --default-height: 38px; }
 .soundbar[data-trait="experimental"] { --default-height: 23px; }
 .soundbar[data-trait="paranoia"] { --default-height: 21px; }
-.soundbar[data-trait="procrastination"] { --default-height: 15px; }
-.soundbar[data-trait="futuristic"] { --default-height: 34px; }
+.soundbar[data-trait="anxious"] { --default-height: 19px; }
+.soundbar[data-trait="supportive"] { --default-height: 26px; }
 
 @keyframes soundbar-pulse {
     0% { 

@@ -413,18 +413,25 @@ def map_ui_traits_to_big_five(selected_traits: Dict[str, bool]) -> Dict[str, flo
     
     # Trait mappings with weights (can be adjusted based on psychological research)
     trait_mappings = {
-        "Innovation": {"Openness": 0.3, "Conscientiousness": 0.1},
-        "Analytical": {"Openness": 0.2, "Conscientiousness": 0.25},
-        "High Energy": {"Extraversion": 0.3, "Neuroticism": -0.1},
-        "Intense Focus": {"Conscientiousness": 0.3, "Neuroticism": -0.05},
-        "Cooperative": {"Agreeableness": 0.3, "Extraversion": 0.1},
-        "Calm Under Pressure": {"Neuroticism": -0.3, "Conscientiousness": 0.1},
-        "Creative": {"Openness": 0.25},
-        "Social": {"Extraversion": 0.25, "Agreeableness": 0.1},
-        "Organized": {"Conscientiousness": 0.25},
-        "Empathetic": {"Agreeableness": 0.25, "Openness": 0.1},
-        "Adventurous": {"Openness": 0.2, "Extraversion": 0.15},
-        "Disciplined": {"Conscientiousness": 0.25, "Neuroticism": -0.1}
+        "innovation": {"Openness": 0.3, "Conscientiousness": 0.1},
+        "energy": {"Extraversion": 0.3, "Neuroticism": -0.1},
+        "intensity": {"Conscientiousness": 0.3, "Neuroticism": -0.05},
+        "cooperative": {"Agreeableness": 0.3, "Extraversion": 0.1},
+        "calm": {"Neuroticism": -0.3, "Conscientiousness": 0.1},
+        "technical": {"Conscientiousness": 0.25, "Openness": 0.1},
+        "creativity": {"Openness": 0.25},
+        "leadership": {"Extraversion": 0.25, "Conscientiousness": 0.1},
+        "collaborative": {"Agreeableness": 0.25, "Extraversion": 0.1},
+        "adventure": {"Openness": 0.2, "Extraversion": 0.15},
+        "empathetic": {"Agreeableness": 0.3},
+        "discipline": {"Conscientiousness": 0.25, "Neuroticism": -0.1},
+        "harmonious": {"Agreeableness": 0.25, "Neuroticism": -0.1},
+        "hustle": {"Extraversion": 0.2, "Conscientiousness": 0.2},
+        "speed": {"Extraversion": 0.15, "Neuroticism": 0.1},
+        "experimental": {"Openness": 0.3},
+        "paranoia": {"Neuroticism": 0.25, "Conscientiousness": 0.1},
+        "anxious": {"Neuroticism": 0.3},
+        "supportive": {"Agreeableness": 0.25, "Extraversion": 0.1}
     }
     
     # Apply trait effects

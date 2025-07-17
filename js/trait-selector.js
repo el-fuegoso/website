@@ -68,12 +68,6 @@ class Terminal {
             this.addToOutput('');
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">────────────────────────────────────────────────────────────</span>`);
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Ready for input...</span>`);
-            this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">> Paste your content or just start talking. My model will extract</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">   your Big Five traits either way.</span>`);
-            this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">> Want to see what the model picks up? Drop literally anything -</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">   emails, cover letters, social media posts. It all works.</span>`);
             this.addPrompt();
         }, elliotLines.length * 150 + 300);
     }

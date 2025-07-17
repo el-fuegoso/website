@@ -38,11 +38,11 @@ class Terminal {
     showWelcomeMessage() {
         // Add ELLIOT ASCII art with animation delay using Unicode blocks
         const elliotLines = [
-            '███████ ██      ██      ██  ██████  ████████',
-            '██      ██      ██      ██ ██    ██    ██   ',
-            '█████   ██      ██      ██ ██    ██    ██   ',
-            '██      ██      ██      ██ ██    ██    ██   ',
-            '███████ ███████ ███████ ██  ██████     ██   '
+            '███████ ██ ██ ██ ██████ ████████',
+            '██      ██ ██ ██ ██  ██    ██   ',
+            '█████   ██ ██ ██ ██  ██    ██   ',
+            '██      ██ ██ ██ ██  ██    ██   ',
+            '███████ ███████ ███████    ██   '
         ];
         
         elliotLines.forEach((line, index) => {
@@ -54,17 +54,26 @@ class Terminal {
         // Add divider and instructions after ASCII art
         setTimeout(() => {
             this.addToOutput('');
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-weight: bold;">PERSONA GENERATOR v2.0 | Custom Neural Architecture</span>`);
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">════════════════════════════════════════════════════════════</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-size: 1.1em; font-weight: bold;">PERSONA GENERATOR v1.0</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">────────────────────────</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">I built a specialized LLM head that extracts Big Five personality</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">traits from any text input. Doesn't matter what you feed it.</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;"><strong>Instructions:</strong></span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">• Type 'quest' for guided personality analysis</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">• Or just start talking to explore El personas</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">• Your unique profile will be generated</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Resume? Job description? Essay you wrote? Random thoughts?</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">The model reads between the lines and pulls your psychological</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">profile. Then generates your personalized "El" avatar.</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-size: 0.9em;">Ready for input...</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">No surveys. No questionnaires. Just raw text analysis.</span>`);
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">────────────────────────────────────────────────────────────</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Ready for input...</span>`);
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">> Paste your content or just start talking. My model will extract</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">   your Big Five traits either way.</span>`);
+            this.addToOutput('');
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">> Want to see what the model picks up? Drop literally anything -</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">   emails, cover letters, social media posts. It all works.</span>`);
             this.addPrompt();
         }, elliotLines.length * 150 + 300);
     }
@@ -184,7 +193,7 @@ Here's my analysis:
 
 Your personality profile shows: ${data.personality_summary || 'Balanced traits across multiple dimensions'}
 
-🎨 I've also generated a character avatar for you! Check the area below.`;
+[COMPLETE] Big Five extracted. Generating your El persona...`;
         } catch (error) {
             console.error('Error connecting to personality analyzer:', error);
             // Fallback to local analysis
@@ -247,7 +256,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                 this.hasGeneratedAvatar = true;
                 return `${data.response || this.getFallbackResponse(userInput)}
 
-🎨 Based on our conversation, I've generated a character avatar that matches your profile! Check below the terminal.`;
+[COMPLETE] Big Five extracted. Generating your El persona...`;
             }
             
             return data.response || this.getFallbackResponse(userInput);
@@ -282,7 +291,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     }
 
     showLoading() {
-        this.addToOutput(`<span class="terminal-loading">elliot@terminal ~ % Thinking...</span>`);
+        this.addToOutput(`<span class="terminal-loading">[ANALYZING] Running text through personality extraction pipeline...</span>`);
     }
 
     hideLoading() {

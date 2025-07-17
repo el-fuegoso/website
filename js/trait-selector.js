@@ -4,7 +4,7 @@
 class Terminal {
     constructor() {
         this.output = document.getElementById('terminalOutput');
-        this.input = document.getElementById('terminalInput');
+        this.input = null; // Will be created dynamically
         this.isProcessing = false;
         this.conversationHistory = [];
         this.questMode = false;
@@ -23,14 +23,6 @@ class Terminal {
     }
 
     init() {
-        if (!this.input) return; // Guard against missing elements
-        
-        this.input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !this.isProcessing) {
-                this.processInput();
-            }
-        });
-        
         // Show welcome message and ELLIOT ASCII art on initialization
         this.showWelcomeMessage();
     }
@@ -38,11 +30,11 @@ class Terminal {
     showWelcomeMessage() {
         // Add ELLIOT ASCII art with animation delay using Unicode blocks
         const elliotLines = [
-            '███████ ██ ██ ██ ██████ ████████',
-            '██      ██ ██ ██ ██  ██    ██   ',
-            '█████   ██ ██ ██ ██  ██    ██   ',
-            '██      ██ ██ ██ ██  ██    ██   ',
-            '███████ ███████ ███████    ██   '
+            '███████ ██      ██      ██  ██████  ████████',
+            '██      ██      ██      ██ ██    ██    ██   ',
+            '█████   ██      ██      ██ ██    ██    ██   ',
+            '██      ██      ██      ██ ██    ██    ██   ',
+            '███████ ███████ ███████ ██  ██████     ██   '
         ];
         
         elliotLines.forEach((line, index) => {
@@ -77,8 +69,10 @@ class Terminal {
         if (!userInput) return;
 
         this.isProcessing = true;
-        this.addToOutput(`<span class="terminal-user">user@terminal ~ % ${userInput}</span>`);
-        this.input.value = '';
+        
+        // Replace the input line with the completed command
+        this.input.parentNode.innerHTML = `<span style="color: #61dafb; font-family: 'Roboto Mono', monospace;">elliot@terminal ~ % </span><span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">${userInput}</span>`;
+        
         this.showLoading();
 
         try {
@@ -301,7 +295,52 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     }
 
     addPrompt() {
-        this.addToOutput(`<span class="terminal-prompt">elliot@terminal ~ % _</span>`);
+        // Remove any existing input
+        if (this.input && this.input.parentNode) {
+            this.input.parentNode.remove();
+        }
+        
+        // Create input container within the output
+        const inputContainer = document.createElement('div');
+        inputContainer.style.display = 'flex';
+        inputContainer.style.alignItems = 'center';
+        inputContainer.style.fontFamily = "'Roboto Mono', monospace";
+        inputContainer.style.fontSize = '12px';
+        inputContainer.style.color = '#ffffff';
+        inputContainer.style.marginTop = '8px';
+        
+        // Create prompt symbol
+        const promptSymbol = document.createElement('span');
+        promptSymbol.textContent = 'elliot@terminal ~ % ';
+        promptSymbol.style.color = '#61dafb';
+        promptSymbol.style.marginRight = '0';
+        
+        // Create input field
+        this.input = document.createElement('input');
+        this.input.type = 'text';
+        this.input.style.background = 'none';
+        this.input.style.border = 'none';
+        this.input.style.color = '#ffffff';
+        this.input.style.fontFamily = "'Roboto Mono', monospace";
+        this.input.style.fontSize = '12px';
+        this.input.style.outline = 'none';
+        this.input.style.flex = '1';
+        this.input.style.caretColor = '#ffffff';
+        
+        // Add event listener
+        this.input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !this.isProcessing) {
+                this.processInput();
+            }
+        });
+        
+        inputContainer.appendChild(promptSymbol);
+        inputContainer.appendChild(this.input);
+        this.output.appendChild(inputContainer);
+        
+        // Focus and scroll to bottom
+        this.input.focus();
+        this.output.scrollTop = this.output.scrollHeight;
     }
 
     async generateTerminalAvatar(analysisData, userText = null) {
@@ -498,10 +537,7 @@ class ElliotGenerator {
             this.waterAscii = new WaterASCII();
         }
         
-        // Initialize terminal if elements exist
-        if (document.getElementById('terminalInput')) {
-            this.terminal = new Terminal();
-        }
+        // Terminal will be initialized when entering terminal mode
         
         // Initialize empty radar charts (greyed out state)
         this.initializeEmptyRadarCharts();
@@ -623,14 +659,18 @@ class ElliotGenerator {
             panel.classList.add('flipped');
             
             setTimeout(() => {
-                const terminalInput = document.getElementById('terminalInput');
-                if (terminalInput) terminalInput.focus();
+                // Initialize terminal if not already done
+                if (!this.terminal) {
+                    this.terminal = new Terminal();
+                }
                 
                 // Show welcome message if terminal output is empty
                 const terminalOutput = document.getElementById('terminalOutput');
-                if (terminalOutput && this.terminal && terminalOutput.children.length === 0) {
+                if (terminalOutput && terminalOutput.children.length === 0) {
                     this.terminal.showWelcomeMessage();
                 }
+                
+                // Focus will be handled by addPrompt() method
             }, 400);
         }
     }

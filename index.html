@@ -94,196 +94,294 @@
                 <p class="build-el-subtitle">Thinking about El? Find the version that works best for you!</p>
             </div>
             
-            <!-- New Trait Selector Interface -->
-            <div class="trait-selector-container">
-                <div class="trait-selector-grid">
-                    <!-- Left Panel - Trait Selection with flip capability -->
-                    <div class="trait-panel" id="traitPanel">
-                        <div class="trait-panel-inner">
-                            <!-- Front side - Original trait selection -->
-                            <div class="trait-panel-front">
-                                <!-- Trait Categories Section -->
-                                <div class="trait-categories">
-                                    <div class="category-header">
-                                        <span class="category-title">Select Traits</span>
-                                    </div>
-
-                                    <div class="trait-row">
-                                        <span class="trait-label">
-                                            <span class="trait-icon">⚡</span>
-                                            High Energy
-                                        </span>
-                                        <div class="trait-toggle active" data-trait="energy"></div>
-                                    </div>
-
-
-                                    <div class="trait-row">
-                                        <span class="trait-label">
-                                            <span class="trait-icon">🎯</span>
-                                            Intense Focus
-                                        </span>
-                                        <div class="trait-toggle" data-trait="intensity"></div>
-                                    </div>
-
-                                    <div class="trait-row">
-                                        <span class="trait-label">
-                                            <span class="trait-icon">🚀</span>
-                                            Innovation
-                                        </span>
-                                        <div class="trait-toggle" data-trait="innovation"></div>
-                                    </div>
-
-                                    <div class="trait-row">
-                                        <span class="trait-label">
-                                            <span class="trait-icon">🤝</span>
-                                            Cooperative
-                                        </span>
-                                        <div class="trait-toggle" data-trait="cooperative"></div>
-                                    </div>
-
-                                    <div class="trait-row">
-                                        <span class="trait-label">
-                                            <span class="trait-icon">🧘</span>
-                                            Calm Under Pressure
-                                        </span>
-                                        <div class="trait-toggle" data-trait="calm"></div>
-                                    </div>
-
-                                    <div class="selection-display">
-                                        <div class="selection-count">2/19</div>
-                                    </div>
-
-                                    <div class="generation-display">
-                                        <div class="soundbar-container" id="soundbarContainer">
-                                            <div class="soundbar" data-trait="energy" title="High Energy"></div>
-                                            <div class="soundbar" data-trait="intensity" title="Intense Focus"></div>
-                                            <div class="soundbar" data-trait="innovation" title="Innovation"></div>
-                                            <div class="soundbar" data-trait="cooperative" title="Cooperative"></div>
-                                            <div class="soundbar" data-trait="calm" title="Calm Under Pressure"></div>
-                                            <div class="soundbar" data-trait="technical" title="Technical"></div>
-                                            <div class="soundbar" data-trait="creativity" title="Creative"></div>
-                                            <div class="soundbar" data-trait="leadership" title="Leadership"></div>
-                                            <div class="soundbar" data-trait="adventure" title="Adventure"></div>
-                                            <div class="soundbar" data-trait="empathetic" title="Empathetic"></div>
-                                            <div class="soundbar" data-trait="discipline" title="Discipline"></div>
-                                            <div class="soundbar" data-trait="harmonious" title="Harmonious"></div>
-                                            <div class="soundbar" data-trait="hustle" title="Hustle"></div>
-                                            <div class="soundbar" data-trait="speed" title="Speed"></div>
-                                            <div class="soundbar" data-trait="experimental" title="Experimental"></div>
-                                            <div class="soundbar" data-trait="paranoia" title="Paranoia"></div>
-                                            <div class="soundbar" data-trait="anxious" title="Anxious"></div>
-                                            <div class="soundbar" data-trait="supportive" title="Supportive"></div>
-                                        </div>
-                                        <div class="soundbar-info">
-                                            <span class="trait-count" id="traitCount">2 traits</span>
-                                            <span class="possibilities-label">∞ combinations</span>
+            <!-- Museum-Style Persona Generator -->
+            <div class="terminal-section">
+                <div class="container">
+                    <!-- Left Panel - Museum Card Style with Flip -->
+                    <div class="terminal-panel">
+                        <div class="trait-panel-accent"></div>
+                        
+                        <!-- Card Flip Container -->
+                        <div class="card-flip-container" id="cardFlipContainer">
+                            <div class="card-flip-inner">
+                                <!-- Front of Card (Original Content) -->
+                                <div class="card-flip-front">
+                                    <!-- Museum Card Header -->
+                                    <div class="terminal-header">
+                                        <div class="toggle-header">
+                                            <span class="toggle-title">Select Traits</span>
+                                            <span class="trait-counter" id="traitCounter">4/18</span>
                                         </div>
                                     </div>
-
-                                    <div class="trait-options">
-                                        <div class="trait-option" data-dimension="technical" data-tooltip="Loves coding & engineering">🔧</div>
-                                        <div class="trait-option" data-dimension="creativity" data-tooltip="Creative & artistic">🎨</div>
-                                        <div class="trait-option selected" data-dimension="energy" data-tooltip="High energy & dynamic">⚡</div>
-                                        <div class="trait-option" data-dimension="leadership" data-tooltip="Natural leader">👑</div>
-                                        <div class="trait-option selected" data-dimension="collaborative" data-tooltip="Team player">🤝</div>
-                                        
-                                        <div class="trait-option" data-dimension="cooperative" data-tooltip="Seeks consensus & agreement">🤝</div>
-                                        <div class="trait-option" data-dimension="adventure" data-tooltip="Seeks bold challenges">🏴‍☠️</div>
-                                        <div class="trait-option" data-dimension="empathetic" data-tooltip="Understands others' feelings">🤗</div>
-                                        <div class="trait-option" data-dimension="discipline" data-tooltip="Systematic & consistent">💪</div>
-                                        <div class="trait-option" data-dimension="innovation" data-tooltip="Revolutionary thinker">🚀</div>
-                                        <div class="trait-option" data-dimension="harmonious" data-tooltip="Promotes peace & balance">🕊️</div>
-                                        <div class="trait-option" data-dimension="hustle" data-tooltip="Relentlessly driven">🔥</div>
-                                        
-                                        <div class="trait-option" data-dimension="speed" data-tooltip="Fast-paced execution">💨</div>
-                                        <div class="trait-option" data-dimension="intensity" data-tooltip="Maximum focus">⚡</div>
-                                        <div class="trait-option" data-dimension="experimental" data-tooltip="Tests weird ideas">🧪</div>
-                                        <div class="trait-option" data-dimension="paranoia" data-tooltip="Security conscious">👀</div>
-                                        <div class="trait-option" data-dimension="anxious" data-tooltip="Feels worry & stress">😰</div>
-                                        <div class="trait-option" data-dimension="supportive" data-tooltip="Helps & encourages others">💝</div>
-                                    </div>
-
-                                    <!-- Advanced Section -->
-                                    <div class="advanced-section">
-                                        <button class="advanced-toggle" id="advancedToggle">
-                                            ▶ Advanced
-                                        </button>
-                                        <div class="advanced-content" id="advancedContent">
-                                            <div style="margin-bottom: 8px;">
-                                                <strong>Are you a pro?</strong> Have a go at doing it the hard way
+                                    
+                                    <!-- Card Content -->
+                                    <div class="terminal-content">
+                                        <!-- Trait Toggle Section -->
+                                        <div class="trait-toggle-section">
+                                            <div class="trait-toggles">
+                                                <div class="trait-row">
+                                                    <span class="trait-label">
+                                                        <span class="trait-emoji">⚡</span>
+                                                        High Energy
+                                                    </span>
+                                                    <div class="toggle-switch active" data-trait="energy"></div>
+                                                </div>
+                                                
+                                                <div class="trait-row">
+                                                    <span class="trait-label">
+                                                        <span class="trait-emoji">🎯</span>
+                                                        Intense Focus
+                                                    </span>
+                                                    <div class="toggle-switch" data-trait="intensity"></div>
+                                                </div>
+                                                
+                                                <div class="trait-row">
+                                                    <span class="trait-label">
+                                                        <span class="trait-emoji">🚀</span>
+                                                        Innovation
+                                                    </span>
+                                                    <div class="toggle-switch" data-trait="innovation"></div>
+                                                </div>
+                                                
+                                                <div class="trait-row">
+                                                    <span class="trait-label">
+                                                        <span class="trait-emoji">🤝</span>
+                                                        Cooperative
+                                                    </span>
+                                                    <div class="toggle-switch" data-trait="collaborative"></div>
+                                                </div>
+                                                
+                                                <div class="trait-row">
+                                                    <span class="trait-label">
+                                                        <span class="trait-emoji">🧘</span>
+                                                        Calm Under Pressure
+                                                    </span>
+                                                    <div class="toggle-switch" data-trait="calm"></div>
+                                                </div>
                                             </div>
-                                            <button class="advanced-button" id="terminalModeBtn">
-                                                Enter Terminal Mode
+                                        </div>
+
+                                        <!-- Soundbar Visualization -->
+                                        <div class="soundbar-container" id="soundbarContainer">
+                                            <div class="soundbar active" data-trait="energy"></div>
+                                            <div class="soundbar" data-trait="intensity"></div>
+                                            <div class="soundbar" data-trait="innovation"></div>
+                                            <div class="soundbar" data-trait="collaborative"></div>
+                                            <div class="soundbar" data-trait="calm"></div>
+                                            <div class="soundbar" data-trait="analytical"></div>
+                                            <div class="soundbar active" data-trait="creative"></div>
+                                            <div class="soundbar active" data-trait="leadership"></div>
+                                            <div class="soundbar active" data-trait="technical"></div>
+                                            <div class="soundbar" data-trait="mystery"></div>
+                                            <div class="soundbar" data-trait="discipline"></div>
+                                            <div class="soundbar" data-trait="curiosity"></div>
+                                            <div class="soundbar" data-trait="hustle"></div>
+                                            <div class="soundbar" data-trait="paranoia"></div>
+                                            <div class="soundbar" data-trait="speed"></div>
+                                            <div class="soundbar" data-trait="experimental"></div>
+                                            <div class="soundbar" data-trait="futuristic"></div>
+                                            <div class="soundbar" data-trait="procrastination"></div>
+                                        </div>
+
+                                        <!-- Trait Grid Section -->
+                                        <div class="trait-grid" id="traitGrid">
+                                            <div class="trait-option" data-trait="analytical" data-tooltip="Analytical">🔬</div>
+                                            <div class="trait-option selected" data-trait="creative" data-tooltip="Creative">🎨</div>
+                                            <div class="trait-option selected" data-trait="leadership" data-tooltip="Leadership">👑</div>
+                                            <div class="trait-option selected" data-trait="technical" data-tooltip="Technical">🔧</div>
+                                            <div class="trait-option" data-trait="mystery" data-tooltip="Mystery">🕵️</div>
+                                            <div class="trait-option" data-trait="discipline" data-tooltip="Discipline">💪</div>
+                                            <div class="trait-option" data-trait="curiosity" data-tooltip="Curiosity">🔍</div>
+                                            <div class="trait-option" data-trait="hustle" data-tooltip="Hustle">🔥</div>
+                                            <div class="trait-option" data-trait="paranoia" data-tooltip="Paranoia">👀</div>
+                                            <div class="trait-option" data-trait="speed" data-tooltip="Speed">💨</div>
+                                            <div class="trait-option" data-trait="experimental" data-tooltip="Experimental">🧪</div>
+                                            <div class="trait-option" data-trait="futuristic" data-tooltip="Futuristic">🤖</div>
+                                            <div class="trait-option" data-trait="procrastination" data-tooltip="Procrastination">😴</div>
+                                            <div class="trait-option" data-trait="empathy" data-tooltip="Empathy">💝</div>
+                                            <div class="trait-option" data-trait="calm-detailed" data-tooltip="Calm">💎</div>
+                                            <div class="trait-option" data-trait="intensity-alt" data-tooltip="Intensity">⚡</div>
+                                            <div class="trait-option" data-trait="flexibility" data-tooltip="Flexibility">🌿</div>
+                                            <div class="trait-option" data-trait="writing" data-tooltip="Writing">✏️</div>
+                                        </div>
+
+                                        <!-- Advanced Section -->
+                                        <div class="advanced-section">
+                                            <div class="advanced-toggle" id="advancedToggle">
+                                                <span>▶ Advanced</span>
+                                            </div>
+                                            <div class="advanced-content" id="advancedContent">
+                                                <p>Advanced personality matrix configuration.</p>
+                                                
+                                                <!-- Terminal Mode Button -->
+                                                <button class="terminal-mode-btn" id="terminalModeBtn">
+                                                    <span>Terminal</span>
+                                                    <div class="button-subtitle">T</div>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Generation Status (hidden by default) -->
+                                        <div class="generation-status" id="generationStatus">
+                                            Analyzing trait patterns and generating persona...
+                                        </div>
+
+                                        <!-- Command Buttons -->
+                                        <div class="command-grid">
+                                            <div class="button-row">
+                                                <button class="terminal-button secondary" id="randomBtn">
+                                                    Random
+                                                    <div class="button-subtitle">R</div>
+                                                </button>
+                                                <button class="terminal-button secondary" id="resetBtn">
+                                                    Reset
+                                                    <div class="button-subtitle">ESC</div>
+                                                </button>
+                                                <button class="terminal-button secondary" id="saveBtn">
+                                                    Save
+                                                    <div class="button-subtitle">S</div>
+                                                </button>
+                                            </div>
+                                            <button class="terminal-button primary button-generate" id="generateBtn">
+                                                Generate
+                                                <div class="button-subtitle">G</div>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="action-grid">
-                                    <button class="action-button" id="generateBtn">
-                                        Generate
-                                        <div class="button-subtitle">G</div>
-                                    </button>
-                                    <button class="action-button" id="randomBtn">
-                                        Random
-                                        <div class="button-subtitle">R</div>
-                                    </button>
-                                    <button class="action-button secondary" id="resetBtn">
-                                        Reset
-                                        <div class="button-subtitle">ESC</div>
-                                    </button>
-                                    <button class="action-button secondary" id="saveBtn">
-                                        Save
-                                        <div class="button-subtitle">S</div>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Back side - Terminal interface -->
-                            <div class="trait-panel-back">
-                                <div class="terminal-container">
-                                    <div class="terminal-titlebar">
-                                        <div class="terminal-buttons">
-                                            <button class="terminal-button close" id="backToTraits"></button>
-                                            <button class="terminal-button minimize"></button>
-                                            <button class="terminal-button maximize"></button>
+                                <!-- Back of Card (Mac-Style Terminal Interface) -->
+                                <div class="card-flip-back">
+                                    <div class="terminal-interface">
+                                        <div class="terminal-header-bar">
+                                            <span>🖥️ Neural Terminal</span>
+                                            <button class="terminal-close-btn" id="terminalCloseBtn">BACK</button>
                                         </div>
-                                        <div class="terminal-title">elliot@terminal — claude-code — 80×24</div>
-                                    </div>
-                                    <div class="terminal-output" id="terminalOutput">
+                                        <div class="terminal-output" id="terminalOutput">
+                                            <!-- Terminal content will be populated by JavaScript -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Panel - Elliot Display -->
-                    <div class="elliot-display">
-                        <div class="helix-container">
-                            <!-- Personality Matrix Label -->
-                            <div class="matrix-label">Personality Matrix</div>
+                    <!-- Right Panel - Museum Card Display -->
+                    <div class="museum-display">
+                        <div class="museum-card" id="museumCard">
+                            <div class="blue-accent"></div>
+                            <div class="hover-effect"></div>
                             
-                            <!-- Water ASCII Visualization - grace without force, finding natural paths -->
-                            <div class="water-ascii" id="waterAscii">
-                                <pre id="asciiContent"></pre>
+                            <!-- Museum Card Header -->
+                            <div class="museum-card-header">
+                                <div class="toggle-header">
+                                    <span class="toggle-title">Digital Persona</span>
+                                    <span class="trait-counter" id="displayTraitCounter">4/18</span>
+                                </div>
                             </div>
                             
-                            <div class="generation-path" id="generationPath"></div>
-                            
-                            <!-- Avatar Generation Label -->
-                            <div class="avatar-label">[ Avatar Generation Space ]</div>
-                            
-                            <!-- Radar Charts Container -->
-                            <div class="radar-charts-container" id="radarChartsContainer">
-                                <div class="radar-chart-wrapper">
-                                    <div class="radar-chart-title">Your Profile</div>
-                                    <canvas id="userRadarChart" class="radar-chart" width="120" height="120"></canvas>
+                            <div class="card-header">
+                                <div class="image-container">
+                                    <div>CONSPIRACYEL PORTRAIT</div>
                                 </div>
-                                <div class="radar-chart-wrapper">
-                                    <div class="radar-chart-title">Character Match</div>
-                                    <canvas id="characterRadarChart" class="radar-chart" width="120" height="120"></canvas>
+                                
+                                <div class="header-radars">
+                                    <div class="header-radar-section">
+                                        <h4 class="header-chart-title">YOUR PROFILE</h4>
+                                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
+                                            <!-- Background grid -->
+                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" fill="none" opacity="0.3">
+                                                <polygon points="60,10 95,35 85,75 35,75 25,35" />
+                                                <polygon points="60,25 80,42.5 75,62.5 45,62.5 40,42.5" />
+                                                <polygon points="60,40 65,50 65,50 55,50 55,50" />
+                                            </g>
+                                            <!-- Axes -->
+                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
+                                                <line x1="60" y1="60" x2="60" y2="10" />
+                                                <line x1="60" y1="60" x2="95" y2="35" />
+                                                <line x1="60" y1="60" x2="85" y2="75" />
+                                                <line x1="60" y1="60" x2="35" y2="75" />
+                                                <line x1="60" y1="60" x2="25" y2="35" />
+                                            </g>
+                                            <!-- Data polygon -->
+                                            <polygon points="60,15 87,40 80,70 45,70 35,40" 
+                                                     fill="rgba(204, 122, 0, 0.2)" 
+                                                     stroke="#CC7A00" 
+                                                     stroke-width="1.5" />
+                                            <!-- Data points -->
+                                            <g fill="#CC7A00" stroke="#CC7A00" stroke-width="1">
+                                                <circle cx="60" cy="15" r="2" />
+                                                <circle cx="87" cy="40" r="2" />
+                                                <circle cx="80" cy="70" r="2" />
+                                                <circle cx="45" cy="70" r="2" />
+                                                <circle cx="35" cy="40" r="2" />
+                                            </g>
+                                            <!-- Labels -->
+                                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
+                                                <text x="60" y="8">O</text>
+                                                <text x="98" y="38">C</text>
+                                                <text x="88" y="78">E</text>
+                                                <text x="32" y="78">A</text>
+                                                <text x="22" y="38">N</text>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    
+                                    <div class="header-radar-section">
+                                        <h4 class="header-chart-title">CHARACTER</h4>
+                                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
+                                            <!-- Background grid -->
+                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" fill="none" opacity="0.3">
+                                                <polygon points="60,10 95,35 85,75 35,75 25,35" />
+                                                <polygon points="60,25 80,42.5 75,62.5 45,62.5 40,42.5" />
+                                                <polygon points="60,40 65,50 65,50 55,50 55,50" />
+                                            </g>
+                                            <!-- Axes -->
+                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
+                                                <line x1="60" y1="60" x2="60" y2="10" />
+                                                <line x1="60" y1="60" x2="95" y2="35" />
+                                                <line x1="60" y1="60" x2="85" y2="75" />
+                                                <line x1="60" y1="60" x2="35" y2="75" />
+                                                <line x1="60" y1="60" x2="25" y2="35" />
+                                            </g>
+                                            <!-- Data polygon -->
+                                            <polygon points="60,12 93,36 82,73 40,73 27,37" 
+                                                     fill="rgba(212, 175, 55, 0.3)" 
+                                                     stroke="#D4AF37" 
+                                                     stroke-width="1.5" />
+                                            <!-- Data points -->
+                                            <g fill="#D4AF37" stroke="#D4AF37" stroke-width="1">
+                                                <circle cx="60" cy="12" r="2" />
+                                                <circle cx="93" cy="36" r="2" />
+                                                <circle cx="82" cy="73" r="2" />
+                                                <circle cx="40" cy="73" r="2" />
+                                                <circle cx="27" cy="37" r="2" />
+                                            </g>
+                                            <!-- Labels -->
+                                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
+                                                <text x="60" y="8">O</text>
+                                                <text x="98" y="38">C</text>
+                                                <text x="88" y="78">E</text>
+                                                <text x="32" y="78">A</text>
+                                                <text x="22" y="38">N</text>
+                                            </g>
+                                        </svg>
+                                    </div>
                                 </div>
+                            </div>
+                            
+                            <div class="card-content">
+                                <h1 class="artwork-title" id="personaName">CONSPIRACYEL</h1>
+                                <h2 class="artwork-subtitle" id="personaTitle">Paranoid Problem Investigator</h2>
+                                
+                                <p class="artwork-details" id="personaDescription">
+                                    Nothing is a coincidence. Every bug is connected. The code is trying to tell us something...
+                                </p>
+                                
+                                <p class="collection-info" id="personaTraits">
+                                    Paranoid, pattern-seeking, suspicious, deep-thinking.<br>
+                                    An expert in pattern recognition, system thinking, uncovering hidden issues.
+                                </p>
                             </div>
                         </div>
                     </div>

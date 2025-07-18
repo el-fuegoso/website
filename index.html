@@ -17,6 +17,8 @@
     <script src="js/conversation/conversation-manager.js?v=4"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/trait-selector.css">
+    <link rel="stylesheet" href="css/museum-cards.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 </head>
 <body>
@@ -86,310 +88,300 @@
         </div>
     </div>
 
-    <!-- Build Your El Section -->
-    <section class="build-your-el-section" id="build-your-el">
-        <div class="build-el-container">
-            <!-- Section Header -->
-            <div class="build-el-header">
-                <h2 class="build-el-title">Create</h2>
-                <p class="build-el-subtitle">Thinking about El? Find the version that works best for you!</p>
-            </div>
-            
-            <!-- Museum-Style Persona Generator -->
-            <div class="terminal-section">
-                <div class="container">
-                    <!-- Left Panel - Museum Card Style with Flip -->
-                    <div class="terminal-panel">
-                        <div class="trait-panel-accent"></div>
-                        
-                        <!-- Card Flip Container -->
-                        <div class="card-flip-container" id="cardFlipContainer">
-                            <div class="card-flip-inner">
-                                <!-- Front of Card (Original Content) -->
-                                <div class="card-flip-front">
-                                    <!-- Museum Card Header -->
-                                    <div class="terminal-header">
-                                        <div class="toggle-header">
-                                            <span class="toggle-title">Select Traits</span>
-                                            <span class="trait-counter" id="traitCounter">4/18</span>
+    <div class="terminal-section">
+        <div class="container">
+            <!-- Left Panel - Museum Card Style with Flip -->
+            <div class="terminal-panel">
+                <div class="trait-panel-accent"></div>
+                
+                <!-- Card Flip Container -->
+                <div class="card-flip-container" id="cardFlipContainer">
+                    <div class="card-flip-inner">
+                        <!-- Front of Card (Original Content) -->
+                        <div class="card-flip-front">
+                            <!-- Museum Card Header -->
+                            <div class="terminal-header">
+                                <div class="toggle-header">
+                                    <span class="toggle-title">Select Traits</span>
+                                    <span class="trait-counter" id="traitCounter">4/18</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Content -->
+                            <div class="terminal-content">
+                                <!-- Trait Toggle Section -->
+                                <div class="trait-toggle-section">
+                                    <div class="trait-toggles">
+                                        <div class="trait-row">
+                                            <span class="trait-label">
+                                                <span class="trait-emoji">⚡</span>
+                                                High Energy
+                                            </span>
+                                            <div class="toggle-switch active" data-trait="energy"></div>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- Card Content -->
-                                    <div class="terminal-content">
-                                        <!-- Trait Toggle Section -->
-                                        <div class="trait-toggle-section">
-                                            <div class="trait-toggles">
-                                                <div class="trait-row">
-                                                    <span class="trait-label">
-                                                        <span class="trait-emoji">⚡</span>
-                                                        High Energy
-                                                    </span>
-                                                    <div class="toggle-switch active" data-trait="energy"></div>
-                                                </div>
-                                                
-                                                <div class="trait-row">
-                                                    <span class="trait-label">
-                                                        <span class="trait-emoji">🎯</span>
-                                                        Intense Focus
-                                                    </span>
-                                                    <div class="toggle-switch" data-trait="intensity"></div>
-                                                </div>
-                                                
-                                                <div class="trait-row">
-                                                    <span class="trait-label">
-                                                        <span class="trait-emoji">🚀</span>
-                                                        Innovation
-                                                    </span>
-                                                    <div class="toggle-switch" data-trait="innovation"></div>
-                                                </div>
-                                                
-                                                <div class="trait-row">
-                                                    <span class="trait-label">
-                                                        <span class="trait-emoji">🤝</span>
-                                                        Cooperative
-                                                    </span>
-                                                    <div class="toggle-switch" data-trait="collaborative"></div>
-                                                </div>
-                                                
-                                                <div class="trait-row">
-                                                    <span class="trait-label">
-                                                        <span class="trait-emoji">🧘</span>
-                                                        Calm Under Pressure
-                                                    </span>
-                                                    <div class="toggle-switch" data-trait="calm"></div>
-                                                </div>
-                                            </div>
+                                        
+                                        <div class="trait-row">
+                                            <span class="trait-label">
+                                                <span class="trait-emoji">🎯</span>
+                                                Intense Focus
+                                            </span>
+                                            <div class="toggle-switch" data-trait="intensity"></div>
                                         </div>
-
-                                        <!-- Soundbar Visualization -->
-                                        <div class="soundbar-container" id="soundbarContainer">
-                                            <div class="soundbar active" data-trait="energy"></div>
-                                            <div class="soundbar" data-trait="intensity"></div>
-                                            <div class="soundbar" data-trait="innovation"></div>
-                                            <div class="soundbar" data-trait="collaborative"></div>
-                                            <div class="soundbar" data-trait="calm"></div>
-                                            <div class="soundbar" data-trait="analytical"></div>
-                                            <div class="soundbar active" data-trait="creative"></div>
-                                            <div class="soundbar active" data-trait="leadership"></div>
-                                            <div class="soundbar active" data-trait="technical"></div>
-                                            <div class="soundbar" data-trait="mystery"></div>
-                                            <div class="soundbar" data-trait="discipline"></div>
-                                            <div class="soundbar" data-trait="curiosity"></div>
-                                            <div class="soundbar" data-trait="hustle"></div>
-                                            <div class="soundbar" data-trait="paranoia"></div>
-                                            <div class="soundbar" data-trait="speed"></div>
-                                            <div class="soundbar" data-trait="experimental"></div>
-                                            <div class="soundbar" data-trait="futuristic"></div>
-                                            <div class="soundbar" data-trait="procrastination"></div>
+                                        
+                                        <div class="trait-row">
+                                            <span class="trait-label">
+                                                <span class="trait-emoji">🚀</span>
+                                                Innovation
+                                            </span>
+                                            <div class="toggle-switch" data-trait="innovation"></div>
                                         </div>
-
-                                        <!-- Trait Grid Section -->
-                                        <div class="trait-grid" id="traitGrid">
-                                            <div class="trait-option" data-trait="analytical" data-tooltip="Analytical">🔬</div>
-                                            <div class="trait-option selected" data-trait="creative" data-tooltip="Creative">🎨</div>
-                                            <div class="trait-option selected" data-trait="leadership" data-tooltip="Leadership">👑</div>
-                                            <div class="trait-option selected" data-trait="technical" data-tooltip="Technical">🔧</div>
-                                            <div class="trait-option" data-trait="mystery" data-tooltip="Mystery">🕵️</div>
-                                            <div class="trait-option" data-trait="discipline" data-tooltip="Discipline">💪</div>
-                                            <div class="trait-option" data-trait="curiosity" data-tooltip="Curiosity">🔍</div>
-                                            <div class="trait-option" data-trait="hustle" data-tooltip="Hustle">🔥</div>
-                                            <div class="trait-option" data-trait="paranoia" data-tooltip="Paranoia">👀</div>
-                                            <div class="trait-option" data-trait="speed" data-tooltip="Speed">💨</div>
-                                            <div class="trait-option" data-trait="experimental" data-tooltip="Experimental">🧪</div>
-                                            <div class="trait-option" data-trait="futuristic" data-tooltip="Futuristic">🤖</div>
-                                            <div class="trait-option" data-trait="procrastination" data-tooltip="Procrastination">😴</div>
-                                            <div class="trait-option" data-trait="empathy" data-tooltip="Empathy">💝</div>
-                                            <div class="trait-option" data-trait="calm-detailed" data-tooltip="Calm">💎</div>
-                                            <div class="trait-option" data-trait="intensity-alt" data-tooltip="Intensity">⚡</div>
-                                            <div class="trait-option" data-trait="flexibility" data-tooltip="Flexibility">🌿</div>
-                                            <div class="trait-option" data-trait="writing" data-tooltip="Writing">✏️</div>
+                                        
+                                        <div class="trait-row">
+                                            <span class="trait-label">
+                                                <span class="trait-emoji">🤝</span>
+                                                Cooperative
+                                            </span>
+                                            <div class="toggle-switch" data-trait="collaborative"></div>
                                         </div>
-
-                                        <!-- Advanced Section -->
-                                        <div class="advanced-section">
-                                            <div class="advanced-toggle" id="advancedToggle">
-                                                <span>▶ Advanced</span>
-                                            </div>
-                                            <div class="advanced-content" id="advancedContent">
-                                                <p>Advanced personality matrix configuration.</p>
-                                                
-                                                <!-- Terminal Mode Button -->
-                                                <button class="terminal-mode-btn" id="terminalModeBtn">
-                                                    <span>Terminal</span>
-                                                    <div class="button-subtitle">T</div>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Generation Status (hidden by default) -->
-                                        <div class="generation-status" id="generationStatus">
-                                            Analyzing trait patterns and generating persona...
-                                        </div>
-
-                                        <!-- Command Buttons -->
-                                        <div class="command-grid">
-                                            <div class="button-row">
-                                                <button class="terminal-button secondary" id="randomBtn">
-                                                    Random
-                                                    <div class="button-subtitle">R</div>
-                                                </button>
-                                                <button class="terminal-button secondary" id="resetBtn">
-                                                    Reset
-                                                    <div class="button-subtitle">ESC</div>
-                                                </button>
-                                                <button class="terminal-button secondary" id="saveBtn">
-                                                    Save
-                                                    <div class="button-subtitle">S</div>
-                                                </button>
-                                            </div>
-                                            <button class="terminal-button primary button-generate" id="generateBtn">
-                                                Generate
-                                                <div class="button-subtitle">G</div>
-                                            </button>
+                                        
+                                        <div class="trait-row">
+                                            <span class="trait-label">
+                                                <span class="trait-emoji">🧘</span>
+                                                Calm Under Pressure
+                                            </span>
+                                            <div class="toggle-switch" data-trait="calm"></div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Back of Card (Mac-Style Terminal Interface) -->
-                                <div class="card-flip-back">
-                                    <div class="terminal-interface">
-                                        <div class="terminal-header-bar">
-                                            <span>🖥️ Neural Terminal</span>
-                                            <button class="terminal-close-btn" id="terminalCloseBtn">BACK</button>
-                                        </div>
-                                        <div class="terminal-output" id="terminalOutput">
-                                            <!-- Terminal content will be populated by JavaScript -->
-                                        </div>
+                                <!-- Soundbar Visualization - BACK TO ORIGINAL POSITION -->
+                                <div class="soundbar-container" id="soundbarContainer">
+                                    <div class="soundbar active" data-trait="energy"></div>
+                                    <div class="soundbar" data-trait="intensity"></div>
+                                    <div class="soundbar" data-trait="innovation"></div>
+                                    <div class="soundbar" data-trait="collaborative"></div>
+                                    <div class="soundbar" data-trait="calm"></div>
+                                    <div class="soundbar" data-trait="analytical"></div>
+                                    <div class="soundbar active" data-trait="creative"></div>
+                                    <div class="soundbar active" data-trait="leadership"></div>
+                                    <div class="soundbar active" data-trait="technical"></div>
+                                    <div class="soundbar" data-trait="mystery"></div>
+                                    <div class="soundbar" data-trait="discipline"></div>
+                                    <div class="soundbar" data-trait="curiosity"></div>
+                                    <div class="soundbar" data-trait="hustle"></div>
+                                    <div class="soundbar" data-trait="paranoia"></div>
+                                    <div class="soundbar" data-trait="speed"></div>
+                                    <div class="soundbar" data-trait="experimental"></div>
+                                    <div class="soundbar" data-trait="futuristic"></div>
+                                    <div class="soundbar" data-trait="procrastination"></div>
+                                </div>
+
+                                <!-- Trait Grid Section -->
+                                <div class="trait-grid" id="traitGrid">
+                                    <div class="trait-option" data-trait="analytical" data-tooltip="Analytical">🔬</div>
+                                    <div class="trait-option selected" data-trait="creative" data-tooltip="Creative">🎨</div>
+                                    <div class="trait-option selected" data-trait="leadership" data-tooltip="Leadership">👑</div>
+                                    <div class="trait-option selected" data-trait="technical" data-tooltip="Technical">🔧</div>
+                                    <div class="trait-option" data-trait="mystery" data-tooltip="Mystery">🕵️</div>
+                                    <div class="trait-option" data-trait="discipline" data-tooltip="Discipline">💪</div>
+                                    <div class="trait-option" data-trait="curiosity" data-tooltip="Curiosity">🔍</div>
+                                    <div class="trait-option" data-trait="hustle" data-tooltip="Hustle">🔥</div>
+                                    <div class="trait-option" data-trait="paranoia" data-tooltip="Paranoia">👀</div>
+                                    <div class="trait-option" data-trait="speed" data-tooltip="Speed">💨</div>
+                                    <div class="trait-option" data-trait="experimental" data-tooltip="Experimental">🧪</div>
+                                    <div class="trait-option" data-trait="futuristic" data-tooltip="Futuristic">🤖</div>
+                                    <div class="trait-option" data-trait="procrastination" data-tooltip="Procrastination">😴</div>
+                                    <div class="trait-option" data-trait="empathy" data-tooltip="Empathy">💝</div>
+                                    <div class="trait-option" data-trait="calm-detailed" data-tooltip="Calm">💎</div>
+                                    <div class="trait-option" data-trait="intensity-alt" data-tooltip="Intensity">⚡</div>
+                                    <div class="trait-option" data-trait="flexibility" data-tooltip="Flexibility">🌿</div>
+                                    <div class="trait-option" data-trait="writing" data-tooltip="Writing">✏️</div>
+                                </div>
+
+                                <!-- Advanced Section -->
+                                <div class="advanced-section">
+                                    <div class="advanced-toggle" id="advancedToggle">
+                                        <span>▶ Advanced</span>
                                     </div>
+                                    <div class="advanced-content" id="advancedContent">
+                                        <p>Advanced personality matrix configuration.</p>
+                                        
+                                        <!-- Terminal Mode Button -->
+                                        <button class="terminal-mode-btn" id="terminalModeBtn">
+                                            <span>Terminal</span>
+                                            <div class="button-subtitle">T</div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Generation Status (hidden by default) -->
+                                <div class="generation-status" id="generationStatus">
+                                    Analyzing trait patterns and generating persona...
+                                </div>
+
+                                <!-- Command Buttons -->
+                                <div class="command-grid">
+                                    <div class="button-row">
+                                        <button class="terminal-button secondary" id="randomBtn">
+                                            Random
+                                            <div class="button-subtitle">R</div>
+                                        </button>
+                                        <button class="terminal-button secondary" id="resetBtn">
+                                            Reset
+                                            <div class="button-subtitle">ESC</div>
+                                        </button>
+                                        <button class="terminal-button secondary" id="saveBtn">
+                                            Save
+                                            <div class="button-subtitle">S</div>
+                                        </button>
+                                    </div>
+                                    <button class="terminal-button primary button-generate" id="generateBtn">
+                                        Generate
+                                        <div class="button-subtitle">G</div>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Right Panel - Museum Card Display -->
-                    <div class="museum-display">
-                        <div class="museum-card" id="museumCard">
-                            <div class="blue-accent"></div>
-                            <div class="hover-effect"></div>
-                            
-                            <!-- Museum Card Header -->
-                            <div class="museum-card-header">
-                                <div class="toggle-header">
-                                    <span class="toggle-title">Digital Persona</span>
-                                    <span class="trait-counter" id="displayTraitCounter">4/18</span>
+                        <!-- Back of Card (Mac-Style Terminal Interface) -->
+                        <div class="card-flip-back">
+                            <div class="terminal-interface">
+                                <div class="terminal-header-bar">
+                                    <span>🖥️ Neural Terminal</span>
+                                    <button class="terminal-close-btn" id="terminalCloseBtn">BACK</button>
                                 </div>
-                            </div>
-                            
-                            <div class="card-header">
-                                <div class="image-container">
-                                    <div>CONSPIRACYEL PORTRAIT</div>
+                                <div class="terminal-output" id="terminalOutput">
+                                    <!-- Terminal content will be populated by JavaScript -->
                                 </div>
-                                
-                                <div class="header-radars">
-                                    <div class="header-radar-section">
-                                        <h4 class="header-chart-title">YOUR PROFILE</h4>
-                                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
-                                            <!-- Background grid -->
-                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" fill="none" opacity="0.3">
-                                                <polygon points="60,10 95,35 85,75 35,75 25,35" />
-                                                <polygon points="60,25 80,42.5 75,62.5 45,62.5 40,42.5" />
-                                                <polygon points="60,40 65,50 65,50 55,50 55,50" />
-                                            </g>
-                                            <!-- Axes -->
-                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
-                                                <line x1="60" y1="60" x2="60" y2="10" />
-                                                <line x1="60" y1="60" x2="95" y2="35" />
-                                                <line x1="60" y1="60" x2="85" y2="75" />
-                                                <line x1="60" y1="60" x2="35" y2="75" />
-                                                <line x1="60" y1="60" x2="25" y2="35" />
-                                            </g>
-                                            <!-- Data polygon -->
-                                            <polygon points="60,15 87,40 80,70 45,70 35,40" 
-                                                     fill="rgba(204, 122, 0, 0.2)" 
-                                                     stroke="#CC7A00" 
-                                                     stroke-width="1.5" />
-                                            <!-- Data points -->
-                                            <g fill="#CC7A00" stroke="#CC7A00" stroke-width="1">
-                                                <circle cx="60" cy="15" r="2" />
-                                                <circle cx="87" cy="40" r="2" />
-                                                <circle cx="80" cy="70" r="2" />
-                                                <circle cx="45" cy="70" r="2" />
-                                                <circle cx="35" cy="40" r="2" />
-                                            </g>
-                                            <!-- Labels -->
-                                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
-                                                <text x="60" y="8">O</text>
-                                                <text x="98" y="38">C</text>
-                                                <text x="88" y="78">E</text>
-                                                <text x="32" y="78">A</text>
-                                                <text x="22" y="38">N</text>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                    
-                                    <div class="header-radar-section">
-                                        <h4 class="header-chart-title">CHARACTER</h4>
-                                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
-                                            <!-- Background grid -->
-                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" fill="none" opacity="0.3">
-                                                <polygon points="60,10 95,35 85,75 35,75 25,35" />
-                                                <polygon points="60,25 80,42.5 75,62.5 45,62.5 40,42.5" />
-                                                <polygon points="60,40 65,50 65,50 55,50 55,50" />
-                                            </g>
-                                            <!-- Axes -->
-                                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
-                                                <line x1="60" y1="60" x2="60" y2="10" />
-                                                <line x1="60" y1="60" x2="95" y2="35" />
-                                                <line x1="60" y1="60" x2="85" y2="75" />
-                                                <line x1="60" y1="60" x2="35" y2="75" />
-                                                <line x1="60" y1="60" x2="25" y2="35" />
-                                            </g>
-                                            <!-- Data polygon -->
-                                            <polygon points="60,12 93,36 82,73 40,73 27,37" 
-                                                     fill="rgba(212, 175, 55, 0.3)" 
-                                                     stroke="#D4AF37" 
-                                                     stroke-width="1.5" />
-                                            <!-- Data points -->
-                                            <g fill="#D4AF37" stroke="#D4AF37" stroke-width="1">
-                                                <circle cx="60" cy="12" r="2" />
-                                                <circle cx="93" cy="36" r="2" />
-                                                <circle cx="82" cy="73" r="2" />
-                                                <circle cx="40" cy="73" r="2" />
-                                                <circle cx="27" cy="37" r="2" />
-                                            </g>
-                                            <!-- Labels -->
-                                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
-                                                <text x="60" y="8">O</text>
-                                                <text x="98" y="38">C</text>
-                                                <text x="88" y="78">E</text>
-                                                <text x="32" y="78">A</text>
-                                                <text x="22" y="38">N</text>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card-content">
-                                <h1 class="artwork-title" id="personaName">CONSPIRACYEL</h1>
-                                <h2 class="artwork-subtitle" id="personaTitle">Paranoid Problem Investigator</h2>
-                                
-                                <p class="artwork-details" id="personaDescription">
-                                    Nothing is a coincidence. Every bug is connected. The code is trying to tell us something...
-                                </p>
-                                
-                                <p class="collection-info" id="personaTraits">
-                                    Paranoid, pattern-seeking, suspicious, deep-thinking.<br>
-                                    An expert in pattern recognition, system thinking, uncovering hidden issues.
-                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Right Panel - Museum Card Display -->
+            <div class="museum-display" style="height: 630px;">
+                <div class="museum-card" id="museumCard" style="height: 590px; max-height: 590px;">
+                    <div class="blue-accent"></div>
+                    <div class="hover-effect"></div>
+                    <div class="blue-accent"></div>
+                    <div class="hover-effect"></div>
+                    
+                    <!-- Museum Card Header - VISIBLE -->
+                    <div class="museum-card-header" style="background: #e0e0e0; padding: 10px 15px; border-bottom: 1px solid rgba(51, 51, 51, 0.2); display: block;">
+                        <div class="toggle-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="toggle-title" style="font-weight: 600; color: #333; text-decoration: none; border: none; outline: none;">Digital Persona</span>
+                            <span class="trait-counter" style="font-weight: 700; color: #CC7A00;" id="displayTraitCounter">4/18</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-header">
+                        <div class="image-container">
+                            <div>CONSPIRACYEL PORTRAIT</div>
+                        </div>
+                        
+                        <div class="header-radars">
+                            <div class="header-radar-section">
+                                <h4 class="header-chart-title">YOUR PROFILE</h4>
+                                <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
+                                    <!-- Background grid -->
+                                    <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" fill="none" opacity="0.3">
+                                        <polygon points="60,10 95,35 85,75 35,75 25,35" />
+                                        <polygon points="60,25 80,42.5 75,62.5 45,62.5 40,42.5" />
+                                        <polygon points="60,40 65,50 65,50 55,50 55,50" />
+                                    </g>
+                                    <!-- Axes -->
+                                    <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
+                                        <line x1="60" y1="60" x2="60" y2="10" />
+                                        <line x1="60" y1="60" x2="95" y2="35" />
+                                        <line x1="60" y1="60" x2="85" y2="75" />
+                                        <line x1="60" y1="60" x2="35" y2="75" />
+                                        <line x1="60" y1="60" x2="25" y2="35" />
+                                    </g>
+                                    <!-- Data polygon -->
+                                    <polygon points="60,15 87,40 80,70 45,70 35,40" 
+                                             fill="rgba(204, 122, 0, 0.2)" 
+                                             stroke="#CC7A00" 
+                                             stroke-width="1.5" />
+                                    <!-- Data points -->
+                                    <g fill="#CC7A00" stroke="#CC7A00" stroke-width="1">
+                                        <circle cx="60" cy="15" r="2" />
+                                        <circle cx="87" cy="40" r="2" />
+                                        <circle cx="80" cy="70" r="2" />
+                                        <circle cx="45" cy="70" r="2" />
+                                        <circle cx="35" cy="40" r="2" />
+                                    </g>
+                                    <!-- Labels -->
+                                    <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
+                                        <text x="60" y="8">O</text>
+                                        <text x="98" y="38">C</text>
+                                        <text x="88" y="78">E</text>
+                                        <text x="32" y="78">A</text>
+                                        <text x="22" y="38">N</text>
+                                    </g>
+                                </svg>
+                            </div>
+                            
+                            <div class="header-radar-section">
+                                <h4 class="header-chart-title">CHARACTER</h4>
+                                <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
+                                    <!-- Background grid -->
+                                    <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" fill="none" opacity="0.3">
+                                        <polygon points="60,10 95,35 85,75 35,75 25,35" />
+                                        <polygon points="60,25 80,42.5 75,62.5 45,62.5 40,42.5" />
+                                        <polygon points="60,40 65,50 65,50 55,50 55,50" />
+                                    </g>
+                                    <!-- Axes -->
+                                    <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
+                                        <line x1="60" y1="60" x2="60" y2="10" />
+                                        <line x1="60" y1="60" x2="95" y2="35" />
+                                        <line x1="60" y1="60" x2="85" y2="75" />
+                                        <line x1="60" y1="60" x2="35" y2="75" />
+                                        <line x1="60" y1="60" x2="25" y2="35" />
+                                    </g>
+                                    <!-- Data polygon -->
+                                    <polygon points="60,12 93,36 82,73 40,73 27,37" 
+                                             fill="rgba(212, 175, 55, 0.3)" 
+                                             stroke="#D4AF37" 
+                                             stroke-width="1.5" />
+                                    <!-- Data points -->
+                                    <g fill="#D4AF37" stroke="#D4AF37" stroke-width="1">
+                                        <circle cx="60" cy="12" r="2" />
+                                        <circle cx="93" cy="36" r="2" />
+                                        <circle cx="82" cy="73" r="2" />
+                                        <circle cx="40" cy="73" r="2" />
+                                        <circle cx="27" cy="37" r="2" />
+                                    </g>
+                                    <!-- Labels -->
+                                    <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
+                                        <text x="60" y="8">O</text>
+                                        <text x="98" y="38">C</text>
+                                        <text x="88" y="78">E</text>
+                                        <text x="32" y="78">A</text>
+                                        <text x="22" y="38">N</text>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-content" style="padding: 12px 25px 150px 25px;">
+                        <h1 class="artwork-title" id="personaName">CONSPIRACYEL</h1>
+                        <h2 class="artwork-subtitle" id="personaTitle">Paranoid Problem Investigator</h2>
+                        
+                        <p class="artwork-details" id="personaDescription">
+                            Nothing is a coincidence. Every bug is connected. The code is trying to tell us something...
+                        </p>
+                        
+                        <p class="collection-info" id="personaTraits" style="margin-bottom: 200px; padding-bottom: 100px;">
+                            Paranoid, pattern-seeking, suspicious, deep-thinking.<br>
+                            An expert in pattern recognition, system thinking, uncovering hidden issues.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
 
     <section class="projects-section" id="projects">
         <div class="projects-header">
@@ -2718,6 +2710,751 @@
     </script>    <!-- Main Application JavaScript -->
     <script src="js/main.js"></script>
     <script src="js/trait-selector.js"></script>
+    
+    <script>
+        // Terminal interface class - Claude Code style with Elliot
+        class Terminal {
+            constructor() {
+                this.output = document.getElementById('terminalOutput');
+                this.input = null; // Will be created dynamically
+                this.isProcessing = false;
+                this.conversationHistory = [];
+                this.questMode = false;
+                this.currentQuestion = 0;
+                this.userResponses = [];
+                this.hasGeneratedAvatar = false;
+                this.init();
+                
+                // Questions for quest mode
+                this.questions = [
+                    "What's your name, and what do you do for work?",
+                    "What's something you've been working on lately that you're genuinely excited about?",
+                    "If you could have dinner with anyone (dead or alive), who would it be and what would you want to talk about?",
+                    "What kind of impact do you hope to make in your work or the world?"
+                ];
+            }
+
+            init() {
+                // Welcome message will be shown when entering terminal mode
+            }
+            
+            showWelcomeMessage() {
+                // Clear any existing content
+                this.output.innerHTML = '';
+                
+                // Add ELLIOT ASCII art with animation delay using Unicode blocks
+                const elliotLines = [
+                    '███████ ██      ██      ██  ██████  ████████',
+                    '██      ██      ██      ██ ██    ██    ██   ',
+                    '█████   ██      ██      ██ ██    ██    ██   ',
+                    '██      ██      ██      ██ ██    ██    ██   ',
+                    '███████ ███████ ███████ ██  ██████     ██   '
+                ];
+                
+                elliotLines.forEach((line, index) => {
+                    setTimeout(() => {
+                        this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; letter-spacing: 1px; white-space: pre;">${line}</span>`);
+                    }, index * 150);
+                });
+                
+                // Add divider and instructions after ASCII art
+                setTimeout(() => {
+                    this.addToOutput('');
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-weight: bold;">PERSONA GENERATOR v2.0 | Custom Neural Architecture</span>`);
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">════════════════════════════════════════════════════════════</span>`);
+                    this.addToOutput('');
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">I built a specialized LLM head that extracts Big Five personality</span>`);
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">traits from any text input. Doesn't matter what you feed it.</span>`);
+                    this.addToOutput('');
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Resume? Job description? Essay you wrote? Random thoughts?</span>`);
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">The model reads between the lines and pulls your psychological</span>`);
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">profile. Then generates your personalized "El" avatar.</span>`);
+                    this.addToOutput('');
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">No surveys. No questionnaires. Just raw text analysis.</span>`);
+                    this.addToOutput('');
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">────────────────────────────────────────────────────────────</span>`);
+                    this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Ready for input...</span>`);
+                    this.addPrompt();
+                }, elliotLines.length * 150 + 300);
+            }
+
+            async processInput() {
+                const userInput = this.input.value.trim();
+                if (!userInput) return;
+
+                this.isProcessing = true;
+                
+                // Replace the input line with the completed command
+                this.input.parentNode.innerHTML = `<span style="color: #28ca42; font-family: 'Roboto Mono', monospace;">elliot@terminal ~ % </span><span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">${userInput}</span>`;
+                
+                this.showLoading();
+
+                try {
+                    // Check for special commands
+                    if (userInput.toLowerCase() === 'quest') {
+                        this.startQuestMode();
+                        return;
+                    }
+
+                    // Build conversation context
+                    this.conversationHistory.push({
+                        role: 'user',
+                        content: userInput
+                    });
+
+                    let response;
+                    if (this.questMode) {
+                        response = await this.handleQuestResponse(userInput);
+                    } else {
+                        response = await this.generateElliotResponse(userInput);
+                    }
+
+                    this.hideLoading();
+                    this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % ${response}</span>`);
+                    
+                    this.conversationHistory.push({
+                        role: 'assistant',
+                        content: response
+                    });
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.addToOutput(`<span style="color: #ff5f57;">ERROR: ${error.message}</span>`);
+                } finally {
+                    this.isProcessing = false;
+                    this.addPrompt();
+                }
+            }
+
+            startQuestMode() {
+                this.questMode = true;
+                this.currentQuestion = 0;
+                this.userResponses = [];
+                
+                this.hideLoading();
+                this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % Perfect! Let's dive into the guided flow.</span>`);
+                this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % I'll ask you ${this.questions.length} questions to understand what kind of El you need.</span>`);
+                this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % </span>`);
+                this.addToOutput(`<span class="terminal-ai">elliot@terminal ~ % ${this.questions[0]}</span>`);
+                this.addPrompt();
+            }
+
+            async handleQuestResponse(userInput) {
+                this.userResponses.push(userInput);
+                
+                if (this.currentQuestion < this.questions.length - 1) {
+                    // Move to next question
+                    this.currentQuestion++;
+                    const followUp = await this.generateFollowUp(userInput, this.currentQuestion - 1);
+                    return `${followUp} \n\nNext question: ${this.questions[this.currentQuestion]}`;
+                } else {
+                    // Final question answered
+                    this.questMode = false;
+                    return await this.generateFinalQuestResponse();
+                }
+            }
+
+            async generateFollowUp(response, questionIndex) {
+                const followUps = [
+                    "Nice to meet you! That sounds like interesting work.",
+                    "That's awesome - passion projects often lead to the best insights.",
+                    "Fascinating choice! Great conversations usually reveal character.",
+                    "That's a meaningful vision - impact-driven people tend to be great collaborators."
+                ];
+                
+                return followUps[questionIndex] || "Thanks for sharing that insight.";
+            }
+
+            async generateFinalQuestResponse() {
+                try {
+                    // Simulate API call with delay
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Generate a response based on user inputs
+                    const response = this.generateLocalAnalysis();
+                    
+                    // Trigger avatar generation on the right card
+                    if (window.personaGenerator) {
+                        const persona = window.personaGenerator.selectPersona();
+                        window.personaGenerator.displayPersona(persona);
+                    }
+                    
+                    return response;
+                } catch (error) {
+                    console.error('Error in quest analysis:', error);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${this.extractKeyTraits()}. Let me generate a personalized recommendation for you.`;
+                }
+            }
+
+            generateLocalAnalysis() {
+                const traits = this.extractKeyTraits();
+                return `Perfect! Based on your responses, I can see you're looking for an El who can balance ${traits}.
+
+Here's my analysis:
+• Strong communication patterns detected
+• Collaborative mindset with technical depth  
+• Innovation-focused with practical application
+• Values meaningful impact over pure technical achievement
+
+Your personality profile shows: Balanced traits across multiple dimensions with strong interpersonal skills.
+
+[COMPLETE] Big Five extracted. Generating your El persona...`;
+            }
+
+            extractKeyTraits() {
+                // Simple trait extraction from responses
+                const allText = this.userResponses.join(' ').toLowerCase();
+                const traits = [];
+                
+                if (allText.includes('technical') || allText.includes('engineer') || allText.includes('code')) {
+                    traits.push('technical expertise');
+                }
+                if (allText.includes('team') || allText.includes('collaborate') || allText.includes('people')) {
+                    traits.push('collaboration');
+                }
+                if (allText.includes('creative') || allText.includes('design') || allText.includes('art')) {
+                    traits.push('creativity');
+                }
+                if (allText.includes('lead') || allText.includes('manage') || allText.includes('direct')) {
+                    traits.push('leadership');
+                }
+                
+                return traits.length > 0 ? traits.join(' and ') : 'multiple perspectives';
+            }
+
+            async generateElliotResponse(userInput) {
+                try {
+                    // Simulate processing time
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    return this.getFallbackResponse(userInput);
+                } catch (error) {
+                    console.error('Error generating response:', error);
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    return this.getFallbackResponse(userInput);
+                }
+            }
+            
+            getFallbackResponse(userInput) {
+                // Check if it's a job description
+                if (userInput.length > 100 && (userInput.includes('requirements') || userInput.includes('experience') || userInput.includes('responsible'))) {
+                    return this.analyzeJobDescription(userInput);
+                }
+                
+                // General conversation responses
+                const responses = [
+                    "I hear you! Based on what you're describing, it sounds like you need an El who can adapt to different situations. What's the main challenge you're trying to solve?",
+                    "Interesting perspective. Tell me more about the context - is this for a specific project or a longer-term role?",
+                    "Got it. I'm picking up on some key themes here. What would success look like with the right El on your team?",
+                    "That makes sense. From what you're sharing, I can see a few different personality directions we could explore. Any particular working style preferences?",
+                    "Understanding your needs... It sounds like you're looking for someone who can balance different skills. What's most important - the technical side or the people side?"
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+
+            analyzeJobDescription(jd) {
+                return "I can see this is a detailed role description. Let me parse through the key requirements... Based on this JD, I'm seeing needs for someone who can handle both strategic thinking and hands-on execution. Want me to break down what kind of El personality would fit best?";
+            }
+
+            showLoading() {
+                this.addToOutput(`<span class="terminal-loading">[ANALYZING] Running text through personality extraction pipeline...</span>`);
+            }
+
+            hideLoading() {
+                const loadingElements = this.output.querySelectorAll('.terminal-loading');
+                loadingElements.forEach(el => el.remove());
+            }
+
+            addToOutput(html) {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                this.output.appendChild(div);
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+
+            addPrompt() {
+                // Remove any existing input
+                if (this.input && this.input.parentNode) {
+                    this.input.parentNode.remove();
+                }
+                
+                // Create input container within the output
+                const inputContainer = document.createElement('div');
+                inputContainer.style.display = 'flex';
+                inputContainer.style.alignItems = 'center';
+                inputContainer.style.fontFamily = "'Roboto Mono', monospace";
+                inputContainer.style.fontSize = '12px';
+                inputContainer.style.color = '#ffffff';
+                inputContainer.style.marginTop = '8px';
+                
+                // Create prompt symbol
+                const promptSymbol = document.createElement('span');
+                promptSymbol.textContent = 'elliot@terminal ~ % ';
+                promptSymbol.style.color = '#28ca42'; // Mac terminal green
+                promptSymbol.style.marginRight = '0';
+                
+                // Create input field
+                this.input = document.createElement('input');
+                this.input.type = 'text';
+                this.input.style.background = 'none';
+                this.input.style.border = 'none';
+                this.input.style.color = '#ffffff';
+                this.input.style.fontFamily = "'Roboto Mono', monospace";
+                this.input.style.fontSize = '12px';
+                this.input.style.outline = 'none';
+                this.input.style.flex = '1';
+                this.input.style.caretColor = '#ffffff';
+                
+                // Add event listener
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !this.isProcessing) {
+                        this.processInput();
+                    }
+                });
+                
+                inputContainer.appendChild(promptSymbol);
+                inputContainer.appendChild(this.input);
+                this.output.appendChild(inputContainer);
+                
+                // Focus and scroll to bottom
+                this.input.focus();
+                this.output.scrollTop = this.output.scrollHeight;
+            }
+        }
+
+        class RetroPersonaGenerator {
+            constructor() {
+                this.selectedTraits = new Set(['energy', 'creative', 'leadership', 'technical']);
+                this.isGenerating = false;
+                this.terminal = null;
+                this.isTerminalMode = false;
+                this.personas = {
+                    conspiracyel: {
+                        name: "CONSPIRACYEL",
+                        title: "Paranoid Problem Investigator",
+                        description: "Nothing is a coincidence. Every bug is connected. The code is trying to tell us something...",
+                        traits: "Paranoid, pattern-seeking, suspicious, deep-thinking.<br>An expert in pattern recognition, system thinking, uncovering hidden issues."
+                    },
+                    energyel: {
+                        name: "ENERGYEL",
+                        title: "High-Velocity Product Catalyst",
+                        description: "Coffee-powered development machine. Ships features before you finish explaining the requirements...",
+                        traits: "High-energy, collaborative, fast-paced, dynamic.<br>Thrives in startup environments requiring rapid iteration and team coordination."
+                    },
+                    analyticalel: {
+                        name: "ANALYTICALEL",
+                        title: "Data-Driven Strategic Architect",
+                        description: "Turns spreadsheets into strategies. Every decision backed by three different data sources...",
+                        traits: "Analytical, methodical, precise, evidence-based.<br>Excels at translating complex data into actionable business insights."
+                    },
+                    creativeel: {
+                        name: "CREATIVEEL",
+                        title: "Innovative Design Catalyst",
+                        description: "Sees possibilities where others see problems. Builds beautiful solutions that users love...",
+                        traits: "Creative, artistic, innovative, user-focused.<br>Combines aesthetic sensibility with practical problem-solving skills."
+                    }
+                };
+                this.init();
+            }
+
+            init() {
+                // Add event listeners for toggle switches
+                document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                    toggle.addEventListener('click', (e) => this.toggleTrait(e));
+                });
+
+                // Add event listeners for trait option buttons
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.addEventListener('click', (e) => this.toggleTraitOption(e));
+                });
+
+                // Add event listeners for sound bars
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.addEventListener('click', (e) => this.toggleSoundbar(e));
+                });
+
+                // Add event listeners for command buttons
+                const generateBtn = document.getElementById('generateBtn');
+                const randomBtn = document.getElementById('randomBtn');
+                const resetBtn = document.getElementById('resetBtn');
+                const saveBtn = document.getElementById('saveBtn');
+                
+                if (generateBtn) generateBtn.addEventListener('click', () => this.generatePersona());
+                if (randomBtn) randomBtn.addEventListener('click', () => this.randomizeTraits());
+                if (resetBtn) resetBtn.addEventListener('click', () => this.resetTraits());
+                if (saveBtn) saveBtn.addEventListener('click', () => this.savePersona());
+
+                // Add Advanced toggle functionality
+                const advancedToggle = document.getElementById('advancedToggle');
+                if (advancedToggle) advancedToggle.addEventListener('click', () => this.toggleAdvanced());
+
+                // Add Terminal Mode functionality
+                const terminalModeBtn = document.getElementById('terminalModeBtn');
+                const terminalCloseBtn = document.getElementById('terminalCloseBtn');
+                if (terminalModeBtn) terminalModeBtn.addEventListener('click', () => this.enterTerminalMode());
+                if (terminalCloseBtn) terminalCloseBtn.addEventListener('click', () => this.exitTerminalMode());
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'g' || e.key === 'G') {
+                        e.preventDefault();
+                        this.generatePersona();
+                    } else if (e.key === 'r' || e.key === 'R') {
+                        e.preventDefault();
+                        this.randomizeTraits();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        if (this.isTerminalMode) {
+                            this.exitTerminalMode();
+                        } else {
+                            this.resetTraits();
+                        }
+                    }
+                });
+
+                this.updateDisplay();
+            }
+
+            enterTerminalMode() {
+                const cardFlipContainer = document.getElementById('cardFlipContainer');
+                if (cardFlipContainer) {
+                    cardFlipContainer.classList.add('flipped');
+                    this.isTerminalMode = true;
+
+                    // Initialize terminal after flip animation
+                    setTimeout(() => {
+                        if (!this.terminal) {
+                            this.terminal = new Terminal();
+                        }
+                        this.terminal.showWelcomeMessage();
+                    }, 400); // Half way through the flip animation
+                }
+            }
+
+            exitTerminalMode() {
+                const cardFlipContainer = document.getElementById('cardFlipContainer');
+                if (cardFlipContainer) {
+                    cardFlipContainer.classList.remove('flipped');
+                    this.isTerminalMode = false;
+                }
+            }
+
+            toggleAdvanced() {
+                const content = document.getElementById('advancedContent');
+                const toggle = document.getElementById('advancedToggle');
+                
+                if (content && toggle) {
+                    content.classList.toggle('show');
+                    const isOpen = content.classList.contains('show');
+                    toggle.innerHTML = isOpen ? '<span>▼ Advanced</span>' : '<span>▶ Advanced</span>';
+                }
+            }
+
+            toggleTrait(e) {
+                const toggle = e.currentTarget;
+                const trait = toggle.dataset.trait;
+
+                if (toggle.classList.contains('active')) {
+                    toggle.classList.remove('active');
+                    this.selectedTraits.delete(trait);
+                } else {
+                    toggle.classList.add('active');
+                    this.selectedTraits.add(trait);
+                }
+
+                // Update corresponding sound bar
+                const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                if (soundbar) {
+                    soundbar.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+
+                this.updateDisplay();
+                this.triggerSoundbarPulse();
+            }
+
+            toggleTraitOption(e) {
+                const option = e.currentTarget;
+                const trait = option.dataset.trait;
+
+                if (option.classList.contains('selected')) {
+                    option.classList.remove('selected');
+                    this.selectedTraits.delete(trait);
+                } else {
+                    option.classList.add('selected');
+                    this.selectedTraits.add(trait);
+                }
+
+                // Update corresponding sound bar
+                const soundbar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+                if (soundbar) {
+                    soundbar.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+
+                this.updateDisplay();
+                this.triggerSoundbarPulse();
+            }
+
+            toggleSoundbar(e) {
+                const bar = e.currentTarget;
+                const trait = bar.dataset.trait;
+                
+                if (this.selectedTraits.has(trait)) {
+                    this.selectedTraits.delete(trait);
+                } else {
+                    this.selectedTraits.add(trait);
+                }
+                
+                // Update corresponding toggle switch if it exists
+                const toggle = document.querySelector(`[data-trait="${trait}"].toggle-switch`);
+                if (toggle) {
+                    toggle.classList.toggle('active', this.selectedTraits.has(trait));
+                }
+
+                // Update corresponding trait option if it exists
+                const option = document.querySelector(`[data-trait="${trait}"].trait-option`);
+                if (option) {
+                    option.classList.toggle('selected', this.selectedTraits.has(trait));
+                }
+                
+                this.updateDisplay();
+                this.triggerSoundbarPulse();
+            }
+
+            updateDisplay() {
+                const count = this.selectedTraits.size;
+                const traitCounter = document.getElementById('traitCounter');
+                if (traitCounter) traitCounter.textContent = `${count}/18`;
+                
+                // Update the display counter on the right card as well
+                const displayCounter = document.getElementById('displayTraitCounter');
+                if (displayCounter) {
+                    displayCounter.textContent = `${count}/18`;
+                }
+
+                // Update sound bars
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    const trait = bar.dataset.trait;
+                    bar.classList.toggle('active', this.selectedTraits.has(trait));
+                });
+
+                // Update toggle switches
+                document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                    const trait = toggle.dataset.trait;
+                    toggle.classList.toggle('active', this.selectedTraits.has(trait));
+                });
+
+                // Update trait options
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    const trait = option.dataset.trait;
+                    option.classList.toggle('selected', this.selectedTraits.has(trait));
+                });
+            }
+
+            triggerSoundbarPulse() {
+                const soundbars = document.querySelectorAll('.soundbar.active');
+                soundbars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        bar.style.background = '#D4AF37'; // Gold
+                        bar.style.transform = 'scaleY(1.2)';
+                        setTimeout(() => {
+                            bar.style.background = '#CC7A00'; // Amber
+                            bar.style.transform = 'scaleY(1)';
+                        }, 200);
+                    }, index * 50);
+                });
+            }
+
+            async generatePersona() {
+                if (this.isGenerating) return;
+
+                this.isGenerating = true;
+                this.showGeneratingState();
+
+                try {
+                    // Simulate generation time
+                    await new Promise(resolve => setTimeout(resolve, 2500));
+                    
+                    // Select persona based on traits
+                    const persona = this.selectPersona();
+                    this.displayPersona(persona);
+                } finally {
+                    this.isGenerating = false;
+                    this.hideGeneratingState();
+                }
+            }
+
+            selectPersona() {
+                const traits = Array.from(this.selectedTraits);
+                
+                if (traits.includes('paranoia') || traits.includes('mystery')) {
+                    return this.personas.conspiracyel;
+                } else if (traits.includes('energy') || traits.includes('speed')) {
+                    return this.personas.energyel;
+                } else if (traits.includes('analytical') || traits.includes('discipline')) {
+                    return this.personas.analyticalel;
+                } else if (traits.includes('creative') || traits.includes('innovation')) {
+                    return this.personas.creativeel;
+                } else {
+                    return this.personas.conspiracyel; // Default
+                }
+            }
+
+            displayPersona(persona) {
+                const personaName = document.getElementById('personaName');
+                const personaTitle = document.getElementById('personaTitle');
+                const personaDescription = document.getElementById('personaDescription');
+                const personaTraits = document.getElementById('personaTraits');
+                
+                if (personaName) personaName.textContent = persona.name;
+                if (personaTitle) personaTitle.textContent = persona.title;
+                if (personaDescription) personaDescription.textContent = persona.description;
+                if (personaTraits) personaTraits.innerHTML = persona.traits;
+
+                // Add success animation to museum card
+                const card = document.getElementById('museumCard');
+                if (card) {
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        card.style.transform = 'scale(1)';
+                    }, 300);
+                }
+            }
+
+            showGeneratingState() {
+                // Show generation status
+                const generationStatus = document.getElementById('generationStatus');
+                if (generationStatus) generationStatus.classList.add('show');
+                
+                // Activate all sound bars for generation
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.classList.add('generating');
+                });
+                
+                // Update generate button
+                const btn = document.getElementById('generateBtn');
+                if (btn) {
+                    btn.classList.add('generating');
+                    btn.innerHTML = 'GENERATING...<div class="button-subtitle">G</div>';
+                }
+            }
+
+            hideGeneratingState() {
+                // Hide generation status
+                const generationStatus = document.getElementById('generationStatus');
+                if (generationStatus) generationStatus.classList.remove('show');
+                
+                // Remove generating state from sound bars
+                document.querySelectorAll('.soundbar').forEach(bar => {
+                    bar.classList.remove('generating');
+                });
+                
+                // Reset generate button
+                const btn = document.getElementById('generateBtn');
+                if (btn) {
+                    btn.classList.remove('generating');
+                    btn.innerHTML = 'Generate<div class="button-subtitle">G</div>';
+                }
+            }
+
+            randomizeTraits() {
+                // Clear current selection
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                this.selectedTraits.clear();
+
+                // Get all available traits
+                const allTraits = Array.from(document.querySelectorAll('.trait-option')).map(option => option.dataset.trait);
+                
+                // Randomly select 3-5 traits
+                const count = 3 + Math.floor(Math.random() * 3);
+                const selectedTraits = [];
+                
+                while (selectedTraits.length < count && selectedTraits.length < allTraits.length) {
+                    const randomTrait = allTraits[Math.floor(Math.random() * allTraits.length)];
+                    if (!selectedTraits.includes(randomTrait)) {
+                        selectedTraits.push(randomTrait);
+                        this.selectedTraits.add(randomTrait);
+                    }
+                }
+
+                // Update UI
+                selectedTraits.forEach(trait => {
+                    const option = document.querySelector(`[data-trait="${trait}"]`);
+                    if (option && option.classList.contains('trait-option')) {
+                        option.classList.add('selected');
+                    }
+                });
+
+                this.updateDisplay();
+                this.triggerSoundbarPulse();
+            }
+
+            resetTraits() {
+                document.querySelectorAll('.trait-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                this.selectedTraits.clear();
+                this.selectedTraits.add('energy');
+                this.selectedTraits.add('creative');
+                this.selectedTraits.add('leadership');
+                this.selectedTraits.add('technical');
+                
+                // Reset to default selections
+                const energyOption = document.querySelector('[data-trait="energy"]');
+                const creativeOption = document.querySelector('[data-trait="creative"]');
+                const leadershipOption = document.querySelector('[data-trait="leadership"]');
+                const technicalOption = document.querySelector('[data-trait="technical"]');
+                
+                if (energyOption) energyOption.classList.add('selected');
+                if (creativeOption) creativeOption.classList.add('selected');
+                if (leadershipOption) leadershipOption.classList.add('selected');
+                if (technicalOption) technicalOption.classList.add('selected');
+                
+                this.updateDisplay();
+                this.triggerSoundbarPulse();
+            }
+
+            savePersona() {
+                const personaName = document.getElementById('personaName');
+                const personaTitle = document.getElementById('personaTitle');
+                
+                const currentPersona = {
+                    name: personaName ? personaName.textContent : 'Unknown',
+                    title: personaTitle ? personaTitle.textContent : 'Unknown',
+                    traits: Array.from(this.selectedTraits),
+                    timestamp: new Date().toISOString()
+                };
+
+                console.log('Saved Persona:', currentPersona);
+                
+                // Visual feedback
+                const btn = document.getElementById('saveBtn');
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = 'EXPORTED!<div class="button-subtitle">S</div>';
+                    setTimeout(() => {
+                        btn.innerHTML = original;
+                    }, 1500);
+                }
+
+                // Copy to clipboard if available
+                try {
+                    navigator.clipboard.writeText(JSON.stringify(currentPersona, null, 2));
+                } catch (err) {
+                    console.log('Clipboard access not available');
+                }
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.personaGenerator = new RetroPersonaGenerator();
+        });
+    </script>
     
     <script>
         // Initialize the application after DOM is loaded

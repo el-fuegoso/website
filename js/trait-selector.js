@@ -23,8 +23,7 @@ class Terminal {
     }
 
     init() {
-        // Show welcome message and ELLIOT ASCII art on initialization
-        this.showWelcomeMessage();
+        // Welcome message will be shown when entering terminal mode
     }
     
     showWelcomeMessage() {

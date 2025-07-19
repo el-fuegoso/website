@@ -37,11 +37,11 @@
     display: flex;
     flex-direction: column;
     font-family: 'Roboto Mono', monospace;
-    overflow: hidden;
+    overflow: visible; /* Allow buttons to show */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* Set specific height to ensure flip container works properly */
-    height: 550px;
+    /* Increase height to accommodate all content */
+    height: 580px;
 }
 
 .terminal-panel:hover {
@@ -620,7 +620,7 @@
     justify-content: center;
     padding: 20px;
     /* Match left panel height */
-    height: 550px;
+    height: 580px;
 }
 
 .museum-card {
@@ -638,8 +638,8 @@
     display: flex;
     flex-direction: column;
     /* Match left panel height exactly */
-    height: 550px;
-    max-height: 550px;
+    height: 580px;
+    max-height: 580px;
 }
 
 .museum-card:hover {

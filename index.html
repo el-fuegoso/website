@@ -3142,6 +3142,7 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             toggleAdvanced() {
+                console.log('Advanced toggle clicked!'); // Debug log
                 const content = document.getElementById('advancedContent');
                 const toggle = document.getElementById('advancedToggle');
                 
@@ -3149,6 +3150,9 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
                     content.classList.toggle('show');
                     const isOpen = content.classList.contains('show');
                     toggle.innerHTML = isOpen ? '<span>▼ Advanced</span>' : '<span>▶ Advanced</span>';
+                    console.log('Advanced content toggled:', isOpen); // Debug log
+                } else {
+                    console.log('Advanced elements not found:', { content, toggle }); // Debug log
                 }
             }
 
@@ -3359,6 +3363,7 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             randomizeTraits() {
+                console.log('Random button clicked!'); // Debug log
                 // Clear current selection
                 document.querySelectorAll('.trait-option').forEach(option => {
                     option.classList.remove('selected');

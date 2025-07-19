@@ -845,6 +845,64 @@
     box-shadow: 0 2px 12px rgba(204, 122, 0, 0.3);
 }
 
+/* Action Buttons Section */
+.action-buttons-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 16px 4px 12px 4px;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    background: var(--bronze);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    font-family: 'Roboto Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+
+.random-btn {
+    background: var(--bronze);
+}
+
+.reset-btn {
+    background: var(--bronze);
+}
+
+.save-btn {
+    background: var(--bronze);
+}
+
+.generate-btn {
+    background: var(--green);
+}
+
+.generate-btn:hover {
+    background: var(--amber);
+}
+
+.btn-shortcut {
+    font-size: 9px;
+    opacity: 0.8;
+    font-weight: normal;
+}
+
 /* Advanced dropdown */
 .advanced-section {
     margin-top: auto;

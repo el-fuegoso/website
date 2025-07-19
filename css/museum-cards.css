@@ -49,8 +49,9 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Museum Card Header - COMPACTED */
-.terminal-header {
+/* Museum Card Header - COMPACTED - Applied to both Select Traits and Digital Persona */
+.terminal-header,
+.museum-card-header {
     background: #f5f5f5;
     color: var(--text-dark);
     padding: 12px 15px;
@@ -58,6 +59,10 @@
     font-weight: 600;
     border-bottom: 1px solid rgba(51, 51, 51, 0.2);
     line-height: 1;
+    display: block;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
 }
 
 .terminal-header .toggle-header {
@@ -162,8 +167,8 @@
 }
 
 .toggle-switch {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     background: white;
     border: 2px solid rgba(51, 51, 51, 0.3);
     border-radius: 0;
@@ -173,6 +178,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Ensure clickable */
+    pointer-events: auto;
+    flex-shrink: 0;
 }
 
 .toggle-switch::after {
@@ -211,17 +219,20 @@
     background: rgba(240, 238, 230, 0.9);
     border: 1px solid rgba(51, 51, 51, 0.2);
     color: var(--text-dark);
-    padding: 4px 4px;
+    padding: 6px 4px;
     text-align: center;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
     border-radius: 0;
-    height: 16px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    /* Ensure clickable */
+    pointer-events: auto;
+    user-select: none;
 }
 
 .trait-option:hover {
@@ -510,12 +521,15 @@
     background: #888;
 }
 
-/* Command Buttons - COMPACTED */
+/* Command Buttons - ENSURE VISIBILITY */
 .command-grid {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    margin-top: 8px; /* Restore spacing for button visibility */
+    gap: 4px;
+    margin-top: auto; /* Push to bottom */
+    padding: 8px 0;
+    border-top: 1px solid rgba(51, 51, 51, 0.1);
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .button-row {
@@ -530,8 +544,8 @@
 
 .terminal-button {
     border: none;
-    padding: 10px 6px;
-    font-size: 12px;
+    padding: 12px 8px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -545,9 +559,10 @@
     flex-direction: column;
     align-items: center;
     gap: 1px;
-    /* Ensure buttons are clickable */
+    /* Ensure buttons are clickable and visible */
     pointer-events: auto;
     z-index: 10;
+    min-height: 40px;
 }
 
 .terminal-button.primary {
@@ -636,20 +651,7 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Museum Card Header for Right Panel */
-.museum-card-header {
-    background: #f5f5f5;
-    color: var(--text-dark);
-    padding: 12px 15px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(51, 51, 51, 0.2);
-    line-height: 1;
-    display: block;
-    width: 100%;
-    position: relative;
-    box-sizing: border-box;
-}
+/* Headers now share styling above */
 
 .museum-card-header .toggle-header {
     display: flex;

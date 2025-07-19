@@ -204,12 +204,12 @@
                                         <span>▶ Advanced</span>
                                     </div>
                                     <div class="advanced-content" id="advancedContent">
-                                        <p>Advanced personality matrix configuration.</p>
+                                        <p>Access the experimental terminal interface for advanced personality analysis.</p>
                                         
                                         <!-- Terminal Mode Button -->
                                         <button class="terminal-mode-btn" id="terminalModeBtn">
-                                            <span>Terminal</span>
-                                            <div class="button-subtitle">T</div>
+                                            <span>🖥️ Enter Terminal Mode</span>
+                                            <div class="button-subtitle">Flip Card</div>
                                         </button>
                                     </div>
                                 </div>
@@ -3157,6 +3157,7 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             toggleTrait(e) {
+                console.log('Toggle switch clicked:', e.currentTarget.dataset.trait); // Debug log
                 const toggle = e.currentTarget;
                 const trait = toggle.dataset.trait;
 
@@ -3179,6 +3180,7 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             toggleTraitOption(e) {
+                console.log('Trait option clicked:', e.currentTarget.dataset.trait); // Debug log
                 const option = e.currentTarget;
                 const trait = option.dataset.trait;
 

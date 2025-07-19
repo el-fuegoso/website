@@ -360,14 +360,10 @@
     font-size: 0.75rem;
     color: var(--text-medium);
     line-height: 1.3;
-    /* Ensure proper visibility when shown */
-    opacity: 0;
-    transition: opacity 0.3s ease;
 }
 
 .advanced-content.show {
     display: block;
-    opacity: 1;
 }
 
 /* Terminal Mode Button - MATCH CARD STYLING */

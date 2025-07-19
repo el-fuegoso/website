@@ -11,19 +11,20 @@
 }
 
 .terminal-section {
-    min-height: 100vh;
-    padding: 20px;
-    background: var(--card-bg);
+    min-height: auto;
+    padding: 80px 40px;
+    background: var(--bg-color);
+    position: relative;
 }
 
-.container {
+.museum-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 1400px;
+    gap: 30px;
+    max-width: 1200px;
     margin: 0 auto;
     align-items: start;
-    height: 550px; /* Optimal height for content */
+    /* Remove fixed height for natural flow */
 }
 
 /* Left Panel - Museum Card Style - COMPACTED */
@@ -39,7 +40,8 @@
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 550px; /* Optimal height to match right panel */
+    /* Remove fixed height - use natural height based on content */
+    min-height: 500px;
 }
 
 .terminal-panel:hover {
@@ -51,7 +53,7 @@
 .terminal-header {
     background: #f5f5f5;
     color: var(--text-dark);
-    padding: 10px 15px;
+    padding: 12px 15px;
     font-size: 0.9rem;
     font-weight: 600;
     border-bottom: 1px solid rgba(51, 51, 51, 0.2);
@@ -319,7 +321,7 @@
 .advanced-section {
     border-top: 1px solid rgba(51, 51, 51, 0.2);
     padding-top: 8px;
-    margin-bottom: 1px; /* Minimal gap to buttons */
+    margin-bottom: 8px; /* Restore proper spacing to buttons */
 }
 
 .advanced-toggle {
@@ -501,7 +503,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-top: 0px; /* Reduced by 90% (4px -> 0px) */
+    margin-top: 8px; /* Restore spacing for button visibility */
 }
 
 .button-row {
@@ -583,7 +585,7 @@
 
 /* Right Panel - Museum Card */
 .museum-display {
-    background: var(--card-bg);
+    background: var(--bg-color);
     border-radius: 8px;
     position: relative;
     overflow: hidden;
@@ -591,7 +593,8 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    height: 550px; /* Optimal height to match left panel */
+    /* Remove fixed height - use natural height based on content */
+    min-height: 500px;
 }
 
 .museum-card {
@@ -607,9 +610,9 @@
     position: relative;
     overflow: hidden;
     display: flex;
-    flex-direction: column; /* Stack header, content properly */
-    height: auto; /* Allow natural height */
-    max-height: 500px; /* Prevent excessive height */
+    flex-direction: column;
+    /* Remove height constraints - use natural content height */
+    min-height: 500px;
 }
 
 .museum-card:hover {
@@ -617,37 +620,34 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Museum Card Header for Right Panel - FORCED VISIBLE */
+/* Museum Card Header for Right Panel */
 .museum-card-header {
-    background: #e0e0e0 !important; /* More visible background */
-    color: var(--text-dark) !important;
-    padding: 12px 15px !important;
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    border-bottom: 2px solid #333 !important; /* Thicker border */
-    line-height: 1 !important;
-    display: block !important;
-    width: 100% !important;
-    position: relative !important;
-    z-index: 100 !important;
-    order: -1 !important; /* Force to top */
-    min-height: 40px !important;
-    box-sizing: border-box !important;
+    background: #f5f5f5;
+    color: var(--text-dark);
+    padding: 12px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.2);
+    line-height: 1;
+    display: block;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
 }
 
 .museum-card-header .toggle-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 100% !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    height: 100%;
 }
 
 .museum-card-header .toggle-title {
-    text-decoration: none !important; /* Remove underline */
-    border: none !important;
-    outline: none !important;
+    text-decoration: none;
+    border: none;
+    outline: none;
 }
 
 .card-content {
@@ -754,7 +754,7 @@
     font-weight: 400;
     opacity: 0.9;
     color: var(--text-dark);
-    padding-bottom: 100px; /* Added bottom padding to match left card height */
+    /* Remove artificial padding - use natural spacing */
 }
 
 .artist-info {
@@ -824,10 +824,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .container {
+    .museum-container {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto;
-        height: auto;
         gap: 20px;
     }
 

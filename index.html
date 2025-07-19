@@ -90,176 +90,127 @@
 
     <div class="terminal-section">
         <div class="avatar-container">
-            <!-- Left Panel - Avatar Card Style with Flip -->
-            <div class="terminal-panel">
+            <!-- Left Panel - Trait Selector Card -->
+            <div class="trait-selector-card">
                 <div class="trait-panel-accent"></div>
                 
-                <!-- Card Flip Container -->
-                <div class="card-flip-container" id="cardFlipContainer">
-                    <div class="card-flip-inner">
-                        <!-- Front of Card (Original Content) -->
-                        <div class="card-flip-front">
-                            <!-- Avatar Card Header -->
-                            <div class="terminal-header">
-                                <div class="toggle-header">
-                                    <span class="toggle-title">Select Traits</span>
-                                    <span class="trait-counter" id="traitCounter">4/18</span>
-                                </div>
+                <!-- Trait Card Header -->
+                <div class="trait-card-header">
+                    <div class="toggle-header">
+                        <span class="toggle-title">Select Traits</span>
+                        <span class="trait-counter" id="traitCounter">4/18</span>
+                    </div>
+                </div>
+                
+                <!-- Trait Card Content -->
+                <div class="trait-card-content">
+                    <!-- Trait Toggle Section -->
+                    <div class="trait-toggle-section">
+                        <div class="trait-toggles">
+                            <div class="trait-row">
+                                <span class="trait-label">
+                                    <span class="trait-emoji">⚡</span>
+                                    High Energy
+                                </span>
+                                <div class="toggle-switch active" data-trait="energy"></div>
                             </div>
                             
-                            <!-- Card Content -->
-                            <div class="terminal-content">
-                                <!-- Trait Toggle Section -->
-                                <div class="trait-toggle-section">
-                                    <div class="trait-toggles">
-                                        <div class="trait-row">
-                                            <span class="trait-label">
-                                                <span class="trait-emoji">⚡</span>
-                                                High Energy
-                                            </span>
-                                            <div class="toggle-switch active" data-trait="energy"></div>
-                                        </div>
-                                        
-                                        <div class="trait-row">
-                                            <span class="trait-label">
-                                                <span class="trait-emoji">🎯</span>
-                                                Intense Focus
-                                            </span>
-                                            <div class="toggle-switch" data-trait="intensity"></div>
-                                        </div>
-                                        
-                                        <div class="trait-row">
-                                            <span class="trait-label">
-                                                <span class="trait-emoji">🚀</span>
-                                                Innovation
-                                            </span>
-                                            <div class="toggle-switch" data-trait="innovation"></div>
-                                        </div>
-                                        
-                                        <div class="trait-row">
-                                            <span class="trait-label">
-                                                <span class="trait-emoji">🤝</span>
-                                                Cooperative
-                                            </span>
-                                            <div class="toggle-switch" data-trait="collaborative"></div>
-                                        </div>
-                                        
-                                        <div class="trait-row">
-                                            <span class="trait-label">
-                                                <span class="trait-emoji">🧘</span>
-                                                Calm Under Pressure
-                                            </span>
-                                            <div class="toggle-switch" data-trait="calm"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Soundbar Visualization - BACK TO ORIGINAL POSITION -->
-                                <div class="soundbar-container" id="soundbarContainer">
-                                    <div class="soundbar active" data-trait="energy"></div>
-                                    <div class="soundbar" data-trait="intensity"></div>
-                                    <div class="soundbar" data-trait="innovation"></div>
-                                    <div class="soundbar" data-trait="collaborative"></div>
-                                    <div class="soundbar" data-trait="calm"></div>
-                                    <div class="soundbar" data-trait="analytical"></div>
-                                    <div class="soundbar active" data-trait="creative"></div>
-                                    <div class="soundbar active" data-trait="leadership"></div>
-                                    <div class="soundbar active" data-trait="technical"></div>
-                                    <div class="soundbar" data-trait="mystery"></div>
-                                    <div class="soundbar" data-trait="discipline"></div>
-                                    <div class="soundbar" data-trait="curiosity"></div>
-                                    <div class="soundbar" data-trait="hustle"></div>
-                                    <div class="soundbar" data-trait="paranoia"></div>
-                                    <div class="soundbar" data-trait="speed"></div>
-                                    <div class="soundbar" data-trait="experimental"></div>
-                                    <div class="soundbar" data-trait="futuristic"></div>
-                                    <div class="soundbar" data-trait="procrastination"></div>
-                                </div>
-
-                                <!-- Trait Grid Section -->
-                                <div class="trait-grid" id="traitGrid">
-                                    <div class="trait-option" data-trait="analytical" data-tooltip="Analytical">🔬</div>
-                                    <div class="trait-option selected" data-trait="creative" data-tooltip="Creative">🎨</div>
-                                    <div class="trait-option selected" data-trait="leadership" data-tooltip="Leadership">👑</div>
-                                    <div class="trait-option selected" data-trait="technical" data-tooltip="Technical">🔧</div>
-                                    <div class="trait-option" data-trait="mystery" data-tooltip="Mystery">🕵️</div>
-                                    <div class="trait-option" data-trait="discipline" data-tooltip="Discipline">💪</div>
-                                    <div class="trait-option" data-trait="curiosity" data-tooltip="Curiosity">🔍</div>
-                                    <div class="trait-option" data-trait="hustle" data-tooltip="Hustle">🔥</div>
-                                    <div class="trait-option" data-trait="paranoia" data-tooltip="Paranoia">👀</div>
-                                    <div class="trait-option" data-trait="speed" data-tooltip="Speed">💨</div>
-                                    <div class="trait-option" data-trait="experimental" data-tooltip="Experimental">🧪</div>
-                                    <div class="trait-option" data-trait="futuristic" data-tooltip="Futuristic">🤖</div>
-                                    <div class="trait-option" data-trait="procrastination" data-tooltip="Procrastination">😴</div>
-                                    <div class="trait-option" data-trait="empathy" data-tooltip="Empathy">💝</div>
-                                    <div class="trait-option" data-trait="calm-detailed" data-tooltip="Calm">💎</div>
-                                    <div class="trait-option" data-trait="intensity-alt" data-tooltip="Intensity">⚡</div>
-                                    <div class="trait-option" data-trait="flexibility" data-tooltip="Flexibility">🌿</div>
-                                    <div class="trait-option" data-trait="writing" data-tooltip="Writing">✏️</div>
-                                </div>
-                                
-                                <!-- Action Buttons Section -->
-                                <div class="action-buttons-section">
-                                    <button class="action-btn random-btn" id="randomBtn">
-                                        RANDOM
-                                        <span class="btn-shortcut">R</span>
-                                    </button>
-                                    <button class="action-btn reset-btn" id="resetBtn">
-                                        RESET
-                                        <span class="btn-shortcut">ESC</span>
-                                    </button>
-                                    <button class="action-btn save-btn" id="saveBtn">
-                                        SAVE
-                                        <span class="btn-shortcut">S</span>
-                                    </button>
-                                    <button class="action-btn generate-btn" id="generateBtn">
-                                        GENERATE
-                                        <span class="btn-shortcut">G</span>
-                                    </button>
-                                </div>
-
-
-                                <!-- Generation Status (hidden by default) -->
-                                <div class="generation-status" id="generationStatus">
-                                    Analyzing trait patterns and generating persona...
-                                </div>
-
-                                <!-- Command Buttons -->
-                                <div class="command-grid">
-                                    <div class="button-row">
-                                        <button class="terminal-button secondary" id="randomBtn">
-                                            Random
-                                            <div class="button-subtitle">R</div>
-                                        </button>
-                                        <button class="terminal-button secondary" id="resetBtn">
-                                            Reset
-                                            <div class="button-subtitle">ESC</div>
-                                        </button>
-                                        <button class="terminal-button secondary" id="saveBtn">
-                                            Save
-                                            <div class="button-subtitle">S</div>
-                                        </button>
-                                    </div>
-                                    <button class="terminal-button primary button-generate" id="generateBtn">
-                                        Generate
-                                        <div class="button-subtitle">G</div>
-                                    </button>
-                                </div>
+                            <div class="trait-row">
+                                <span class="trait-label">
+                                    <span class="trait-emoji">🎯</span>
+                                    Intense Focus
+                                </span>
+                                <div class="toggle-switch" data-trait="intensity"></div>
+                            </div>
+                            
+                            <div class="trait-row">
+                                <span class="trait-label">
+                                    <span class="trait-emoji">🚀</span>
+                                    Innovation
+                                </span>
+                                <div class="toggle-switch" data-trait="innovation"></div>
+                            </div>
+                            
+                            <div class="trait-row">
+                                <span class="trait-label">
+                                    <span class="trait-emoji">🤝</span>
+                                    Cooperative
+                                </span>
+                                <div class="toggle-switch" data-trait="collaborative"></div>
+                            </div>
+                            
+                            <div class="trait-row">
+                                <span class="trait-label">
+                                    <span class="trait-emoji">🧘</span>
+                                    Calm Under Pressure
+                                </span>
+                                <div class="toggle-switch" data-trait="calm"></div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Back of Card (Mac-Style Terminal Interface) -->
-                        <div class="card-flip-back">
-                            <div class="terminal-interface">
-                                <div class="terminal-header-bar">
-                                    <span>🖥️ Neural Terminal</span>
-                                    <button class="terminal-close-btn" id="terminalCloseBtn">BACK</button>
-                                </div>
-                                <div class="terminal-output" id="terminalOutput">
-                                    <!-- Terminal content will be populated by JavaScript -->
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Soundbar Visualization -->
+                    <div class="soundbar-container" id="soundbarContainer">
+                        <div class="soundbar active" data-trait="energy"></div>
+                        <div class="soundbar" data-trait="intensity"></div>
+                        <div class="soundbar" data-trait="innovation"></div>
+                        <div class="soundbar" data-trait="collaborative"></div>
+                        <div class="soundbar" data-trait="calm"></div>
+                        <div class="soundbar" data-trait="analytical"></div>
+                        <div class="soundbar active" data-trait="creative"></div>
+                        <div class="soundbar active" data-trait="leadership"></div>
+                        <div class="soundbar active" data-trait="technical"></div>
+                        <div class="soundbar" data-trait="mystery"></div>
+                        <div class="soundbar" data-trait="discipline"></div>
+                        <div class="soundbar" data-trait="curiosity"></div>
+                        <div class="soundbar" data-trait="hustle"></div>
+                        <div class="soundbar" data-trait="paranoia"></div>
+                        <div class="soundbar" data-trait="speed"></div>
+                        <div class="soundbar" data-trait="experimental"></div>
+                        <div class="soundbar" data-trait="futuristic"></div>
+                        <div class="soundbar" data-trait="procrastination"></div>
+                    </div>
+
+                    <!-- Trait Grid Section -->
+                    <div class="trait-grid" id="traitGrid">
+                        <div class="trait-option" data-trait="analytical" data-tooltip="Analytical">🔬</div>
+                        <div class="trait-option selected" data-trait="creative" data-tooltip="Creative">🎨</div>
+                        <div class="trait-option selected" data-trait="leadership" data-tooltip="Leadership">👑</div>
+                        <div class="trait-option selected" data-trait="technical" data-tooltip="Technical">🔧</div>
+                        <div class="trait-option" data-trait="mystery" data-tooltip="Mystery">🕵️</div>
+                        <div class="trait-option" data-trait="discipline" data-tooltip="Discipline">💪</div>
+                        <div class="trait-option" data-trait="curiosity" data-tooltip="Curiosity">🔍</div>
+                        <div class="trait-option" data-trait="hustle" data-tooltip="Hustle">🔥</div>
+                        <div class="trait-option" data-trait="paranoia" data-tooltip="Paranoia">👀</div>
+                        <div class="trait-option" data-trait="speed" data-tooltip="Speed">💨</div>
+                        <div class="trait-option" data-trait="experimental" data-tooltip="Experimental">🧪</div>
+                        <div class="trait-option" data-trait="futuristic" data-tooltip="Futuristic">🤖</div>
+                        <div class="trait-option" data-trait="procrastination" data-tooltip="Procrastination">😴</div>
+                        <div class="trait-option" data-trait="empathy" data-tooltip="Empathy">💝</div>
+                        <div class="trait-option" data-trait="calm-detailed" data-tooltip="Calm">💎</div>
+                        <div class="trait-option" data-trait="intensity-alt" data-tooltip="Intensity">⚡</div>
+                        <div class="trait-option" data-trait="flexibility" data-tooltip="Flexibility">🌿</div>
+                        <div class="trait-option" data-trait="writing" data-tooltip="Writing">✏️</div>
+                    </div>
+                    
+                    <!-- Action Buttons Section -->
+                    <div class="action-buttons-section">
+                        <button class="action-btn random-btn" id="randomBtn">
+                            RANDOM
+                            <span class="btn-shortcut">R</span>
+                        </button>
+                        <button class="action-btn reset-btn" id="resetBtn">
+                            RESET
+                            <span class="btn-shortcut">ESC</span>
+                        </button>
+                        <button class="action-btn save-btn" id="saveBtn">
+                            SAVE
+                            <span class="btn-shortcut">S</span>
+                        </button>
+                        <button class="action-btn generate-btn" id="generateBtn">
+                            GENERATE
+                            <span class="btn-shortcut">G</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -3092,11 +3043,6 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
                 if (saveBtn) saveBtn.addEventListener('click', () => this.savePersona());
 
 
-                // Add Terminal Mode functionality
-                const terminalModeBtn = document.getElementById('terminalModeBtn');
-                const terminalCloseBtn = document.getElementById('terminalCloseBtn');
-                if (terminalModeBtn) terminalModeBtn.addEventListener('click', () => this.enterTerminalMode());
-                if (terminalCloseBtn) terminalCloseBtn.addEventListener('click', () => this.exitTerminalMode());
 
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
@@ -3108,11 +3054,7 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
                         this.randomizeTraits();
                     } else if (e.key === 'Escape') {
                         e.preventDefault();
-                        if (this.isTerminalMode) {
-                            this.exitTerminalMode();
-                        } else {
-                            this.resetTraits();
-                        }
+                        this.resetTraits();
                     }
                 });
 
@@ -3317,9 +3259,6 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             showGeneratingState() {
-                // Show generation status
-                const generationStatus = document.getElementById('generationStatus');
-                if (generationStatus) generationStatus.classList.add('show');
                 
                 // Activate all sound bars for generation
                 document.querySelectorAll('.soundbar').forEach(bar => {
@@ -3335,9 +3274,6 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             hideGeneratingState() {
-                // Hide generation status
-                const generationStatus = document.getElementById('generationStatus');
-                if (generationStatus) generationStatus.classList.remove('show');
                 
                 // Remove generating state from sound bars
                 document.querySelectorAll('.soundbar').forEach(bar => {

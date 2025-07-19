@@ -27,7 +27,7 @@
 }
 
 /* Unified Card Styling */
-.terminal-panel, .avatar-card {
+.trait-selector-card, .avatar-card {
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(51, 51, 51, 0.2);
     border-radius: 0;
@@ -41,13 +41,13 @@
     height: 580px; /* Fixed height for both cards */
 }
 
-.terminal-panel:hover, .avatar-card:hover {
+.trait-selector-card:hover, .avatar-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Unified Header Styling */
-.terminal-header, .avatar-card-header {
+.trait-card-header, .avatar-card-header {
     background: #e0e0e0;
     color: #333;
     padding: 12px 15px;
@@ -67,7 +67,7 @@
 }
 
 /* Left Panel Content */
-.terminal-content {
+.trait-card-content {
     padding: 10px 15px 15px;
     color: var(--text-dark);
     display: flex;
@@ -362,62 +362,6 @@
 }
 
 
-/* Command Buttons */
-.command-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 8px;
-}
-
-.button-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 2px;
-}
-
-.terminal-button {
-    border: none;
-    padding: 10px 6px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: 'Roboto Mono', monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-}
-
-.terminal-button.primary {
-    background: var(--green);
-    color: white;
-}
-
-.terminal-button.primary:hover {
-    background: #002d1a;
-    transform: translateY(-1px);
-}
-
-.terminal-button.secondary {
-    background: var(--bronze);
-    color: white;
-}
-
-.terminal-button.secondary:hover {
-    background: #6b5010;
-    transform: translateY(-1px);
-}
-
-.button-subtitle {
-    font-size: 8px;
-    opacity: 0.8;
-    font-weight: 400;
-}
 
 /* Card Accents */
 .trait-panel-accent, .blue-accent {
@@ -438,7 +382,7 @@
         gap: 20px;
     }
 
-    .avatar-display, .terminal-panel {
+    .avatar-display, .trait-selector-card {
         height: auto; /* Allow flexible height on mobile */
         min-height: 400px;
     }

@@ -3142,8 +3142,14 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
             }
 
             toggleAdvanced() {
-                // Advanced button should directly flip to terminal mode
-                this.enterTerminalMode();
+                const content = document.getElementById('advancedContent');
+                const toggle = document.getElementById('advancedToggle');
+                
+                if (content && toggle) {
+                    content.classList.toggle('show');
+                    const isOpen = content.classList.contains('show');
+                    toggle.innerHTML = isOpen ? '<span>▼ Advanced</span>' : '<span>▶ Advanced</span>';
+                }
             }
 
             toggleTrait(e) {

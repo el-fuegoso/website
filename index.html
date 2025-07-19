@@ -17,7 +17,7 @@
     <script src="js/conversation/conversation-manager.js?v=4"></script>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/trait-selector.css">
-    <link rel="stylesheet" href="css/museum-cards.css?v=1.5">
+    <link rel="stylesheet" href="css/avatar-cards.css?v=1.5">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 </head>
@@ -89,8 +89,8 @@
     </div>
 
     <div class="terminal-section">
-        <div class="museum-container">
-            <!-- Left Panel - Museum Card Style with Flip -->
+        <div class="avatar-container">
+            <!-- Left Panel - Avatar Card Style with Flip -->
             <div class="terminal-panel">
                 <div class="trait-panel-accent"></div>
                 
@@ -99,7 +99,7 @@
                     <div class="card-flip-inner">
                         <!-- Front of Card (Original Content) -->
                         <div class="card-flip-front">
-                            <!-- Museum Card Header -->
+                            <!-- Avatar Card Header -->
                             <div class="terminal-header">
                                 <div class="toggle-header">
                                     <span class="toggle-title">Select Traits</span>
@@ -279,16 +279,16 @@
                 </div>
             </div>
 
-            <!-- Right Panel - Museum Card Display -->
-            <div class="museum-display">
-                <div class="museum-card" id="museumCard">
+            <!-- Right Panel - Avatar Card Display -->
+            <div class="avatar-display">
+                <div class="avatar-card" id="avatarCard">
                     <div class="blue-accent"></div>
                     <div class="hover-effect"></div>
                     <div class="blue-accent"></div>
                     <div class="hover-effect"></div>
                     
-                    <!-- Museum Card Header -->
-                    <div class="museum-card-header">
+                    <!-- Avatar Card Header -->
+                    <div class="avatar-card-header">
                         <div class="toggle-header">
                             <span class="toggle-title">Digital Persona</span>
                             <span class="trait-counter" id="displayTraitCounter">4/18</span>
@@ -3338,8 +3338,8 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
                 if (personaDescription) personaDescription.textContent = persona.description;
                 if (personaTraits) personaTraits.innerHTML = persona.traits;
 
-                // Add success animation to museum card
-                const card = document.getElementById('museumCard');
+                // Add success animation to avatar card
+                const card = document.getElementById('avatarCard');
                 if (card) {
                     card.style.transform = 'scale(1.02)';
                     setTimeout(() => {

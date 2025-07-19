@@ -849,7 +849,7 @@
 .action-buttons-section {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 8px;
+    gap: 2px;
     margin: 16px 4px 12px 4px;
     flex-shrink: 0;
 }
@@ -858,7 +858,7 @@
     background: var(--bronze);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     padding: 12px 8px;
     font-size: 12px;
     font-weight: 600;
@@ -1094,7 +1094,7 @@
     color: #ffffff;
     font-size: 14px;
     font-weight: 600;
-    margin: 12px 12px 8px 12px;
+    margin: 0;
     text-align: left;
     flex-shrink: 0;
 }

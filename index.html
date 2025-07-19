@@ -218,21 +218,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Advanced Section -->
-                                <div class="advanced-section">
-                                    <div class="advanced-toggle" id="advancedToggle">
-                                        <span>▶ Advanced</span>
-                                    </div>
-                                    <div class="advanced-content" id="advancedContent">
-                                        <p>Access the experimental terminal interface for advanced personality analysis.</p>
-                                        
-                                        <!-- Terminal Mode Button -->
-                                        <button class="terminal-mode-btn" id="terminalModeBtn">
-                                            <span>🖥️ Enter Terminal Mode</span>
-                                            <div class="button-subtitle">Flip Card</div>
-                                        </button>
-                                    </div>
-                                </div>
 
                                 <!-- Generation Status (hidden by default) -->
                                 <div class="generation-status" id="generationStatus">
@@ -3106,9 +3091,6 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
                 if (resetBtn) resetBtn.addEventListener('click', () => this.resetTraits());
                 if (saveBtn) saveBtn.addEventListener('click', () => this.savePersona());
 
-                // Add Advanced toggle functionality
-                const advancedToggle = document.getElementById('advancedToggle');
-                if (advancedToggle) advancedToggle.addEventListener('click', () => this.toggleAdvanced());
 
                 // Add Terminal Mode functionality
                 const terminalModeBtn = document.getElementById('terminalModeBtn');
@@ -3161,20 +3143,6 @@ Your personality profile shows: Balanced traits across multiple dimensions with 
                 }
             }
 
-            toggleAdvanced() {
-                console.log('Advanced toggle clicked!'); // Debug log
-                const content = document.getElementById('advancedContent');
-                const toggle = document.getElementById('advancedToggle');
-                
-                if (content && toggle) {
-                    content.classList.toggle('show');
-                    const isOpen = content.classList.contains('show');
-                    toggle.innerHTML = isOpen ? '<span>▼ Advanced</span>' : '<span>▶ Advanced</span>';
-                    console.log('Advanced content toggled:', isOpen); // Debug log
-                } else {
-                    console.log('Advanced elements not found:', { content, toggle }); // Debug log
-                }
-            }
 
             toggleTrait(e) {
                 console.log('Toggle switch clicked:', e.currentTarget.dataset.trait); // Debug log

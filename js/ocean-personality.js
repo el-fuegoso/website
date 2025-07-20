@@ -15,6 +15,7 @@ class OceanPersonalitySystem {
         
         this.selectedTraits = new Set();
         this.isGenerating = false;
+        this.helixAnimation = null;
         
         this.init();
     }
@@ -22,7 +23,190 @@ class OceanPersonalitySystem {
     init() {
         this.setupTraitSelectors();
         this.setupActionButtons();
+        this.startDefaultShuffleAnimation();
         this.updateDisplay();
+    }
+
+    startDefaultShuffleAnimation() {
+        // Start with shuffled character display
+        this.displayShuffledCharacters();
+        this.startHelixAnimation();
+    }
+
+    displayShuffledCharacters() {
+        const titleElement = document.querySelector('.artwork-title');
+        const subtitleElement = document.querySelector('.artwork-subtitle');
+        const detailsElement = document.querySelector('.artwork-details');
+        
+        if (titleElement) titleElement.textContent = 'SHUFFLING...';
+        if (subtitleElement) subtitleElement.textContent = 'Analyzing Personality Matrix';
+        if (detailsElement) detailsElement.textContent = 'Select traits to discover your character match. Each selection refines the personality analysis...';
+        
+        // Start continuous character shuffle
+        this.shuffleCharacterNames();
+    }
+
+    shuffleCharacterNames() {
+        const names = ['CONSPIRACYEL', 'THEBUILDER', 'THEDETECTIVE', 'GYMBRO', 'PIRATEEIL', 'COFFEEADDICT'];
+        const titleElement = document.querySelector('.artwork-title');
+        
+        if (!titleElement) return;
+        
+        let index = 0;
+        const shuffleInterval = setInterval(() => {
+            if (this.isGenerating) {
+                clearInterval(shuffleInterval);
+                return;
+            }
+            
+            titleElement.textContent = names[index % names.length];
+            index++;
+        }, 800);
+        
+        // Store interval for cleanup
+        this.shuffleInterval = shuffleInterval;
+    }
+
+    startHelixAnimation() {
+        const imageContainer = document.querySelector('.image-container');
+        if (!imageContainer) return;
+
+        // Create canvas for helix animation
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 250;
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        
+        imageContainer.innerHTML = '';
+        imageContainer.appendChild(canvas);
+        
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Animation variables
+        let time = 0;
+        const particles = [];
+        let helixPoints = [];
+        const numParticles = 30; // Fewer particles for performance
+        const TWO_PI = Math.PI * 2;
+
+        // Helper functions
+        const random = (min, max) => {
+            if (max === undefined) {
+                max = min;
+                min = 0;
+            }
+            return Math.random() * (max - min) + min;
+        };
+
+        const map = (value, start1, stop1, start2, stop2) => {
+            return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+        };
+
+        const dist = (x1, y1, z1, x2, y2, z2) => {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const dz = z2 - z1;
+            return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        };
+
+        // HelixParticle class
+        class HelixParticle {
+            constructor(initialPhase) {
+                this.phase = initialPhase || random(TWO_PI);
+                this.radius = random(45, 55); // Scaled for smaller canvas
+                this.yOffset = random(-150, 150);
+                this.ySpeed = random(0.3, 0.6) * (random() > 0.5 ? 1 : -1);
+                this.rotationSpeed = random(0.005, 0.0075);
+                this.size = random(2, 4);
+                this.opacity = random(120, 180);
+                this.strength = random(0.8, 1);
+            }
+
+            update() {
+                this.phase += this.rotationSpeed * this.strength;
+                this.yOffset += this.ySpeed;
+
+                if (this.yOffset > 175) this.yOffset = -175;
+                if (this.yOffset < -175) this.yOffset = 175;
+
+                const x = width / 2 + Math.cos(this.phase) * this.radius;
+                const y = height / 2 + this.yOffset;
+                const z = Math.sin(this.phase) * this.radius;
+
+                return { x, y, z, strength: this.strength, size: this.size, opacity: this.opacity };
+            }
+        }
+
+        // Create helix particles
+        for (let i = 0; i < numParticles; i++) {
+            const initialPhase = (i / numParticles) * TWO_PI * 3;
+            particles.push(new HelixParticle(initialPhase));
+        }
+
+        // Animation loop
+        const animate = () => {
+            if (!this.helixAnimation) return;
+
+            // Clear background
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, width, height);
+
+            time += 0.02;
+
+            // Update helix points
+            helixPoints = particles.map(particle => particle.update());
+            helixPoints.sort((a, b) => a.z - b.z);
+
+            // Draw connections
+            ctx.lineWidth = 1;
+            for (let i = 0; i < helixPoints.length; i++) {
+                const hp1 = helixPoints[i];
+                for (let j = 0; j < helixPoints.length; j++) {
+                    if (i !== j) {
+                        const hp2 = helixPoints[j];
+                        const d = dist(hp1.x, hp1.y, hp1.z, hp2.x, hp2.y, hp2.z);
+
+                        if (d < 60) {
+                            const opacity = map(d, 0, 60, 40, 10) * 
+                                          map(Math.min(hp1.z, hp2.z), -55, 55, 0.3, 1);
+
+                            ctx.strokeStyle = `rgba(200, 200, 200, ${opacity / 255})`;
+                            ctx.beginPath();
+                            ctx.moveTo(hp1.x, hp1.y);
+                            ctx.lineTo(hp2.x, hp2.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            // Draw helix points
+            for (let i = 0; i < helixPoints.length; i++) {
+                const hp = helixPoints[i];
+                const sizeMultiplier = map(hp.z, -55, 55, 0.6, 1.3);
+                const adjustedOpacity = map(hp.z, -55, 55, hp.opacity * 0.4, hp.opacity);
+
+                ctx.fillStyle = `rgba(255, 255, 255, ${adjustedOpacity / 255})`;
+                ctx.beginPath();
+                ctx.arc(hp.x, hp.y, (hp.size * sizeMultiplier) / 2, 0, TWO_PI);
+                ctx.fill();
+            }
+
+            this.helixAnimation = requestAnimationFrame(animate);
+        };
+
+        // Start animation
+        this.helixAnimation = requestAnimationFrame(animate);
+    }
+
+    stopHelixAnimation() {
+        if (this.helixAnimation) {
+            cancelAnimationFrame(this.helixAnimation);
+            this.helixAnimation = null;
+        }
     }
 
     // Trait to OCEAN mapping weights
@@ -185,8 +369,64 @@ class OceanPersonalitySystem {
         const counter = document.getElementById('traitCounter');
         const displayCounter = document.getElementById('displayTraitCounter');
         
-        if (counter) counter.textContent = `${this.selectedTraits.size}/18`;
-        if (displayCounter) displayCounter.textContent = `${this.selectedTraits.size}/18`;
+        if (counter) counter.textContent = `${this.selectedTraits.size}/18 v2.0`;
+        if (displayCounter) displayCounter.textContent = `${this.selectedTraits.size}/18 v2.0`;
+        
+        // Update soundbars to be responsive to trait selection
+        this.updateSoundbars();
+        
+        // Update radar charts
+        this.updateRadarCharts();
+    }
+
+    updateSoundbars() {
+        const soundbars = document.querySelectorAll('.soundbar');
+        const oceanScores = this.userScores;
+        
+        soundbars.forEach((bar, index) => {
+            // Map soundbars to OCEAN dimensions and selected traits
+            const traitNames = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
+            const dimension = traitNames[index % 5];
+            const score = oceanScores[dimension] || 0;
+            
+            // Calculate height based on OCEAN score and selected traits
+            let height = Math.max(8, score * 50 + 10); // Base height + score influence
+            
+            // Add activity if related traits are selected
+            const relatedTraits = this.getRelatedTraits(dimension);
+            const hasRelatedTraits = relatedTraits.some(trait => this.selectedTraits.has(trait));
+            
+            if (hasRelatedTraits) {
+                height += 15; // Boost height for active traits
+                bar.classList.add('active');
+            } else {
+                bar.classList.remove('active');
+            }
+            
+            // Apply height with smooth transition
+            bar.style.height = `${Math.min(height, 60)}px`;
+            bar.style.transition = 'height 0.3s ease, background-color 0.3s ease';
+            
+            // Color based on activity
+            if (hasRelatedTraits) {
+                bar.style.backgroundColor = 'var(--amber)';
+            } else if (score > 0.3) {
+                bar.style.backgroundColor = 'var(--bronze)';
+            } else {
+                bar.style.backgroundColor = '#ddd';
+            }
+        });
+    }
+
+    getRelatedTraits(dimension) {
+        const traitMappings = {
+            openness: ['innovation', 'brush', 'fire', 'lightning', 'cycle'],
+            conscientiousness: ['intense-focus', 'wrench', 'sword', 'hammer', 'pencil'],
+            extraversion: ['high-energy', 'crown', 'smile', 'fire', 'lightning'],
+            agreeableness: ['cooperative', 'heart', 'link', 'plant', 'smile'],
+            neuroticism: ['warning', 'eyes', 'shield']
+        };
+        return traitMappings[dimension] || [];
     }
 
     findBestCharacterMatch() {
@@ -224,6 +464,13 @@ class OceanPersonalitySystem {
         this.isGenerating = true;
         const generateBtn = document.querySelector('.generate-btn');
         
+        // Stop shuffling
+        if (this.shuffleInterval) {
+            clearInterval(this.shuffleInterval);
+            this.shuffleInterval = null;
+        }
+        this.stopHelixAnimation();
+        
         if (generateBtn) {
             generateBtn.textContent = 'GENERATING...';
             generateBtn.disabled = true;
@@ -245,7 +492,7 @@ class OceanPersonalitySystem {
         } finally {
             this.isGenerating = false;
             if (generateBtn) {
-                generateBtn.textContent = 'GENERATE';
+                generateBtn.textContent = 'GENERATE v2.0';
                 generateBtn.disabled = false;
             }
         }
@@ -334,6 +581,74 @@ class OceanPersonalitySystem {
         }
         
         element.textContent = finalText;
+    }
+
+    updateRadarCharts() {
+        // Update user profile radar chart
+        this.updateRadarChart('user', this.userScores);
+        
+        // Update character radar chart if a character is generated
+        const match = this.findBestCharacterMatch();
+        if (match.character) {
+            this.updateRadarChart('character', match.character.ocean);
+        }
+    }
+
+    updateRadarChart(type, scores) {
+        const charts = document.querySelectorAll('.header-radar-chart');
+        const chartIndex = type === 'user' ? 0 : 1;
+        const chart = charts[chartIndex];
+        
+        if (!chart) return;
+
+        // OCEAN dimensions mapped to pentagon points
+        const oceanOrder = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
+        const points = [];
+        
+        // Pentagon coordinates (center at 60,60, radius varies with score)
+        const centerX = 60;
+        const centerY = 60;
+        const maxRadius = 45;
+        
+        oceanOrder.forEach((dimension, index) => {
+            const angle = (index * 72 - 90) * (Math.PI / 180); // Start from top, 72° between points
+            const score = scores[dimension] || 0;
+            const radius = maxRadius * score;
+            
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+        });
+
+        // Remove existing data elements
+        const existingData = chart.querySelectorAll('.data-polygon, .data-point');
+        existingData.forEach(element => element.remove());
+
+        // Create new data polygon
+        const dataPolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        dataPolygon.setAttribute('class', 'data-polygon');
+        dataPolygon.setAttribute('points', points.join(' '));
+        dataPolygon.setAttribute('fill', type === 'user' ? 'rgba(0, 66, 37, 0.3)' : 'rgba(204, 122, 0, 0.3)');
+        dataPolygon.setAttribute('stroke', type === 'user' ? '#004225' : '#CC7A00');
+        dataPolygon.setAttribute('stroke-width', '1.5');
+
+        // Add to chart
+        chart.appendChild(dataPolygon);
+
+        // Add data points
+        points.forEach((point, index) => {
+            const [x, y] = point.split(',').map(Number);
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '2');
+            circle.setAttribute('fill', type === 'user' ? '#004225' : '#CC7A00');
+            circle.setAttribute('stroke', type === 'user' ? '#004225' : '#CC7A00');
+            circle.setAttribute('stroke-width', '1');
+            circle.setAttribute('class', 'data-point');
+            
+            chart.appendChild(circle);
+        });
     }
 
     randomizeTraits() {

@@ -2667,6 +2667,7 @@
     </script>    <!-- Main Application JavaScript -->
     <script src="js/main.js?v=2.0&t=20250720"></script>
     <script src="js/ocean-personality.js?v=1.0&t=20250720"></script>
+    <script src="js/trait-selector.js?v=1.0&t=20250720"></script>
     
     <script>
         // Cache busting and debugging
@@ -2706,7 +2707,14 @@
     <script>
         // Initialize the application after DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            window.initialize();
+            console.log('🚀 Application initializing...');
+            
+            // All initialization is handled by individual modules
+            // Ocean system initializes via ocean-personality.js
+            // Terminal mode initializes via trait-selector.js
+            // Main app features initialize via main.js
+            
+            console.log('✅ Application initialized successfully');
         });
     </script>
 </body>

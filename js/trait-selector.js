@@ -1569,32 +1569,16 @@ function initializeTerminalMode() {
     if (terminalModeBtn && terminalContainer && traitSelectorCard) {
         // Enter terminal mode
         terminalModeBtn.addEventListener('click', () => {
+            // Trigger flip animation to show the terminal
             traitSelectorCard.classList.add('flipped');
-            terminalContainer.style.display = 'flex';
-            
-            // Initialize terminal if not already done
-            if (!window.terminal) {
-                window.terminal = new Terminal();
-            }
-            
-            // Show welcome message and focus input
-            setTimeout(() => {
-                window.terminal.showWelcomeMessage();
-                if (terminalInput) {
-                    terminalInput.focus();
-                }
-            }, 300);
+            terminalContainer.classList.add('flipped');
         });
-        
-        // Exit terminal mode
-        if (terminalCloseBtn) {
-            terminalCloseBtn.addEventListener('click', () => {
-                traitSelectorCard.classList.remove('flipped');
-                setTimeout(() => {
-                    terminalContainer.style.display = 'none';
-                }, 300);
-            });
-        }
+
+        terminalCloseBtn.addEventListener('click', () => {
+            // Trigger flip animation to show the trait selector card
+            traitSelectorCard.classList.remove('flipped');
+            terminalContainer.classList.remove('flipped');
+        });
         
         // Handle terminal input
         if (terminalInput) {

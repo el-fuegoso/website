@@ -636,6 +636,7 @@ class OceanPersonalitySystem {
             const traitsList = match.character.traits.join(', ');
             const traitsText = `${traitsList}.<br>An expert in pattern recognition, system thinking, uncovering hidden issues.`;
             traitsElement.innerHTML = traitsText;
+            traitsElement.style.display = 'block'; // Show the traits when character is generated
         }
     }
 

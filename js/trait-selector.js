@@ -27,6 +27,11 @@ class Terminal {
     }
     
     showWelcomeMessage() {
+        // Clear existing content first
+        if (this.output) {
+            this.output.innerHTML = '';
+        }
+        
         // Add ELLIOT ASCII art with animation delay using Unicode blocks
         const elliotLines = [
             '███████ ██      ██      ██  ██████  ████████',

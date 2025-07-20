@@ -502,6 +502,9 @@
 .terminal-line {
     margin-bottom: 2px;
     word-wrap: break-word;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
 }
 
 .terminal-input-line {

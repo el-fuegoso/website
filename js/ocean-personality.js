@@ -381,40 +381,135 @@ class OceanPersonalitySystem {
 
     updateSoundbars() {
         const soundbars = document.querySelectorAll('.soundbar');
-        const oceanScores = this.userScores;
         
-        soundbars.forEach((bar, index) => {
-            // Map soundbars to traits directly
+        soundbars.forEach((bar) => {
             const trait = bar.dataset.trait;
+            const harmony = bar.dataset.harmony;
             if (!trait) return;
             
             // Check if this trait is selected
             const isSelected = this.selectedTraits.has(trait);
             
-            // Calculate height based on selection and OCEAN influence
-            let height = 8; // Base height
+            // Calculate height based on selection and relationships
+            let height = 12; // Base height
+            const relatedTraits = this.getTraitResonance(trait);
+            const resonanceCount = relatedTraits.filter(t => this.selectedTraits.has(t)).length;
             
             if (isSelected) {
-                height = Math.random() * 30 + 35; // Dynamic height for selected traits
+                height = 45 + Math.random() * 15; // Primary trait height
                 bar.classList.add('active');
+                this.applyTraitColor(bar, harmony, 'primary');
                 
-                // Add pulse effect for visual feedback
-                bar.classList.add('pulse');
-                setTimeout(() => bar.classList.remove('pulse'), 400);
-            } else {
-                height = Math.random() * 15 + 8; // Subtle variation for unselected
+                // Trigger resonance effects
+                this.triggerResonance(trait);
+            } else if (resonanceCount > 0) {
+                height = 25 + (resonanceCount * 8) + Math.random() * 10; // Resonance height
+                bar.classList.add('resonance');
                 bar.classList.remove('active');
+                this.applyTraitColor(bar, harmony, 'resonance');
+            } else {
+                height = 8 + Math.random() * 8; // Base height with variation
+                bar.classList.remove('active', 'resonance');
+                this.applyTraitColor(bar, harmony, 'neutral');
             }
             
             // Apply height with smooth transition
-            bar.style.height = `${Math.min(height, 60)}px`;
-            bar.style.transition = 'height 0.3s ease, background-color 0.3s ease';
+            bar.style.height = `${Math.min(height, 65)}px`;
+            bar.style.transition = 'all 0.3s ease';
             
             // Add click handler for interactive soundbars
             if (!bar.hasClickHandler) {
                 bar.addEventListener('click', () => this.toggleTraitFromSoundbar(trait));
                 bar.style.cursor = 'pointer';
                 bar.hasClickHandler = true;
+            }
+        });
+    }
+
+    getTraitResonance(trait) {
+        // Define trait relationship matrix for resonance effects
+        const resonanceMatrix = {
+            // Creative cluster
+            'brush': ['fire', 'lightning', 'diamond', 'cycle'],
+            'fire': ['brush', 'lightning', 'crown', 'hammer'],
+            'lightning': ['fire', 'brush', 'crown', 'wrench'],
+            
+            // Technical cluster  
+            'wrench': ['sword', 'hammer', 'pencil', 'lightning'],
+            'sword': ['wrench', 'magnify', 'eyes', 'shield'],
+            'hammer': ['wrench', 'fire', 'crown', 'plant'],
+            'pencil': ['wrench', 'sword', 'magnify', 'diamond'],
+            
+            // Social cluster
+            'heart': ['smile', 'link', 'plant', 'shield'],
+            'smile': ['heart', 'link', 'crown', 'fire'],
+            'link': ['heart', 'smile', 'cycle', 'plant'],
+            
+            // Leadership cluster
+            'crown': ['fire', 'lightning', 'smile', 'hammer'],
+            'shield': ['sword', 'heart', 'eyes', 'warning'],
+            
+            // Analytical cluster
+            'magnify': ['sword', 'eyes', 'pencil', 'cycle'],
+            'eyes': ['magnify', 'sword', 'warning', 'shield'],
+            'warning': ['eyes', 'shield', 'sword', 'cycle'],
+            
+            // Growth cluster
+            'plant': ['heart', 'link', 'hammer', 'cycle'],
+            'cycle': ['plant', 'brush', 'magnify', 'warning'],
+            'diamond': ['brush', 'pencil', 'crown', 'lightning']
+        };
+        
+        return resonanceMatrix[trait] || [];
+    }
+
+    applyTraitColor(bar, harmony, state) {
+        // Color harmony system based on personality psychology
+        const colorPalettes = {
+            // Creative/Openness - Warm, vibrant colors
+            creative: { primary: '#FF6B35', resonance: '#FF8E53', neutral: '#D4A574' },
+            passionate: { primary: '#E63946', resonance: '#F77F7F', neutral: '#C9ADA7' },
+            energetic: { primary: '#FFD60A', resonance: '#FFE066', neutral: '#FFEAA7' },
+            
+            // Technical/Conscientiousness - Cool, precise colors
+            technical: { primary: '#457B9D', resonance: '#6A9AC1', neutral: '#A8DADC' },
+            analytical: { primary: '#1D3557', resonance: '#4A628A', neutral: '#758EA1' },
+            precise: { primary: '#2A9D8F', resonance: '#54B3A7', neutral: '#81C3B7' },
+            
+            // Social/Agreeableness - Warm, harmonious colors
+            social: { primary: '#F77F00', resonance: '#FB8500', neutral: '#FFB30F' },
+            empathetic: { primary: '#C1666B', resonance: '#D4939D', neutral: '#E8BBB7' },
+            positive: { primary: '#06FFA5', resonance: '#40FFB8', neutral: '#7AFFCC' },
+            
+            // Leadership/Extraversion - Bold, commanding colors
+            leadership: { primary: '#7209B7', resonance: '#9D4EDD', neutral: '#C77DFF' },
+            builder: { primary: '#F72585', resonance: '#FF6BB3', neutral: '#FF9EC7' },
+            
+            // Protective/Mixed traits - Balanced colors
+            protective: { primary: '#2F3E46', resonance: '#52796F', neutral: '#84A98C' },
+            vigilant: { primary: '#CAD2C5', resonance: '#84A98C', neutral: '#52796F' },
+            investigative: { primary: '#264653', resonance: '#2A9D8F', neutral: '#8AB17D' },
+            observant: { primary: '#E9C46A', resonance: '#F4A261', neutral: '#E76F51' },
+            adaptive: { primary: '#6A994E', resonance: '#A7C957', neutral: '#BC4749' },
+            growth: { primary: '#386641', resonance: '#6A994E', neutral: '#A7C957' },
+            valuable: { primary: '#7B2CBF', resonance: '#9D4EDD', neutral: '#C77DFF' }
+        };
+        
+        const palette = colorPalettes[harmony] || colorPalettes.technical;
+        bar.style.backgroundColor = palette[state];
+    }
+
+    triggerResonance(clickedTrait) {
+        const relatedTraits = this.getTraitResonance(clickedTrait);
+        
+        relatedTraits.forEach((relatedTrait, index) => {
+            const relatedBar = document.querySelector(`.soundbar[data-trait="${relatedTrait}"]`);
+            if (relatedBar && !this.selectedTraits.has(relatedTrait)) {
+                // Staggered pulse animation
+                setTimeout(() => {
+                    relatedBar.classList.add('pulse');
+                    setTimeout(() => relatedBar.classList.remove('pulse'), 600);
+                }, index * 100);
             }
         });
     }
@@ -500,12 +595,31 @@ class OceanPersonalitySystem {
     }
 
     toggleTraitFromSoundbar(trait) {
-        // Find the corresponding checkbox for this trait
-        const checkbox = document.querySelector(`input[data-trait="${trait}"]`);
-        if (checkbox) {
-            checkbox.checked = !checkbox.checked;
-            // Trigger the existing toggle logic
-            this.toggleTrait(trait, checkbox.checked);
+        // Find the corresponding trait option in the emoji grid
+        const traitOption = document.querySelector(`.trait-option[data-trait="${trait}"]`);
+        if (traitOption) {
+            // Toggle the trait selection
+            const isSelected = this.selectedTraits.has(trait);
+            if (isSelected) {
+                this.selectedTraits.delete(trait);
+                traitOption.classList.remove('selected');
+            } else {
+                this.selectedTraits.add(trait);
+                traitOption.classList.add('selected');
+            }
+            
+            // Update personality scores and UI
+            this.calculatePersonalityScores();
+            this.updateTraitCounter();
+            this.updateSoundbars();
+            this.updateRadarCharts();
+            
+            // Add visual feedback for the clicked soundbar
+            const clickedBar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
+            if (clickedBar) {
+                clickedBar.classList.add('pulse');
+                setTimeout(() => clickedBar.classList.remove('pulse'), 600);
+            }
         }
     }
 

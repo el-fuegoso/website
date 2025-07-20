@@ -391,24 +391,24 @@ class OceanPersonalitySystem {
             const isSelected = this.selectedTraits.has(trait);
             
             // Calculate height based on selection and relationships
-            let height = 12; // Base height
+            let height = 8; // Base height - always start from bottom
             const relatedTraits = this.getTraitResonance(trait);
             const resonanceCount = relatedTraits.filter(t => this.selectedTraits.has(t)).length;
             
             if (isSelected) {
-                height = 45 + Math.random() * 15; // Primary trait height
+                height = 45; // Primary trait height - no randomness
                 bar.classList.add('active');
                 this.applyTraitColor(bar, harmony, 'primary');
                 
                 // Trigger resonance effects
                 this.triggerResonance(trait);
             } else if (resonanceCount > 0) {
-                height = 25 + (resonanceCount * 8) + Math.random() * 10; // Resonance height
+                height = 20 + (resonanceCount * 5); // Resonance height - clean calculation
                 bar.classList.add('resonance');
                 bar.classList.remove('active');
                 this.applyTraitColor(bar, harmony, 'resonance');
             } else {
-                height = 8 + Math.random() * 8; // Base height with variation
+                height = 8; // Base height - consistent
                 bar.classList.remove('active', 'resonance');
                 this.applyTraitColor(bar, harmony, 'neutral');
             }
@@ -464,39 +464,14 @@ class OceanPersonalitySystem {
     }
 
     applyTraitColor(bar, harmony, state) {
-        // Color harmony system based on personality psychology
-        const colorPalettes = {
-            // Creative/Openness - Warm, vibrant colors
-            creative: { primary: '#FF6B35', resonance: '#FF8E53', neutral: '#D4A574' },
-            passionate: { primary: '#E63946', resonance: '#F77F7F', neutral: '#C9ADA7' },
-            energetic: { primary: '#FFD60A', resonance: '#FFE066', neutral: '#FFEAA7' },
-            
-            // Technical/Conscientiousness - Cool, precise colors
-            technical: { primary: '#457B9D', resonance: '#6A9AC1', neutral: '#A8DADC' },
-            analytical: { primary: '#1D3557', resonance: '#4A628A', neutral: '#758EA1' },
-            precise: { primary: '#2A9D8F', resonance: '#54B3A7', neutral: '#81C3B7' },
-            
-            // Social/Agreeableness - Warm, harmonious colors
-            social: { primary: '#F77F00', resonance: '#FB8500', neutral: '#FFB30F' },
-            empathetic: { primary: '#C1666B', resonance: '#D4939D', neutral: '#E8BBB7' },
-            positive: { primary: '#06FFA5', resonance: '#40FFB8', neutral: '#7AFFCC' },
-            
-            // Leadership/Extraversion - Bold, commanding colors
-            leadership: { primary: '#7209B7', resonance: '#9D4EDD', neutral: '#C77DFF' },
-            builder: { primary: '#F72585', resonance: '#FF6BB3', neutral: '#FF9EC7' },
-            
-            // Protective/Mixed traits - Balanced colors
-            protective: { primary: '#2F3E46', resonance: '#52796F', neutral: '#84A98C' },
-            vigilant: { primary: '#CAD2C5', resonance: '#84A98C', neutral: '#52796F' },
-            investigative: { primary: '#264653', resonance: '#2A9D8F', neutral: '#8AB17D' },
-            observant: { primary: '#E9C46A', resonance: '#F4A261', neutral: '#E76F51' },
-            adaptive: { primary: '#6A994E', resonance: '#A7C957', neutral: '#BC4749' },
-            growth: { primary: '#386641', resonance: '#6A994E', neutral: '#A7C957' },
-            valuable: { primary: '#7B2CBF', resonance: '#9D4EDD', neutral: '#C77DFF' }
+        // Simple brand orange color system with subtle variations
+        const colors = {
+            primary: '#B8860B',    // Brand amber/gold
+            resonance: 'rgba(184, 134, 11, 0.6)',  // Lighter orange for resonance
+            neutral: '#ddd'        // Default neutral gray
         };
         
-        const palette = colorPalettes[harmony] || colorPalettes.technical;
-        bar.style.backgroundColor = palette[state];
+        bar.style.backgroundColor = colors[state];
     }
 
     triggerResonance(clickedTrait) {
@@ -505,11 +480,11 @@ class OceanPersonalitySystem {
         relatedTraits.forEach((relatedTrait, index) => {
             const relatedBar = document.querySelector(`.soundbar[data-trait="${relatedTrait}"]`);
             if (relatedBar && !this.selectedTraits.has(relatedTrait)) {
-                // Staggered pulse animation
+                // Simple, subtle pulse - no staggering
                 setTimeout(() => {
                     relatedBar.classList.add('pulse');
-                    setTimeout(() => relatedBar.classList.remove('pulse'), 600);
-                }, index * 100);
+                    setTimeout(() => relatedBar.classList.remove('pulse'), 400);
+                }, index * 50); // Shorter delay
             }
         });
     }

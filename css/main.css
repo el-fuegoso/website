@@ -320,6 +320,35 @@ body {
     z-index: 100;
 }
 
+/* CREATE Section Styling */
+.create-section {
+    padding: 80px 40px;
+    background: var(--bg-color);
+    position: relative;
+}
+
+.create-header {
+    margin-bottom: 60px;
+}
+
+.create-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    color: var(--text-color);
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.create-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    font-weight: 400;
+    margin: 0;
+    text-align: left;
+}
+
 .projects-header {
     margin-bottom: 60px;
 }

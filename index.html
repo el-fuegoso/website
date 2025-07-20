@@ -88,7 +88,12 @@
         </div>
     </div>
 
-    <div class="terminal-section">
+    <section class="create-section" id="create">
+        <div class="create-header">
+            <h2 class="create-title">Create</h2>
+            <p class="create-subtitle">Thinking about El? Find out which version would work best for you!</p>
+        </div>
+        
         <div class="avatar-container">
             <!-- Left Panel - Trait Selector Card -->
             <div class="trait-selector-card">
@@ -210,6 +215,39 @@
                             <span class="btn-shortcut">G</span>
                         </button>
                     </div>
+                    
+                    <!-- Advanced Section -->
+                    <div class="advanced-section">
+                        <div class="advanced-header">
+                            <span class="advanced-toggle">▼</span>
+                            <span class="advanced-title">Advanced</span>
+                        </div>
+                        <div class="advanced-content">
+                            <p class="advanced-description">Are you a pro? Have a go at doing it the hard way</p>
+                            <button class="terminal-mode-btn" id="terminalModeBtn">
+                                Enter Terminal Mode
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Terminal Container (Hidden by default) -->
+                    <div class="terminal-container" id="terminalContainer" style="display: none;">
+                        <div class="terminal-header">
+                            <div class="terminal-title">TERMINAL MODE</div>
+                            <button class="terminal-close-btn" id="terminalCloseBtn">×</button>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-output" id="terminalOutput">
+                                <div class="terminal-line">El Terminal v1.0 - Advanced Personality Interface</div>
+                                <div class="terminal-line">Type 'help' for available commands</div>
+                                <div class="terminal-line">&nbsp;</div>
+                            </div>
+                            <div class="terminal-input-line">
+                                <span class="terminal-prompt">el@personality:~$ </span>
+                                <input type="text" class="terminal-input" id="terminalInput" placeholder="Enter command..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -300,7 +338,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <section class="projects-section" id="projects">
         <div class="projects-header">

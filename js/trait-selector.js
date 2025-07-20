@@ -294,52 +294,19 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     }
 
     addPrompt() {
-        // Remove any existing input
-        if (this.input && this.input.parentNode) {
-            this.input.parentNode.remove();
+        // Use the existing terminal input field
+        this.input = document.getElementById('terminalInput');
+        
+        if (this.input) {
+            // Clear the input and focus it
+            this.input.value = '';
+            this.input.focus();
         }
         
-        // Create input container within the output
-        const inputContainer = document.createElement('div');
-        inputContainer.style.display = 'flex';
-        inputContainer.style.alignItems = 'center';
-        inputContainer.style.fontFamily = "'Roboto Mono', monospace";
-        inputContainer.style.fontSize = '12px';
-        inputContainer.style.color = '#ffffff';
-        inputContainer.style.marginTop = '8px';
-        
-        // Create prompt symbol
-        const promptSymbol = document.createElement('span');
-        promptSymbol.textContent = 'elliot@terminal ~ % ';
-        promptSymbol.style.color = '#61dafb';
-        promptSymbol.style.marginRight = '0';
-        
-        // Create input field
-        this.input = document.createElement('input');
-        this.input.type = 'text';
-        this.input.style.background = 'none';
-        this.input.style.border = 'none';
-        this.input.style.color = '#ffffff';
-        this.input.style.fontFamily = "'Roboto Mono', monospace";
-        this.input.style.fontSize = '12px';
-        this.input.style.outline = 'none';
-        this.input.style.flex = '1';
-        this.input.style.caretColor = '#ffffff';
-        
-        // Add event listener
-        this.input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !this.isProcessing) {
-                this.processInput();
-            }
-        });
-        
-        inputContainer.appendChild(promptSymbol);
-        inputContainer.appendChild(this.input);
-        this.output.appendChild(inputContainer);
-        
-        // Focus and scroll to bottom
-        this.input.focus();
-        this.output.scrollTop = this.output.scrollHeight;
+        // Scroll output to bottom
+        if (this.output) {
+            this.output.scrollTop = this.output.scrollHeight;
+        }
     }
 
     async generateTerminalAvatar(analysisData, userText = null) {
@@ -1577,6 +1544,55 @@ class ElliotGenerator {
     }
 }
 
+// Terminal Mode Functionality
+function initializeTerminalMode() {
+    const terminalModeBtn = document.getElementById('terminalModeBtn');
+    const terminalCloseBtn = document.getElementById('terminalCloseBtn');
+    const terminalContainer = document.getElementById('terminalContainer');
+    const traitSelectorCard = document.querySelector('.trait-selector-card');
+    const terminalInput = document.getElementById('terminalInput');
+    
+    if (terminalModeBtn && terminalContainer && traitSelectorCard) {
+        // Enter terminal mode
+        terminalModeBtn.addEventListener('click', () => {
+            traitSelectorCard.classList.add('flipped');
+            terminalContainer.style.display = 'flex';
+            
+            // Initialize terminal if not already done
+            if (!window.terminal) {
+                window.terminal = new Terminal();
+            }
+            
+            // Show welcome message and focus input
+            setTimeout(() => {
+                window.terminal.showWelcomeMessage();
+                if (terminalInput) {
+                    terminalInput.focus();
+                }
+            }, 300);
+        });
+        
+        // Exit terminal mode
+        if (terminalCloseBtn) {
+            terminalCloseBtn.addEventListener('click', () => {
+                traitSelectorCard.classList.remove('flipped');
+                setTimeout(() => {
+                    terminalContainer.style.display = 'none';
+                }, 300);
+            });
+        }
+        
+        // Handle terminal input
+        if (terminalInput) {
+            terminalInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && window.terminal && !window.terminal.isProcessing) {
+                    window.terminal.processInput();
+                }
+            });
+        }
+    }
+}
+
 // Initialize trait selector when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize global avatar generator first
@@ -1592,6 +1608,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('.trait-selector-container')) {
         window.elliotGenerator = new ElliotGenerator();
     }
+    
+    // Initialize terminal mode functionality
+    initializeTerminalMode();
 });
 
 // Export for global access

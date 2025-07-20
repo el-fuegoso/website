@@ -16,8 +16,8 @@
     <script src="js/conversation/chat-ui.js?v=5"></script>
     <script src="js/conversation/conversation-manager.js?v=4"></script>
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/trait-selector.css">
-    <link rel="stylesheet" href="css/avatar-cards.css?v=1.5">
+    <link rel="stylesheet" href="css/trait-selector.css?v=2.0&t=20250720">
+    <link rel="stylesheet" href="css/avatar-cards.css?v=2.0&t=20250720">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 </head>
@@ -98,7 +98,7 @@
                 <div class="trait-card-header">
                     <div class="toggle-header">
                         <span class="toggle-title">Select Traits</span>
-                        <span class="trait-counter" id="traitCounter">4/18</span>
+                        <span class="trait-counter" id="traitCounter">0/18 v2.0</span>
                     </div>
                 </div>
                 
@@ -208,7 +208,7 @@
                             <span class="btn-shortcut">S</span>
                         </button>
                         <button class="action-btn generate-btn" id="generateBtn">
-                            GENERATE
+                            GENERATE v2.0
                             <span class="btn-shortcut">G</span>
                         </button>
                     </div>
@@ -227,7 +227,7 @@
                     <div class="avatar-card-header">
                         <div class="toggle-header">
                             <span class="toggle-title">Digital Persona</span>
-                            <span class="trait-counter" id="displayTraitCounter">4/18</span>
+                            <span class="trait-counter" id="displayTraitCounter">0/18 v2.0</span>
                         </div>
                     </div>
                     
@@ -2689,6 +2689,16 @@
         // Auto-run debug after 2 seconds
         setTimeout(() => {
             window.debugOcean();
+            // Add visible confirmation
+            const generateBtn = document.getElementById('generateBtn');
+            if (generateBtn && window.oceanSystem) {
+                generateBtn.style.background = '#00ff00';
+                generateBtn.style.color = 'black';
+                setTimeout(() => {
+                    generateBtn.style.background = '';
+                    generateBtn.style.color = '';
+                }, 1000);
+            }
         }, 2000);
     </script>
     

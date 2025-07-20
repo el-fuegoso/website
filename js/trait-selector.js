@@ -1551,6 +1551,15 @@ function initializeTerminalMode() {
     const terminalContainer = document.getElementById('terminalContainer');
     const traitSelectorCard = document.querySelector('.trait-selector-card');
     const terminalInput = document.getElementById('terminalInput');
+    const advancedSection = document.querySelector('.advanced-section');
+    const advancedHeader = document.querySelector('.advanced-header');
+    
+    // Advanced dropdown functionality
+    if (advancedHeader && advancedSection) {
+        advancedHeader.addEventListener('click', () => {
+            advancedSection.classList.toggle('expanded');
+        });
+    }
     
     if (terminalModeBtn && terminalContainer && traitSelectorCard) {
         // Enter terminal mode

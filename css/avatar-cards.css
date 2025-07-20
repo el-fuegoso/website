@@ -391,6 +391,17 @@
 
 .advanced-content {
     margin-left: 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.advanced-section.expanded .advanced-content {
+    max-height: 120px; /* Enough for content */
+}
+
+.advanced-section.expanded .advanced-toggle {
+    transform: rotate(90deg);
 }
 
 .advanced-description {

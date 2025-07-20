@@ -45,7 +45,7 @@ class Terminal {
         // Add divider and instructions after ASCII art
         setTimeout(() => {
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-weight: bold;">PERSONA GENERATOR v2.0 | Custom Neural Architecture</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-weight: bold;">PERSONA GENERATOR | Custom Neural Architecture</span>`);
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">════════════════════════════════════════════════════════════</span>`);
             this.addToOutput('');
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">I built a specialized LLM head that extracts Big Five personality</span>`);

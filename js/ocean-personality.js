@@ -369,8 +369,8 @@ class OceanPersonalitySystem {
         const counter = document.getElementById('traitCounter');
         const displayCounter = document.getElementById('displayTraitCounter');
         
-        if (counter) counter.textContent = `${this.selectedTraits.size}/18 v2.0`;
-        if (displayCounter) displayCounter.textContent = `${this.selectedTraits.size}/18 v2.0`;
+        if (counter) counter.textContent = `${this.selectedTraits.size}/18`;
+        if (displayCounter) displayCounter.textContent = `${this.selectedTraits.size}/18`;
         
         // Update soundbars to be responsive to trait selection
         this.updateSoundbars();
@@ -384,22 +384,25 @@ class OceanPersonalitySystem {
         const oceanScores = this.userScores;
         
         soundbars.forEach((bar, index) => {
-            // Map soundbars to OCEAN dimensions and selected traits
-            const traitNames = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
-            const dimension = traitNames[index % 5];
-            const score = oceanScores[dimension] || 0;
+            // Map soundbars to traits directly
+            const trait = bar.dataset.trait;
+            if (!trait) return;
             
-            // Calculate height based on OCEAN score and selected traits
-            let height = Math.max(8, score * 50 + 10); // Base height + score influence
+            // Check if this trait is selected
+            const isSelected = this.selectedTraits.has(trait);
             
-            // Add activity if related traits are selected
-            const relatedTraits = this.getRelatedTraits(dimension);
-            const hasRelatedTraits = relatedTraits.some(trait => this.selectedTraits.has(trait));
+            // Calculate height based on selection and OCEAN influence
+            let height = 8; // Base height
             
-            if (hasRelatedTraits) {
-                height += 15; // Boost height for active traits
+            if (isSelected) {
+                height = Math.random() * 30 + 35; // Dynamic height for selected traits
                 bar.classList.add('active');
+                
+                // Add pulse effect for visual feedback
+                bar.classList.add('pulse');
+                setTimeout(() => bar.classList.remove('pulse'), 400);
             } else {
+                height = Math.random() * 15 + 8; // Subtle variation for unselected
                 bar.classList.remove('active');
             }
             
@@ -407,13 +410,11 @@ class OceanPersonalitySystem {
             bar.style.height = `${Math.min(height, 60)}px`;
             bar.style.transition = 'height 0.3s ease, background-color 0.3s ease';
             
-            // Color based on activity
-            if (hasRelatedTraits) {
-                bar.style.backgroundColor = 'var(--amber)';
-            } else if (score > 0.3) {
-                bar.style.backgroundColor = 'var(--bronze)';
-            } else {
-                bar.style.backgroundColor = '#ddd';
+            // Add click handler for interactive soundbars
+            if (!bar.hasClickHandler) {
+                bar.addEventListener('click', () => this.toggleTraitFromSoundbar(trait));
+                bar.style.cursor = 'pointer';
+                bar.hasClickHandler = true;
             }
         });
     }
@@ -492,9 +493,19 @@ class OceanPersonalitySystem {
         } finally {
             this.isGenerating = false;
             if (generateBtn) {
-                generateBtn.textContent = 'GENERATE v2.0';
+                generateBtn.textContent = 'GENERATE';
                 generateBtn.disabled = false;
             }
+        }
+    }
+
+    toggleTraitFromSoundbar(trait) {
+        // Find the corresponding checkbox for this trait
+        const checkbox = document.querySelector(`input[data-trait="${trait}"]`);
+        if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+            // Trigger the existing toggle logic
+            this.toggleTrait(trait, checkbox.checked);
         }
     }
 

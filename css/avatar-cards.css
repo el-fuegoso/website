@@ -23,7 +23,7 @@
     gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
-    align-items: stretch;
+    align-items: start;
 }
 
 /* Unified Card Styling */
@@ -38,7 +38,7 @@
     font-family: 'Roboto Mono', monospace;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 580px; /* Fixed height for both cards */
+    min-height: 580px; /* Minimum height for both cards */
 }
 
 .trait-selector-card:hover, .avatar-card:hover {

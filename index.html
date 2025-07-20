@@ -2664,12 +2664,32 @@
         `;
         document.head.appendChild(chatStyle);
     </script>    <!-- Main Application JavaScript -->
-    <script src="js/main.js"></script>
-    <script src="js/ocean-personality.js"></script>
+    <script src="js/main.js?v=2.0&t=20250720"></script>
+    <script src="js/ocean-personality.js?v=1.0&t=20250720"></script>
     
     <script>
-        // Clean slate - OCEAN personality system handles all trait selector functionality
-        console.log('OCEAN Personality System loaded');
+        // Cache busting and debugging
+        console.log('🔄 Cache busted: 20250720');
+        console.log('🎯 OCEAN Personality System loading...');
+        
+        // Debug function to check if system is working
+        window.debugOcean = function() {
+            console.log('🔍 Debug Info:');
+            console.log('- oceanSystem exists:', !!window.oceanSystem);
+            console.log('- Toggle switches found:', document.querySelectorAll('.toggle-switch').length);
+            console.log('- Trait options found:', document.querySelectorAll('.trait-option').length);
+            console.log('- Action buttons found:', document.querySelectorAll('.action-btn').length);
+            
+            if (window.oceanSystem) {
+                console.log('- Selected traits:', Array.from(window.oceanSystem.selectedTraits));
+                console.log('- OCEAN scores:', window.oceanSystem.userScores);
+            }
+        };
+        
+        // Auto-run debug after 2 seconds
+        setTimeout(() => {
+            window.debugOcean();
+        }, 2000);
     </script>
     
     <script>

@@ -2713,13 +2713,7 @@
         // Initialize the application after DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Application initializing...');
-            
-            // All initialization is handled by individual modules
-            // Ocean system initializes via ocean-personality.js
-            // Terminal mode initializes via trait-selector.js
-            // Main app features initialize via main.js
-            
-            console.log('✅ Application initialized successfully');
+            window.initialize();
         });
     </script>
 </body>

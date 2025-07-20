@@ -151,7 +151,7 @@ class OceanPersonalitySystem {
             if (!this.helixAnimation) return;
 
             // Clear background
-            ctx.fillStyle = '#333';
+            ctx.fillStyle = '#ddd';
             ctx.fillRect(0, 0, width, height);
 
             time += 0.02;
@@ -173,7 +173,7 @@ class OceanPersonalitySystem {
                             const opacity = map(d, 0, 60, 40, 10) * 
                                           map(Math.min(hp1.z, hp2.z), -55, 55, 0.3, 1);
 
-                            ctx.strokeStyle = `rgba(200, 200, 200, ${opacity / 255})`;
+                            ctx.strokeStyle = `rgba(184, 134, 11, ${opacity / 255})`;
                             ctx.beginPath();
                             ctx.moveTo(hp1.x, hp1.y);
                             ctx.lineTo(hp2.x, hp2.y);
@@ -189,7 +189,7 @@ class OceanPersonalitySystem {
                 const sizeMultiplier = map(hp.z, -55, 55, 0.6, 1.3);
                 const adjustedOpacity = map(hp.z, -55, 55, hp.opacity * 0.4, hp.opacity);
 
-                ctx.fillStyle = `rgba(255, 255, 255, ${adjustedOpacity / 255})`;
+                ctx.fillStyle = `rgba(184, 134, 11, ${adjustedOpacity / 255})`;
                 ctx.beginPath();
                 ctx.arc(hp.x, hp.y, (hp.size * sizeMultiplier) / 2, 0, TWO_PI);
                 ctx.fill();
@@ -599,37 +599,8 @@ class OceanPersonalitySystem {
     }
 
     startWaterfallAnimation() {
-        const imageContainer = document.querySelector('.image-container');
-        if (!imageContainer) return;
-
-        imageContainer.innerHTML = '<div id="asciiWaterfall"></div>';
-        
-        // Simple ASCII waterfall effect
-        const waterfall = document.getElementById('asciiWaterfall');
-        const chars = '01234567890ABCDEF!@#$%^&*';
-        let frame = 0;
-        
-        const animate = () => {
-            if (this.isGenerating) {
-                let content = '';
-                for (let i = 0; i < 200; i++) {
-                    const char = chars[Math.floor(Math.random() * chars.length)];
-                    content += char;
-                    if ((i + 1) % 20 === 0) content += '\n';
-                }
-                waterfall.textContent = content;
-                waterfall.style.fontFamily = 'Roboto Mono, monospace';
-                waterfall.style.fontSize = '8px';
-                waterfall.style.color = '#00ff00';
-                waterfall.style.lineHeight = '1';
-                waterfall.style.overflow = 'hidden';
-                
-                frame++;
-                setTimeout(animate, 100);
-            }
-        };
-        
-        animate();
+        // Removed ASCII waterfall animation
+        return;
     }
 
     async displayCharacterWithScrambling(match) {
@@ -657,6 +628,14 @@ class OceanPersonalitySystem {
         if (detailsElement) {
             const details = `${match.character.description}\n\nMatch Score: ${Math.round(match.similarity * 100)}%`;
             await this.scrambleText(detailsElement, details);
+        }
+        
+        // Update dynamic character traits
+        const traitsElement = document.querySelector('#personaTraits');
+        if (traitsElement && match.character.traits) {
+            const traitsList = match.character.traits.join(', ');
+            const traitsText = `${traitsList}.<br>An expert in pattern recognition, system thinking, uncovering hidden issues.`;
+            traitsElement.innerHTML = traitsText;
         }
     }
 

@@ -240,18 +240,44 @@
                     <div class="trait-panel-back">
                         <div class="terminal-container" id="terminalContainer">
                             <div class="terminal-header">
-                                <div class="terminal-title">TERMINAL MODE</div>
-                                <button class="terminal-close-btn" id="terminalCloseBtn">×</button>
+                                <div class="terminal-icon">💻</div>
+                                <div class="terminal-title">Neural Terminal</div>
+                                <button class="terminal-close-btn" id="terminalCloseBtn">BACK</button>
                             </div>
+                            
+                            <div class="terminal-ascii-art">
+                                <div class="ascii-line">██████  ██      </div>
+                                <div class="ascii-line">██      ██      </div>
+                                <div class="ascii-line">█████   ██      </div>
+                                <div class="ascii-line">██      ██      </div>
+                                <div class="ascii-line">██████  ███████ </div>
+                            </div>
+                            
+                            <div class="terminal-title-line">
+                                <strong>PERSONA GENERATOR v2.0 | Custom Neural Architecture</strong>
+                            </div>
+                            
+                            <div class="terminal-separator"></div>
+                            
                             <div class="terminal-content">
                                 <div class="terminal-output" id="terminalOutput">
-                                    <div class="terminal-line">El Terminal v1.0 - Advanced Personality Interface</div>
-                                    <div class="terminal-line">Type 'help' for available commands</div>
-                                    <div class="terminal-line">&nbsp;</div>
+                                    <div class="terminal-description">
+                                        <p>I built a specialized LLM head that extracts Big Five</p>
+                                        <p>personality traits from any text input. Doesn't matter what you</p>
+                                        <p>feed it.</p>
+                                        <p>Resume? Job description? Essay you wrote? Random thoughts?</p>
+                                        <p>The model reads between the lines and pulls your psychological</p>
+                                        <p>profile. Then generates your personalized "El" avatar.</p>
+                                        <p>No surveys. No questionnaires. Just raw text analysis.</p>
+                                    </div>
+                                    
+                                    <div class="terminal-separator"></div>
+                                    
+                                    <div class="terminal-ready">Ready for input...</div>
                                 </div>
                                 <div class="terminal-input-line">
-                                    <span class="terminal-prompt">el@personality:~$ </span>
-                                    <input type="text" class="terminal-input" id="terminalInput" placeholder="Enter command..." autocomplete="off">
+                                    <span class="terminal-prompt">elliot@terminal ~ %</span>
+                                    <input type="text" class="terminal-input" id="terminalInput" placeholder="" autocomplete="off">
                                 </div>
                             </div>
                         </div>

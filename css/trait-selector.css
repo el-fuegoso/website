@@ -649,7 +649,7 @@
     font-size: 10px;
     line-height: 1.1;
     color: #ffffff;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     text-align: left;
     white-space: pre;
 }
@@ -658,21 +658,26 @@
     color: #ffffff;
     font-size: 13px;
     font-family: 'Roboto Mono', monospace;
-    line-height: 1.4;
+    line-height: 1.2;
     text-align: left;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 
 .terminal-output p {
-    margin: 0 0 8px 0;
+    margin: 0 0 2px 0;
     text-align: left;
     font-family: 'Roboto Mono', monospace;
+    color: #ffffff;
 }
 
 .terminal-separator {
     border-top: 1px solid #555;
-    margin: 16px 0;
+    margin: 8px 0;
     width: 100%;
+}
+
+.terminal-title-printing {
+    color: #ffffff;
 }
 
 .terminal-prompt-section {

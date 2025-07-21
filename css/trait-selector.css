@@ -724,6 +724,41 @@
     51%, 100% { opacity: 0; }
 }
 
+/* Printer animation styles */
+.terminal-line {
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: none;
+}
+
+.terminal-line.printing {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+}
+
+.terminal-ascii-header {
+    opacity: 0;
+    transform: translateY(-2px);
+}
+
+.terminal-ascii-header.printing {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.terminal-title-printing {
+    opacity: 0;
+    transform: translateY(-2px);
+}
+
+.terminal-title-printing.printing {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.1s ease-out, transform 0.1s ease-out;
+}
+
 
 /* Trait Categories */
 .trait-categories {

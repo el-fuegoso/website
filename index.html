@@ -258,22 +258,23 @@
 </div>
                                 
                                 <div class="terminal-output" id="terminalOutput">
-                                    <p><strong>PERSONA GENERATOR v2.0 | Custom Neural Architecture</strong></p>
+                                    <p class="terminal-title-printing"><strong>PERSONA GENERATOR v2.0 | Custom Neural Architecture</strong></p>
                                 </div>
                                 
                                 <div class="terminal-separator"></div>
                                 
-                                <div class="terminal-output">
-                                    <p>I built a specialized LLM head that extracts Big Five</p>
-                                    <p>personality</p>
-                                    <p>traits from any text input. Doesn't matter what you</p>
-                                    <p>feed it.</p>
-                                    <p>Resume? Job description? Essay you wrote? Random</p>
-                                    <p>thoughts?</p>
-                                    <p>The model reads between the lines and pulls your</p>
-                                    <p>psychological</p>
-                                    <p>profile. Then generates your personalized "El" avatar.</p>
-                                    <p>No surveys. No questionnaires. Just raw text analysis.</p>
+                                <div class="terminal-output" id="terminalContent">
+                                    <p class="terminal-line">I built a specialized LLM head that extracts Big Five</p>
+                                    <p class="terminal-line">personality traits from any text input. Doesn't matter</p>
+                                    <p class="terminal-line">what you feed it.</p>
+                                    <p class="terminal-line">&nbsp;</p>
+                                    <p class="terminal-line">Resume? Job description? Essay you wrote? Random thoughts?</p>
+                                    <p class="terminal-line">&nbsp;</p>
+                                    <p class="terminal-line">The model reads between the lines and pulls your</p>
+                                    <p class="terminal-line">psychological profile. Then generates your personalized</p>
+                                    <p class="terminal-line">"El" avatar.</p>
+                                    <p class="terminal-line">&nbsp;</p>
+                                    <p class="terminal-line">No surveys. No questionnaires. Just raw text analysis.</p>
                                 </div>
                                 
                                 <div class="terminal-separator"></div>
@@ -2758,6 +2759,34 @@
             const traitPanel = document.getElementById('traitPanel');
             const terminalModeBtn = document.getElementById('terminalModeBtn');
             const terminalCloseBtn = document.getElementById('terminalCloseBtn');
+            let hasAnimated = false; // Track if animation has run
+            
+            // Printer animation function
+            function runPrinterAnimation() {
+                if (hasAnimated) return; // Only run once per session
+                hasAnimated = true;
+                
+                const asciiHeader = document.querySelector('.terminal-ascii-header');
+                const titleElement = document.querySelector('.terminal-title-printing');
+                const terminalLines = document.querySelectorAll('.terminal-line');
+                
+                // Start with ASCII header
+                setTimeout(() => {
+                    if (asciiHeader) asciiHeader.classList.add('printing');
+                }, 100);
+                
+                // Then title
+                setTimeout(() => {
+                    if (titleElement) titleElement.classList.add('printing');
+                }, 400);
+                
+                // Then each content line with printer timing
+                terminalLines.forEach((line, index) => {
+                    setTimeout(() => {
+                        line.classList.add('printing');
+                    }, 700 + (index * 200)); // 200ms between lines
+                });
+            }
             
             // Enter terminal mode
             if (terminalModeBtn) {
@@ -2765,6 +2794,11 @@
                     if (traitPanel) {
                         traitPanel.classList.add('flipped');
                         console.log('🔄 Flipped to terminal mode');
+                        
+                        // Start printer animation after flip completes
+                        setTimeout(() => {
+                            runPrinterAnimation();
+                        }, 800); // Wait for flip animation to complete
                     }
                 });
             }

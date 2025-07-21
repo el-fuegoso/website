@@ -553,7 +553,7 @@
 }
 
 .trait-panel-front {
-    background: rgba(240, 238, 230, 0.95);
+    background: #ffffff;
 }
 
 .trait-panel-back {
@@ -561,121 +561,128 @@
     transform: rotateY(180deg);
 }
 
-/* Terminal Styles */
+/* Terminal Styles - Mac Style */
 .terminal-container {
     width: 100%;
     height: 100%;
-    background: #2c2c2c;
+    background: #1e1e1e;
     color: #ffffff;
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     display: flex;
     flex-direction: column;
-    padding: 16px;
-    box-sizing: border-box;
-    border-radius: 0;
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .terminal-header {
+    background: #323232;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #444;
 }
 
-.terminal-icon {
-    font-size: 18px;
-    margin-right: 8px;
+.terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 12px;
+}
+
+.terminal-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.terminal-button.close {
+    background: #ff5f57;
+}
+
+.terminal-button.minimize {
+    background: #ffbd2e;
+}
+
+.terminal-button.maximize {
+    background: #28ca42;
+}
+
+.terminal-button:hover {
+    filter: brightness(1.1);
 }
 
 .terminal-title {
     color: #ffffff;
-    font-weight: bold;
+    font-size: 13px;
+    font-weight: 500;
     flex: 1;
+    text-align: center;
 }
 
 .terminal-close-btn {
-    background: #ff5f57;
-    color: white;
+    background: none;
     border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
+    color: #888;
     cursor: pointer;
     font-size: 12px;
-    font-weight: bold;
-    font-family: 'Roboto Mono', monospace;
+    padding: 4px 8px;
+    border-radius: 4px;
 }
 
 .terminal-close-btn:hover {
-    background: #ff3b30;
+    background: #444;
+    color: #fff;
 }
 
-.terminal-ascii-art {
-    margin: 16px 0;
-    font-size: 12px;
-    line-height: 1.2;
-    color: #ffffff;
-    font-family: 'Roboto Mono', monospace;
-}
-
-.ascii-line {
-    margin-bottom: 2px;
-}
-
-.terminal-title-line {
-    font-size: 14px;
-    color: #ffffff;
-    margin: 16px 0;
-    font-family: 'Roboto Mono', monospace;
-}
-
-.terminal-separator {
-    border-top: 1px solid #555;
-    margin: 16px 0;
-}
-
-.terminal-content {
+.terminal-body {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
+    padding: 16px;
+    background: #1e1e1e;
+    overflow-y: auto;
+}
+
+.terminal-ascii-header {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 10px;
+    line-height: 1.1;
+    color: #4ade80;
+    margin-bottom: 16px;
+    text-align: left;
 }
 
 .terminal-output {
-    flex: 1;
     color: #ffffff;
     font-size: 13px;
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     line-height: 1.4;
-    overflow-y: auto;
+    text-align: left;
     margin-bottom: 16px;
 }
 
-.terminal-description p {
-    margin: 0 0 4px 0;
-    color: #ffffff;
+.terminal-output p {
+    margin: 0 0 8px 0;
+    text-align: left;
 }
 
-.terminal-ready {
-    margin-top: 8px;
-    color: #ffffff;
+.terminal-prompt-section {
+    margin-top: auto;
+    padding-top: 8px;
 }
 
 .terminal-input-line {
     display: flex;
     align-items: center;
-    margin-top: 8px;
+    text-align: left;
 }
 
 .terminal-prompt {
     color: #4ade80;
     margin-right: 8px;
     font-weight: normal;
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    white-space: nowrap;
 }
 
 .terminal-input {
@@ -683,7 +690,7 @@
     background: none;
     border: none;
     color: #ffffff;
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 13px;
     outline: none;
     caret-color: #4ade80;

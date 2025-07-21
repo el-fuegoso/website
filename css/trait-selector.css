@@ -516,7 +516,7 @@
     min-height: 750px;
 }
 
-/* Left Panel - Trait Selection with flip capability */
+/* Trait Panel - Flip Container */
 .trait-panel {
     background: var(--green);
     border-radius: 16px;
@@ -524,6 +524,7 @@
     position: relative;
     perspective: 1000px;
     overflow: hidden;
+    min-height: 600px;
 }
 
 .trait-panel-inner {
@@ -531,7 +532,7 @@
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.8s;
+    transition: transform 0.8s ease-in-out;
     transform-style: preserve-3d;
 }
 
@@ -539,7 +540,8 @@
     transform: rotateY(180deg);
 }
 
-.trait-panel-front, .trait-panel-back {
+.trait-panel-front,
+.trait-panel-back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -559,6 +561,114 @@
     background: #001122;
     transform: rotateY(180deg);
 }
+
+/* Terminal Styles */
+.terminal-container {
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    color: #00ff00;
+    font-family: 'Roboto Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #333;
+}
+
+.terminal-title {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.terminal-close-btn {
+    background: #ff5f57;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.terminal-close-btn:hover {
+    background: #ff3b30;
+}
+
+.terminal-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.terminal-output {
+    flex: 1;
+    background: #0f0f0f;
+    padding: 12px;
+    color: #ffffff;
+    font-size: 12px;
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.5;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.terminal-line {
+    margin-bottom: 4px;
+    color: #ffffff;
+}
+
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+    background: #0f0f0f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #333;
+}
+
+.terminal-prompt {
+    color: #61dafb;
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+.terminal-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    caret-color: #00ff00;
+}
+
+.terminal-input::placeholder {
+    color: #666;
+}
+
 
 /* Trait Categories */
 .trait-categories {
@@ -970,166 +1080,6 @@
     margin-top: 2px;
 }
 
-/* Terminal Mode */
-.terminal-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #1a1a1a;
-    color: #00ff00;
-    font-family: 'Roboto Mono', monospace;
-    flex-direction: column;
-    padding: 20px;
-    box-sizing: border-box;
-    border-radius: 15px;
-    overflow: hidden;
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.terminal-container.flipped {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.terminal-titlebar {
-    background: #323232;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    flex-shrink: 0;
-}
-
-.terminal-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.terminal-button {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-}
-
-.terminal-button.close {
-    background: #ff5f57;
-}
-
-.terminal-button.minimize {
-    background: #ffbd2e;
-}
-
-.terminal-button.maximize {
-    background: #28ca42;
-}
-
-.terminal-button:hover {
-    filter: brightness(1.1);
-}
-
-.terminal-title {
-    flex: 1;
-    text-align: center;
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 500;
-    margin: 0 12px;
-}
-
-.terminal-header {
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0;
-    text-align: left;
-    flex-shrink: 0;
-}
-
-.terminal-output {
-    flex: 1;
-    background: #1e1e1e;
-    padding: 0 12px;
-    color: #ffffff;
-    font-size: 12px;
-    font-family: 'Roboto Mono', monospace !important;
-    text-align: left !important;
-    line-height: 1.5;
-    overflow-y: auto;
-    margin-bottom: 6px;
-    min-height: 0;
-}
-
-.terminal-output > div {
-    text-align: left !important;
-    font-family: 'Roboto Mono', monospace !important;
-    color: #ffffff !important;
-}
-
-.terminal-prompt {
-    color: #61dafb;
-}
-
-.terminal-user {
-    color: #ffffff;
-    font-family: 'Roboto Mono', monospace !important;
-    font-weight: 500;
-}
-
-.terminal-ai {
-    color: #ffffff;
-    font-family: 'Roboto Mono', monospace !important;
-    margin-bottom: 8px;
-    line-height: 1.6;
-}
-
-.terminal-input-container {
-    display: flex;
-    align-items: center;
-    background: #1e1e1e;
-    padding: 8px 12px 12px 12px;
-    flex-shrink: 0;
-}
-
-.terminal-prompt-symbol {
-    color: #61dafb;
-    margin-right: 8px;
-    font-weight: bold;
-}
-
-.terminal-input {
-    flex: 1;
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Roboto Mono', monospace;
-    font-size: 12px;
-    outline: none;
-    caret-color: #ffffff;
-}
-
-.terminal-input::placeholder {
-    color: #666;
-}
-
-.terminal-loading {
-    color: #f39c12;
-    animation: terminal-blink 1s infinite;
-    font-style: italic;
-}
-
-@keyframes terminal-blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0.3; }
-}
 
 /* Right Panel - Elliot Display */
 .elliot-display {

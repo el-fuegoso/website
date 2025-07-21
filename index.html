@@ -96,20 +96,23 @@
         </div>
         
         <div class="avatar-container">
-            <!-- Left Panel - Trait Selector Card -->
-            <div class="trait-selector-card">
-                <div class="trait-panel-accent"></div>
-                
-                <!-- Trait Card Header -->
-                <div class="trait-card-header">
-                    <div class="toggle-header">
-                        <span class="toggle-title">Select Traits</span>
-                        <span class="trait-counter" id="traitCounter">0/18</span>
-                    </div>
-                </div>
-                
-                <!-- Trait Card Content -->
-                <div class="trait-card-content">
+            <!-- Left Panel - Trait Selector with Flip -->
+            <div class="trait-panel" id="traitPanel">
+                <div class="trait-panel-inner">
+                    <!-- Front Side - Trait Selector -->
+                    <div class="trait-panel-front">
+                        <div class="trait-panel-accent"></div>
+                        
+                        <!-- Trait Card Header -->
+                        <div class="trait-card-header">
+                            <div class="toggle-header">
+                                <span class="toggle-title">Select Traits</span>
+                                <span class="trait-counter" id="traitCounter">0/18</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Trait Card Content -->
+                        <div class="trait-card-content">
                     <!-- Trait Toggle Section -->
                     <div class="trait-toggle-section">
                         <div class="trait-toggles">
@@ -217,35 +220,39 @@
                         </button>
                     </div>
                     
-                    <!-- Advanced Section -->
-                    <div class="advanced-section">
-                        <div class="advanced-header">
-                            <span class="advanced-toggle">▼</span>
-                            <span class="advanced-title">Advanced</span>
-                        </div>
-                        <div class="advanced-content">
-                            <p class="advanced-description">Are you a pro? Have a go at doing it the hard way</p>
-                            <button class="terminal-mode-btn" id="terminalModeBtn">
-                                Enter Terminal Mode
-                            </button>
+                            <!-- Advanced Section -->
+                            <div class="advanced-section">
+                                <div class="advanced-header">
+                                    <span class="advanced-toggle">▼</span>
+                                    <span class="advanced-title">Advanced</span>
+                                </div>
+                                <div class="advanced-content">
+                                    <p class="advanced-description">Are you a pro? Have a go at doing it the hard way</p>
+                                    <button class="terminal-mode-btn" id="terminalModeBtn">
+                                        Enter Terminal Mode
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Terminal Container (Hidden by default) -->
-                    <div class="terminal-container" id="terminalContainer">
-                        <div class="terminal-header">
-                            <div class="terminal-title">TERMINAL MODE</div>
-                            <button class="terminal-close-btn" id="terminalCloseBtn">×</button>
-                        </div>
-                        <div class="terminal-content">
-                            <div class="terminal-output" id="terminalOutput">
-                                <div class="terminal-line">El Terminal v1.0 - Advanced Personality Interface</div>
-                                <div class="terminal-line">Type 'help' for available commands</div>
-                                <div class="terminal-line">&nbsp;</div>
+                    <!-- Back Side - Terminal -->
+                    <div class="trait-panel-back">
+                        <div class="terminal-container" id="terminalContainer">
+                            <div class="terminal-header">
+                                <div class="terminal-title">TERMINAL MODE</div>
+                                <button class="terminal-close-btn" id="terminalCloseBtn">×</button>
                             </div>
-                            <div class="terminal-input-line">
-                                <span class="terminal-prompt">el@personality:~$ </span>
-                                <input type="text" class="terminal-input" id="terminalInput" placeholder="Enter command..." autocomplete="off">
+                            <div class="terminal-content">
+                                <div class="terminal-output" id="terminalOutput">
+                                    <div class="terminal-line">El Terminal v1.0 - Advanced Personality Interface</div>
+                                    <div class="terminal-line">Type 'help' for available commands</div>
+                                    <div class="terminal-line">&nbsp;</div>
+                                </div>
+                                <div class="terminal-input-line">
+                                    <span class="terminal-prompt">el@personality:~$ </span>
+                                    <input type="text" class="terminal-input" id="terminalInput" placeholder="Enter command..." autocomplete="off">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2710,6 +2717,33 @@
     </script>
     
     <script>
+        // Terminal flip functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const traitPanel = document.getElementById('traitPanel');
+            const terminalModeBtn = document.getElementById('terminalModeBtn');
+            const terminalCloseBtn = document.getElementById('terminalCloseBtn');
+            
+            // Enter terminal mode
+            if (terminalModeBtn) {
+                terminalModeBtn.addEventListener('click', () => {
+                    if (traitPanel) {
+                        traitPanel.classList.add('flipped');
+                        console.log('🔄 Flipped to terminal mode');
+                    }
+                });
+            }
+            
+            // Exit terminal mode
+            if (terminalCloseBtn) {
+                terminalCloseBtn.addEventListener('click', () => {
+                    if (traitPanel) {
+                        traitPanel.classList.remove('flipped');
+                        console.log('🔄 Flipped back to trait selector');
+                    }
+                });
+            }
+        });
+        
         // Initialize the application after DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Application initializing...');

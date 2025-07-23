@@ -1068,8 +1068,8 @@
     color: white;
     border: none;
     border-radius: 0;
-    padding: 12px 8px;
-    font-size: 12px;
+    padding: 8px 6px; /* Reduced from 12px 8px */
+    font-size: 10px; /* Reduced from 12px */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;

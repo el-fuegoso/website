@@ -238,52 +238,44 @@
                     <div class="trait-panel-back">
                         <div class="terminal-container" id="terminalContainer">
                             <div class="terminal-header">
-                                <div class="terminal-buttons">
-                                    <button class="terminal-button close" id="terminalCloseBtn"></button>
-                                    <button class="terminal-button minimize"></button>
-                                    <button class="terminal-button maximize"></button>
+                                <div class="terminal-controls">
+                                    <div class="control-btn close" id="terminalCloseBtn"></div>
+                                    <div class="control-btn minimize"></div>
+                                    <div class="control-btn maximize"></div>
                                 </div>
-                                <div class="terminal-title">elliot@terminal — zsh — 80×24</div>
+                                <div class="terminal-title">Terminal — Persona Generator v2.0</div>
                             </div>
                             
                             <div class="terminal-body">
-                                <div class="terminal-ascii-header">
-███████ ██      ██      ██  ██████  ████████ 
-██      ██      ██      ██ ██    ██    ██    
-█████   ██      ██      ██ ██    ██    ██    
-██      ██      ██      ██ ██    ██    ██    
-███████ ███████ ███████ ██  ██████     ██    
-</div>
-                                
-                                <div class="terminal-output" id="terminalOutput">
-                                    <p class="terminal-title-printing"><strong>PERSONA GENERATOR v2.0 | Custom Neural Architecture</strong></p>
+                                <div id="terminal-output">
+                                    <div>Initializing...</div>
+                                    <div></div>
+                                    <div style="white-space: pre;">███████ ██      ██      ██  ██████  ████████
+██      ██      ██      ██ ██    ██    ██   
+█████   ██      ██      ██ ██    ██    ██   
+██      ██      ██      ██ ██    ██    ██   
+███████ ███████ ███████ ██  ██████     ██   </div>
+                                    <div></div>
+                                    <div><strong>PERSONA GENERATOR v2.0</strong></div>
+                                    <div></div>
+                                    <div>I built a specialized LLM head that extracts Big Five</div>
+                                    <div>personality traits from any text input. Doesn't matter</div>
+                                    <div>what you feed it.</div>
+                                    <div></div>
+                                    <div>Resume? Job description? Essay you wrote? Random thoughts?</div>
+                                    <div>The model reads between the lines and pulls your</div>
+                                    <div>psychological profile. Then generates your personalized</div>
+                                    <div>"El" avatar.</div>
+                                    <div></div>
+                                    <div>No surveys. No questionnaires. Just raw text analysis.</div>
+                                    <div></div>
+                                    <div>Ready for input...</div>
                                 </div>
                                 
-                                <div class="terminal-separator"></div>
-                                
-                                <div class="terminal-output" id="terminalContent">
-                                    <p class="terminal-line">I built a specialized LLM head that extracts Big Five</p>
-                                    <p class="terminal-line">personality traits from any text input. Doesn't matter</p>
-                                    <p class="terminal-line">what you feed it.</p>
-                                    <p class="terminal-line">Resume? Job description? Essay you wrote? Random thoughts?</p>
-                                    <p class="terminal-line">The model reads between the lines and pulls your</p>
-                                    <p class="terminal-line">psychological profile. Then generates your personalized</p>
-                                    <p class="terminal-line">"El" avatar.</p>
-                                    <p class="terminal-line">No surveys. No questionnaires. Just raw text analysis.</p>
-                                </div>
-                                
-                                <div class="terminal-separator"></div>
-                                
-                                <div class="terminal-output">
-                                    <p>Ready for input...</p>
-                                </div>
-                                
-                                <div class="terminal-prompt-section">
-                                    <div class="terminal-input-line">
-                                        <span class="terminal-prompt">elliot@terminal ~ %</span>
-                                        <input type="text" class="terminal-input" id="terminalInput" placeholder="" autocomplete="off">
-                                        <span class="terminal-cursor"></span>
-                                    </div>
+                                <div class="prompt-line hidden" id="prompt-line">
+                                    <span class="prompt">elliot@terminal ~ %</span>
+                                    <input type="text" class="input-line" id="terminalInput" placeholder="" autocomplete="off">
+                                    <span class="cursor">█</span>
                                 </div>
                             </div>
                         </div>

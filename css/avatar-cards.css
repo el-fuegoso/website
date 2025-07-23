@@ -442,102 +442,164 @@
     transform: translateY(0);
 }
 
-/* Terminal Interface Styling */
+/* Terminal Interface Styling - GitHub Style */
 .terminal-container {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000;
-    color: #00ff00;
-    font-family: 'Courier New', monospace;
+    background: #0d1117;
+    border: 1px solid #21262d;
     display: flex;
     flex-direction: column;
     z-index: 100;
+    font-family: 'Roboto Mono', monospace;
 }
 
 .terminal-header {
-    background: #333;
-    color: #fff;
-    padding: 8px 12px;
+    background: #21262d;
+    height: 32px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #555;
+    padding: 0 12px;
+    border-bottom: 1px solid #30363d;
+    user-select: none;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 8px;
+    margin-right: 12px;
+}
+
+.control-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.control-btn.close { 
+    background: #ff5f56; 
+}
+
+.control-btn.minimize { 
+    background: #ffbd2e; 
+}
+
+.control-btn.maximize { 
+    background: #27ca3f; 
 }
 
 .terminal-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 400;
 }
 
-.terminal-close-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 2px;
-    transition: background 0.2s ease;
+.terminal-body {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: #0d1117;
+    line-height: 1.4;
+    font-size: 12px;
+    color: #ffffff;
+    text-align: left; /* Ensure left alignment */
 }
 
-.terminal-close-btn:hover {
-    background: #ff4444;
+#terminal-output {
+    text-align: left; /* Left align all terminal output */
+}
+
+#terminal-output div {
+    text-align: left; /* Left align each line */
+    margin: 0;
+    padding: 0;
 }
 
 .terminal-content {
-    flex-grow: 1;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.terminal-output {
-    flex-grow: 1;
-    overflow-y: auto;
-    margin-bottom: 12px;
-    font-size: 0.8rem;
-    line-height: 1.4;
-}
-
-.terminal-line {
-    margin-bottom: 2px;
+    color: #ffffff;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 400;
+    white-space: pre-wrap;
     word-wrap: break-word;
-    color: #00ff00;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
 }
 
-.terminal-input-line {
+.loading-line {
+    opacity: 0;
+    animation: fadeIn 0.1s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+.typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 0.05s steps(1) forwards;
+}
+
+.prompt-line {
+    margin-top: 20px;
     display: flex;
     align-items: center;
-    gap: 4px;
 }
 
-.terminal-prompt {
-    color: #00ff00;
-    font-weight: bold;
-    font-size: 0.8rem;
+.prompt-line.hidden {
+    display: none !important;
 }
 
-.terminal-input {
+.prompt {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+.cursor {
+    background: #ffffff;
+    color: #0d1117;
+    animation: blink 1s infinite;
+    margin-left: 2px;
+    width: 8px;
+    height: 16px;
+    display: inline-block;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.input-line {
+    color: #ffffff;
     background: transparent;
     border: none;
-    color: #00ff00;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
     outline: none;
-    flex-grow: 1;
-    padding: 2px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    margin-left: 4px;
+    flex: 1;
 }
 
-.terminal-input::placeholder {
-    color: #666;
+/* Scrollbar styling */
+.terminal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
 }
 
 /* Card Flip Animation */
@@ -601,5 +663,11 @@
 
     .artwork-title {
         font-size: 1.8rem;
+    }
+
+    /* Terminal mobile adjustments */
+    .terminal-body {
+        padding: 12px;
+        font-size: 12px;
     }
 }

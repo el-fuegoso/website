@@ -1549,6 +1549,419 @@ class ElliotGenerator {
     }
 }
 
+// Smart Text Classification System
+const TEXT_PATTERNS = {
+    jobDescription: [
+        /we are (looking for|seeking)/i,
+        /ideal candidate/i,
+        /requirements?:/i,
+        /must have|should have/i,
+        /responsibilities include/i,
+        /qualifications?:/i,
+        /position requires/i,
+        /\$\d+k|\$\d+,\d+/i, // Salary patterns
+        /benefits package/i,
+        /company offers/i
+    ],
+    personalWriting: [
+        /\bi\s+(am|have|believe|think)/i,
+        /my (experience|background|passion|skills)/i,
+        /\bme\b.*\b(responsible|managed|led)/i,
+        /\bi've\s+(worked|been|done)/i,
+        /personally/i,
+        /in my (opinion|view|experience)/i
+    ],
+    performanceReview: [
+        /employee (demonstrates|shows|exhibits)/i,
+        /during this period/i,
+        /goals (met|exceeded|achieved)/i,
+        /performance (review|evaluation)/i,
+        /rated as/i,
+        /(exceeds|meets|below) expectations/i
+    ],
+    resume: [
+        /\d{4}\s*-\s*\d{4}/i, // Date ranges
+        /education:|experience:|skills:/i,
+        /bachelor|master|phd|degree/i,
+        /university|college/i,
+        /references available/i
+    ],
+    coverLetter: [
+        /dear (hiring manager|sir|madam)/i,
+        /i am writing to/i,
+        /position.*advertised/i,
+        /sincerely|best regards/i,
+        /i would welcome/i
+    ]
+};
+
+function classifyTextType(text) {
+    const scores = {};
+    const minLength = 50; // Minimum text length for reliable classification
+    
+    if (text.length < minLength) {
+        return { type: 'insufficient', confidence: 0 };
+    }
+    
+    // Calculate pattern match scores
+    for (const [type, patterns] of Object.entries(TEXT_PATTERNS)) {
+        scores[type] = patterns.reduce((count, pattern) => 
+            count + (text.match(pattern) ? 1 : 0), 0
+        );
+    }
+    
+    // Find the type with highest score
+    const topType = Object.keys(scores).reduce((a, b) => 
+        scores[a] > scores[b] ? a : b
+    );
+    
+    const maxScore = scores[topType];
+    const totalPatterns = TEXT_PATTERNS[topType].length;
+    const confidence = maxScore / totalPatterns;
+    
+    // If confidence is too low, mark as ambiguous
+    if (confidence < 0.3 || maxScore === 0) {
+        return { type: 'ambiguous', confidence: confidence };
+    }
+    
+    return { type: topType, confidence: confidence };
+}
+
+function getAnalysisContext(classification, text) {
+    const contexts = {
+        jobDescription: {
+            mode: 'jd',
+            instruction: 'Analyzing the ideal candidate traits this role requires...'
+        },
+        personalWriting: {
+            mode: 'general',
+            instruction: 'Analyzing your personality based on your writing style and content...'
+        },
+        performanceReview: {
+            mode: 'general',
+            instruction: 'Analyzing personality traits from this performance review...'
+        },
+        resume: {
+            mode: 'general',
+            instruction: 'Analyzing your professional personality from your resume...'
+        },
+        coverLetter: {
+            mode: 'general',
+            instruction: 'Analyzing your personality from this cover letter...'
+        },
+        ambiguous: {
+            mode: 'general',
+            instruction: 'This text could be interpreted multiple ways. I\'ll analyze it as personal writing...'
+        },
+        insufficient: {
+            mode: null,
+            instruction: 'I need more text to provide an accurate personality analysis. Please share more details about yourself or paste a longer document.'
+        }
+    };
+    
+    return contexts[classification.type] || contexts.ambiguous;
+}
+
+// Terminal Intelligence Layer
+class TerminalIntelligence {
+    constructor() {
+        this.conversationHistory = [];
+        this.awaitingClarification = false;
+        this.pendingAnalysis = null;
+    }
+    
+    processInput(userInput) {
+        // Add to conversation history
+        this.conversationHistory.push({
+            type: 'user',
+            content: userInput,
+            timestamp: Date.now()
+        });
+        
+        // Classify the input
+        const classification = classifyTextType(userInput);
+        const context = getAnalysisContext(classification, userInput);
+        
+        // Determine next action based on classification
+        if (classification.type === 'insufficient') {
+            return {
+                action: 'request_more_info',
+                message: context.instruction
+            };
+        }
+        
+        if (classification.type === 'ambiguous' && classification.confidence < 0.3) {
+            this.pendingAnalysis = { text: userInput, classification };
+            this.awaitingClarification = true;
+            return {
+                action: 'request_clarification',
+                message: 'This text could be analyzed in different ways:\n\n□ Analyze your personality (as the writer)\n□ Analyze the described person\'s traits\n\nWhich would you prefer?'
+            };
+        }
+        
+        // Ready for analysis
+        return {
+            action: 'analyze',
+            classification: classification,
+            context: context,
+            text: userInput
+        };
+    }
+    
+    handleClarification(choice) {
+        if (!this.awaitingClarification || !this.pendingAnalysis) {
+            return { action: 'error', message: 'No pending analysis found.' };
+        }
+        
+        this.awaitingClarification = false;
+        const analysis = this.pendingAnalysis;
+        this.pendingAnalysis = null;
+        
+        // Adjust mode based on user choice
+        const mode = choice.toLowerCase().includes('writer') ? 'general' : 'jd';
+        const instruction = choice.toLowerCase().includes('writer') 
+            ? 'Analyzing your personality as the writer...'
+            : 'Analyzing the described person\'s traits...';
+        
+        return {
+            action: 'analyze',
+            classification: analysis.classification,
+            context: { mode, instruction },
+            text: analysis.text
+        };
+    }
+    
+    addAssistantResponse(response) {
+        this.conversationHistory.push({
+            type: 'assistant',
+            content: response,
+            timestamp: Date.now()
+        });
+    }
+}
+
+// Terminal Animation
+function runTerminalAnimation() {
+    console.log('runTerminalAnimation function started');
+    const output = document.getElementById('terminal-output');
+    const promptLine = document.getElementById('prompt-line');
+    
+    console.log('Elements found - output:', !!output, 'promptLine:', !!promptLine);
+    
+    if (!output || !promptLine) {
+        console.error('Missing terminal elements - output:', !!output, 'promptLine:', !!promptLine);
+        return;
+    }
+    
+    const loadingSequence = [
+        { text: 'Initializing...', delay: 1000 },
+        { text: '', delay: 200 },
+        { 
+            text: `███████ ██      ██      ██  ██████  ████████
+██      ██      ██      ██ ██    ██    ██   
+█████   ██      ██      ██ ██    ██    ██   
+██      ██      ██      ██ ██    ██    ██   
+███████ ███████ ███████ ██  ██████     ██   `, 
+            delay: 1200,
+            typewriter: true
+        },
+        { text: '', delay: 300 },
+        { text: '**PERSONA GENERATOR v2.0**', delay: 100 },
+        { text: '', delay: 200 },
+        { text: 'I built a specialized LLM head that extracts Big Five', delay: 50 },
+        { text: 'personality traits from any text input. Doesn\'t matter', delay: 50 },
+        { text: 'what you feed it.', delay: 50 },
+        { text: '', delay: 200 },
+        { text: 'Resume? Job description? Essay you wrote? Random thoughts?', delay: 50 },
+        { text: 'The model reads between the lines and pulls your', delay: 50 },
+        { text: 'psychological profile. Then generates your personalized', delay: 50 },
+        { text: '"El" avatar.', delay: 50 },
+        { text: '', delay: 200 },
+        { text: 'No surveys. No questionnaires. Just raw text analysis.', delay: 50 },
+        { text: '', delay: 300 },
+        { text: 'Ready for input...', delay: 100 }
+    ];
+    
+    function typeWriter(text, element, speed = 30) {
+        return new Promise(resolve => {
+            let i = 0;
+            element.textContent = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    resolve();
+                }
+            }
+            type();
+        });
+    }
+    
+    async function runLoadingSequence() {
+        // Clear existing content and hide prompt
+        output.innerHTML = '';
+        promptLine.classList.add('hidden');
+        
+        for (let i = 0; i < loadingSequence.length; i++) {
+            const item = loadingSequence[i];
+            const line = document.createElement('div');
+            
+            if (item.typewriter) {
+                line.style.whiteSpace = 'pre';
+                output.appendChild(line);
+                await typeWriter(item.text, line, 10);
+            } else {
+                line.textContent = item.text;
+                output.appendChild(line);
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, item.delay));
+        }
+        
+        // Show prompt after loading is complete
+        console.log('Attempting to show prompt line:', promptLine);
+        console.log('Classes before:', promptLine.className);
+        promptLine.classList.remove('hidden');
+        console.log('Classes after:', promptLine.className);
+        promptLine.style.display = 'flex'; // Force display as backup
+        console.log('Final computed style:', window.getComputedStyle(promptLine).display);
+        focusTerminalInput();
+    }
+    
+    // Start animation
+    runLoadingSequence();
+}
+
+// Python Backend Integration
+async function callPersonalityAPI(text, mode = 'general', context = {}) {
+    try {
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text: text,
+                mode: mode,
+                context: context
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API call failed:', error);
+        throw error;
+    }
+}
+
+// Terminal Display Functions
+function addTerminalLine(text, isUser = false) {
+    const output = document.getElementById('terminal-output');
+    if (!output) return;
+    
+    const line = document.createElement('div');
+    if (isUser) {
+        line.innerHTML = `<span style="color: #00ff41;">elliot@terminal ~ %</span> ${text}`;
+    } else {
+        line.textContent = text;
+    }
+    output.appendChild(line);
+    
+    // Scroll to bottom
+    output.scrollTop = output.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const output = document.getElementById('terminal-output');
+    if (!output) return;
+    
+    const indicator = document.createElement('div');
+    indicator.id = 'typing-indicator';
+    indicator.innerHTML = '<span style="color: #666;">Analyzing...</span>';
+    output.appendChild(indicator);
+    output.scrollTop = output.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+function updateAvatarCard(analysisResult) {
+    // Update avatar card with analysis results
+    if (analysisResult.avatar_data) {
+        const avatarCard = document.getElementById('avatarCard');
+        const personaName = document.getElementById('personaName');
+        const personaTitle = document.getElementById('personaTitle');
+        const personaDescription = document.getElementById('personaDescription');
+        
+        if (personaName && analysisResult.avatar_data.title) {
+            personaName.textContent = analysisResult.avatar_data.title;
+        }
+        
+        if (personaTitle && analysisResult.avatar_data.archetype) {
+            personaTitle.textContent = analysisResult.avatar_data.archetype.description;
+        }
+        
+        if (personaDescription && analysisResult.explanation) {
+            personaDescription.textContent = analysisResult.explanation;
+        }
+        
+        // Add chat button if not exists
+        if (avatarCard && !avatarCard.querySelector('.chat-avatar-btn')) {
+            const chatButton = document.createElement('button');
+            chatButton.className = 'chat-avatar-btn';
+            chatButton.textContent = 'CHAT';
+            chatButton.style.cssText = `
+                background: var(--green);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-family: 'Roboto Mono', monospace;
+                font-weight: 600;
+                cursor: pointer;
+                margin-top: 15px;
+                text-transform: uppercase;
+            `;
+            
+            chatButton.addEventListener('click', () => {
+                // Trigger existing chat modal
+                if (window.conversationManager) {
+                    window.conversationManager.openChat();
+                }
+            });
+            
+            const cardContent = avatarCard.querySelector('.card-content');
+            if (cardContent) {
+                cardContent.appendChild(chatButton);
+            }
+        }
+    }
+    
+    // Update radar charts if personality scores exist
+    if (analysisResult.personality_scores) {
+        // This would integrate with existing radar chart code
+        console.log('Personality scores:', analysisResult.personality_scores);
+    }
+}
+
+// Terminal Focus Handler
+function focusTerminalInput() {
+    const input = document.querySelector('.input-line');
+    if (input) {
+        input.focus();
+    }
+}
+
 // Terminal Mode Functionality
 function initializeTerminalMode() {
     const terminalModeBtn = document.getElementById('terminalModeBtn');
@@ -1558,6 +1971,9 @@ function initializeTerminalMode() {
     const terminalInput = document.getElementById('terminalInput');
     const advancedSection = document.querySelector('.advanced-section');
     const advancedHeader = document.querySelector('.advanced-header');
+    
+    // Initialize terminal intelligence
+    let terminalIntelligence = null;
     
     // Advanced dropdown functionality
     if (advancedHeader && advancedSection) {
@@ -1569,24 +1985,123 @@ function initializeTerminalMode() {
     if (terminalModeBtn && terminalContainer && traitSelectorCard) {
         // Enter terminal mode
         terminalModeBtn.addEventListener('click', () => {
+            console.log('Terminal mode button clicked - starting setup');
+            
+            // Initialize terminal intelligence
+            terminalIntelligence = new TerminalIntelligence();
+            console.log('Terminal intelligence initialized');
+            
             // Trigger flip animation to show the terminal
             traitSelectorCard.classList.add('flipped');
             terminalContainer.classList.add('flipped');
+            console.log('Terminal flipped, checking if runTerminalAnimation exists:', typeof runTerminalAnimation);
+            
+            // Test direct call first
+            console.log('Calling runTerminalAnimation directly');
+            runTerminalAnimation();
         });
 
         terminalCloseBtn.addEventListener('click', () => {
             // Trigger flip animation to show the trait selector card
             traitSelectorCard.classList.remove('flipped');
             terminalContainer.classList.remove('flipped');
+            
+            // Reset terminal intelligence
+            terminalIntelligence = null;
         });
         
+        // Handle terminal input processing
+        async function processTerminalInput(userInput) {
+            if (!terminalIntelligence) return;
+            
+            // Add user input to terminal display
+            addTerminalLine(userInput, true);
+            
+            // Process input through intelligence layer
+            const result = terminalIntelligence.processInput(userInput);
+            
+            switch (result.action) {
+                case 'request_more_info':
+                    addTerminalLine(result.message);
+                    break;
+                    
+                case 'request_clarification':
+                    addTerminalLine(result.message);
+                    break;
+                    
+                case 'analyze':
+                    // Show analysis message
+                    addTerminalLine(result.context.instruction);
+                    showTypingIndicator();
+                    
+                    try {
+                        // Call Python backend
+                        const analysisResult = await callPersonalityAPI(
+                            result.text, 
+                            result.context.mode, 
+                            { classification: result.classification }
+                        );
+                        
+                        removeTypingIndicator();
+                        
+                        // Process successful analysis
+                        if (analysisResult.status === 'success') {
+                            addTerminalLine('Analysis complete! Your personalized avatar has been generated.');
+                            
+                            // Update avatar card with results
+                            updateAvatarCard(analysisResult);
+                            
+                            // Add response to conversation history
+                            terminalIntelligence.addAssistantResponse('Analysis completed successfully');
+                        } else {
+                            addTerminalLine('Analysis failed: ' + (analysisResult.error || 'Unknown error'));
+                        }
+                        
+                    } catch (error) {
+                        removeTypingIndicator();
+                        addTerminalLine('Error connecting to analysis service. Please try again.');
+                        console.error('Analysis error:', error);
+                    }
+                    break;
+                    
+                case 'error':
+                    addTerminalLine(result.message);
+                    break;
+            }
+        }
+        
         // Handle terminal input
-        if (terminalInput) {
-            terminalInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && window.terminal && !window.terminal.isProcessing) {
-                    window.terminal.processInput();
+        const inputLine = document.querySelector('.input-line');
+        const inputElement = terminalInput || inputLine;
+        
+        if (inputElement) {
+            inputElement.addEventListener('keydown', async (e) => {
+                if (e.key === 'Enter') {
+                    const value = inputElement.value.trim();
+                    if (value && terminalIntelligence) {
+                        // Clear input immediately
+                        inputElement.value = '';
+                        
+                        // Handle clarification responses
+                        if (terminalIntelligence.awaitingClarification) {
+                            const clarificationResult = terminalIntelligence.handleClarification(value);
+                            if (clarificationResult.action === 'analyze') {
+                                await processTerminalInput(clarificationResult.text);
+                            } else {
+                                addTerminalLine(clarificationResult.message);
+                            }
+                        } else {
+                            // Process normal input
+                            await processTerminalInput(value);
+                        }
+                    }
                 }
             });
+        }
+        
+        // Handle input focus on terminal click
+        if (terminalContainer) {
+            terminalContainer.addEventListener('click', focusTerminalInput);
         }
     }
 }

@@ -200,20 +200,290 @@ Tests cover:
 - Model information retrieval
 - Error handling
 
-## Deployment
+## Production Deployment
 
-For production deployment:
+### Option 1: Gunicorn (Recommended)
 
-1. **Use Production WSGI Server**: Gunicorn, uWSGI, etc.
-2. **Environment Variables**: Move configuration to env vars
-3. **Logging**: Configure proper logging levels
-4. **Model Loading**: Optimize model loading for production
-5. **CORS**: Configure CORS for your domain
+The project includes production-ready configuration:
+
+```bash
+# Install production dependencies
+pip install gunicorn
+
+# Start with custom configuration
+gunicorn --config gunicorn.conf.py app:app
+
+# Or use the provided startup script
+chmod +x start_server.sh
+./start_server.sh
+```
+
+### Option 2: Docker Deployment
+
+Create a `Dockerfile`:
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 5000
+
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "app:app"]
+```
+
+### Environment Configuration
+
+For production, set these environment variables:
+
+```bash
+# Core Configuration
+FLASK_ENV=production
+FLASK_DEBUG=False
+MODEL_PATH=/app/models/ocean_model/
+
+# Database (if using persistent storage)
+DATABASE_URL=postgresql://user:pass@host:port/db
+
+# Security
+SECRET_KEY=your-production-secret-key
+ALLOWED_HOSTS=your-domain.com,api.your-domain.com
+
+# Performance
+WORKERS=4
+TIMEOUT=120
+MAX_REQUESTS=1000
+
+# Monitoring
+LOG_LEVEL=INFO
+METRICS_ENDPOINT=/metrics
+```
+
+### Production Optimizations
+
+1. **Model Loading**: Pre-load models at startup
+   ```python
+   # In app.py
+   @app.before_first_request
+   def load_models():
+       # Preload ML models to avoid cold starts
+       analyzer.initialize_models()
+   ```
+
+2. **Caching**: Implement Redis caching
+   ```bash
+   pip install redis flask-caching
+   ```
+
+3. **Database**: Add PostgreSQL for persistent storage
+   ```bash
+   pip install psycopg2-binary flask-sqlalchemy
+   ```
+
+4. **Monitoring**: Add health checks and metrics
+   ```python
+   @app.route('/health')
+   def health_check():
+       return {'status': 'healthy', 'timestamp': datetime.utcnow()}
+   ```
+
+### Reverse Proxy Setup (Nginx)
+
+```nginx
+server {
+    listen 80;
+    server_name api.yourdomain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Handle long analysis requests
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+    }
+}
+```
+
+### Cloud Deployment Options
+
+#### AWS Elastic Beanstalk
+```bash
+# Install EB CLI
+pip install awsebcli
+
+# Initialize and deploy
+eb init
+eb create production
+eb deploy
+```
+
+#### Google Cloud Platform
+```bash
+# Install gcloud CLI and deploy
+gcloud app deploy
+
+# app.yaml
+runtime: python39
+env: standard
+instance_class: F2
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+```
+
+#### Heroku
+```bash
+# Add Procfile
+echo "web: gunicorn --config gunicorn.conf.py app:app" > Procfile
+
+# Deploy
+git add .
+git commit -m "Add production config"
+git push heroku main
+```
+
+## Performance Monitoring
+
+### Metrics Collection
+
+Add application performance monitoring:
+
+```python
+# Install monitoring dependencies
+pip install prometheus_client psutil
+
+# Add to app.py
+from prometheus_client import Counter, Histogram, generate_latest
+
+# Metrics
+REQUEST_COUNT = Counter('app_requests_total', 'Total requests', ['method', 'endpoint'])
+REQUEST_DURATION = Histogram('app_request_duration_seconds', 'Request duration')
+
+@app.route('/metrics')
+def metrics():
+    return generate_latest()
+```
+
+### Load Testing
+
+Test API performance with realistic loads:
+
+```bash
+# Install load testing tools
+pip install locust
+
+# Create locustfile.py
+from locust import HttpUser, task, between
+
+class PersonalityAPIUser(HttpUser):
+    wait_time = between(1, 3)
+    
+    @task
+    def analyze_text(self):
+        self.client.post("/api/analyze", json={
+            "text": "Sample text for analysis",
+            "mode": "general"
+        })
+```
+
+### Database Optimization
+
+For high-volume deployments:
+
+```python
+# Add database connection pooling
+from sqlalchemy import create_engine
+from sqlalchemy.pool import QueuePool
+
+engine = create_engine(
+    DATABASE_URL,
+    poolclass=QueuePool,
+    pool_size=20,
+    max_overflow=0,
+    pool_pre_ping=True
+)
+```
+
+## Security Considerations
+
+### Input Validation
+- Sanitize all text inputs
+- Rate limiting per IP/user
+- Input length restrictions
+- Content filtering for sensitive data
+
+### API Security
+```python
+# Add rate limiting
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+@app.route('/api/analyze')
+@limiter.limit("10 per minute")
+def analyze():
+    # Your analysis logic here
+    pass
+```
+
+### Data Privacy
+- No persistent storage of user input (by default)
+- GDPR compliance considerations
+- Anonymized analytics only
+- Clear data retention policies
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Model Loading Errors**
+   ```bash
+   # Check model files exist
+   ls -la models/ocean_model/
+   
+   # Verify permissions
+   chmod -R 755 models/
+   ```
+
+2. **Memory Issues**
+   ```bash
+   # Monitor memory usage
+   htop
+   
+   # Adjust model loading strategy
+   export MODEL_CACHE_SIZE=1  # Reduce memory usage
+   ```
+
+3. **API Timeout Issues**
+   ```python
+   # Increase timeout in gunicorn.conf.py
+   timeout = 300  # 5 minutes for complex analysis
+   ```
+
+### Performance Optimization
+
+1. **Model Inference**: Use batch processing for multiple requests
+2. **Caching**: Implement intelligent result caching
+3. **Async Processing**: Use Celery for long-running tasks
+4. **CDN**: Cache static responses at edge locations
 
 ## Next Steps
 
-1. **Frontend Integration**: Connect to Elliot terminal interface
-2. **Model Training**: Train actual ML models on personality datasets
-3. **Enhanced Features**: Add more sophisticated linguistic analysis
-4. **Performance**: Optimize for real-time analysis
-5. **Validation**: Add psychometric validation of results
+1. **Frontend Integration**: Complete integration with Elliot terminal interface
+2. **Model Training**: Train production ML models on larger personality datasets  
+3. **Enhanced Features**: Add multilingual support and advanced linguistic analysis
+4. **Performance**: Implement caching and async processing for scale
+5. **Validation**: Add comprehensive psychometric validation and A/B testing
+6. **Documentation**: Create interactive API documentation with Swagger/OpenAPI

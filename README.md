@@ -43,12 +43,22 @@ Vanilla JavaScript  → Modular component architecture
 CSS3                → Custom properties & responsive design
 ```
 
+### Backend Stack  
+```
+Flask (Python)      → RESTful API for personality analysis
+PyTorch/Transformers → Machine learning model inference
+BERT/RoBERTa        → Language model for text analysis
+Gunicorn            → Production WSGI server
+Big Five Framework  → Psychological personality model
+```
+
 ### AI Integration
 ```
 Claude API          → Real-time character conversations
 Streaming Responses → Live conversation updates
 Personality Engine  → Multi-dimensional user analysis
 Avatar Generation   → Dynamic character customization
+ML Models           → BERT-based personality trait extraction
 ```
 
 ### Core Components
@@ -63,23 +73,34 @@ Avatar Generation   → Dynamic character customization
 - **ConversationManager.js** - Message handling and API coordination
 - **ClaudeClient.js** - Streaming API client with error handling
 
-#### 🖥️ Terminal Experience  
-- **TerminalQuestionnaire.js** - Draggable retro terminal interface
-- **CharacterTerminal.js** - Character profile display system
-- **DataCollector.js** - User response analysis and storage
+#### 🖥️ Frontend Experience  
+- **main.js** - Core application logic and orchestration
+- **ocean-personality.js** - OCEAN personality framework implementation
+- **trait-selector.js** - Interactive personality trait selection interface
+
+#### 🧠 Backend Personality Engine
+- **analyzer.py** - Core personality analysis with Big Five framework
+- **model_loader.py** - Machine learning model loading and inference
+- **preprocessing.py** - Advanced text preprocessing and feature extraction
+- **utils.py** - Avatar generation and personality trait utilities
+- **character_data.py** - Character archetype definitions and mappings
 
 ## 🔄 System Workflow
 
 ```mermaid
 graph TD
     A[User Visits Site] --> B[Interactive Art Experience]
-    B --> C[Character Discovery Terminal]
-    C --> D[4-Question Personality Assessment]
-    D --> E[Advanced Multi-Dimensional Analysis]
-    E --> F[Character Archetype Matching]
-    F --> G[AI Avatar Generation via Claude]
-    G --> H[Personalized Chat Experience]
-    H --> I[Character Profile Display]
+    B --> C[Personality Trait Selection]
+    C --> D[Text Input / Conversation]
+    D --> E[Flask Backend Processing]
+    E --> F[Text Preprocessing & Analysis]
+    F --> G[BERT Model Inference]
+    G --> H[Big Five Personality Scoring]
+    H --> I[Character Archetype Matching]
+    I --> J[Avatar Generation]
+    J --> K[Claude API Integration]
+    K --> L[Personalized Chat Experience]
+    L --> M[Dynamic Character Responses]
 ```
 
 ## 🧪 Personality Analysis Engine
@@ -102,57 +123,163 @@ graph TD
 ```
 website/
 ├── index.html                          # Main entry point
-├── css/
-│   └── conversation.css                 # Chat & terminal styling
-├── js/
-│   ├── conversation/                    # Chat system components
-│   │   ├── chat-ui.js                  # Modern chat interface
-│   │   ├── claude-client.js            # API client with streaming
-│   │   ├── conversation-manager.js     # Message coordination
-│   │   └── avatar-generator.js         # Basic avatar utilities
-│   └── terminal-experience/            # Character system core
-│       ├── TerminalQuestionnaire.js    # Draggable terminal UI
-│       ├── AdvancedPersonalityAnalyzer.js # Personality engine
-│       ├── TemplateAvatarGenerator.js  # Character templates
-│       ├── ClaudeAvatarService.js      # AI avatar generation
-│       ├── CharacterTerminal.js        # Profile display
-│       ├── AvatarDisplay.js            # Character visualization
-│       └── DataCollector.js            # Base analysis class
-├── api/
-│   ├── claude.js                       # Serverless Claude endpoint
-│   └── claude-stream.js                # Streaming response handler
-└── website-text-content.md             # Complete character definitions
+├── vercel.json                         # Vercel deployment configuration
+├── website-text-content.md             # Complete character definitions
+├── CLAUDE.md                           # Development guidelines
+├── 
+├── Frontend/
+├── css/                                # Stylesheets
+│   ├── main.css                        # Core styling
+│   ├── conversation.css                # Chat interface styling
+│   ├── avatar-cards.css                # Character card styling
+│   └── trait-selector.css              # Personality selector UI
+├── js/                                 # JavaScript modules
+│   ├── main.js                         # Main application logic
+│   ├── ocean-personality.js            # OCEAN personality framework
+│   ├── trait-selector.js               # Personality trait selection
+│   └── conversation/                   # Chat system components
+│       ├── chat-ui.js                  # Modern chat interface
+│       ├── claude-client.js            # API client with streaming
+│       ├── conversation-manager.js     # Message coordination
+│       └── avatar-generator.js         # Avatar generation utilities
+├── api/                                # Serverless API endpoints
+│   ├── claude.js                       # Main Claude API endpoint
+│   ├── claude-stream.js                # Streaming responses
+│   └── chat.js                         # Chat functionality
+├── images/                             # Static assets & project galleries
+│   ├── 121-festival/                   # Festival project screenshots
+│   ├── blackbird/                      # Blackbird project images
+│   ├── daobot/                         # DAO bot visuals
+│   ├── drama/                          # Drama project assets
+│   ├── eliza/                          # ELIZA chatbot images
+│   ├── kaiawhina/                      # Kaiawhina project
+│   ├── talent-army/                    # Talent Army screenshots
+│   └── vipassana/                      # Vipassana app images
+├──
+├── Backend - Python/Flask API/
+├── backend/                            # Flask personality analysis API
+│   ├── app.py                          # Main Flask application
+│   ├── requirements.txt                # Python dependencies
+│   ├── requirements_training.txt       # ML training dependencies
+│   ├── gunicorn.conf.py               # Production server config
+│   ├── start_server.sh                # Server startup script
+│   ├── personality_analyzer/           # Core analysis package
+│   │   ├── __init__.py
+│   │   ├── analyzer.py                 # Main personality analyzer
+│   │   ├── preprocessing.py            # Text preprocessing
+│   │   ├── model_loader.py             # ML model loading
+│   │   ├── utils.py                    # Utilities & avatar generation
+│   │   ├── character_data.py           # Character archetype data
+│   │   └── claude_chat.py              # Claude integration
+│   ├── models/                         # ML model storage
+│   │   ├── ocean_analyzer.py           # OCEAN model implementation
+│   │   └── ocean_model/                # Trained model files
+│   │       ├── config.json
+│   │       ├── pytorch_model.bin
+│   │       └── tokenizer files...
+│   ├── data/                           # Training datasets
+│   │   ├── essays_big5_dataset.csv     # Big Five essay dataset
+│   │   ├── synthetic_dataset.csv       # Generated training data
+│   │   └── dataset statistics...
+│   ├── utils/                          # Backend utilities
+│   │   └── terminal_processor.py       # Terminal text processing
+│   ├── logs/                           # Training & server logs
+│   ├── Training & Development/
+│   ├── train_model.py                  # ML model training script
+│   ├── run_training.py                 # Training execution
+│   ├── prepare_dataset.py              # Data preparation
+│   ├── training_config.yaml            # Training configuration
+│   ├── test_analyzer.py                # Analyzer tests
+│   ├── test_essays_big5.py            # Dataset validation
+│   ├── Personality_Training_Colab.ipynb # Jupyter training notebook
+│   ├── TRAINING_README.md              # Training documentation
+│   ├── CLOUD_TRAINING_GUIDE.md         # Cloud training setup
+│   └── venv/                           # Python virtual environment
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Claude API key from Anthropic
-- Modern web browser with ES6+ support
-- Local web server (for API functionality)
+- **Frontend**: Modern web browser with ES6+ support
+- **Backend**: Python 3.8+, pip, virtual environment
+- **APIs**: Claude API key from Anthropic
+- **Development**: Local web server for development
 
-### Setup
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/el-fuegoso/website.git
-   cd website
-   ```
+### Complete Setup
 
-2. **Configure Claude API**
-   - Get API key from [Anthropic Console](https://console.anthropic.com/)
-   - Key will be requested during first chat interaction
-   - Stored securely in browser localStorage
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/el-fuegoso/website.git
+cd website
+```
 
-3. **Local Development**
-   ```bash
-   # Simple HTTP server
-   python -m http.server 8000
-   # Or use any preferred local server
-   ```
+#### 2. Backend Setup (Python/Flask)
+```bash
+# Navigate to backend directory
+cd backend
 
-4. **Deploy**
-   - Works with Vercel, Netlify, GitHub Pages
-   - Serverless functions handle Claude API securely
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Test the personality analyzer
+python test_analyzer.py
+
+# Start the Flask development server
+python app.py
+```
+The backend server will be available at `http://localhost:5000`
+
+#### 3. Frontend Setup
+```bash
+# Return to project root (if in backend directory)
+cd ..
+
+# Start a local web server
+python -m http.server 8000
+# Or use Node.js: npx serve .
+# Or use any preferred local server
+```
+The frontend will be available at `http://localhost:8000`
+
+#### 4. Configure Claude API
+- Get your API key from [Anthropic Console](https://console.anthropic.com/)
+- Key will be requested during first chat interaction
+- Stored securely in browser localStorage
+
+#### 5. Verify Integration
+1. Visit `http://localhost:8000` for the frontend
+2. Ensure `http://localhost:5000` shows backend health check
+3. Test personality analysis through the interface
+4. Verify Claude chat functionality
+
+### Production Deployment
+
+#### Frontend Deployment
+- **Vercel**: Automatic deployment via Git hooks
+- **Netlify**: Serverless functions handle Claude API
+- **GitHub Pages**: Static hosting with external API
+
+#### Backend Deployment
+```bash
+# Install production dependencies
+pip install gunicorn
+
+# Start production server
+gunicorn --config gunicorn.conf.py app:app
+
+# Or use the provided startup script
+./start_server.sh
+```
+
+### Development Workflow
+1. **Backend Development**: Run Flask in development mode (`python app.py`)
+2. **Frontend Development**: Use local web server with hot reloading
+3. **API Testing**: Backend provides test endpoints at `http://localhost:5000`
+4. **Model Training**: Use provided Jupyter notebooks and training scripts
 
 ## 🔧 Configuration
 
@@ -164,8 +291,124 @@ The system uses Claude API for:
 
 ### Environment Variables
 ```javascript
-// Configured via browser interface
+// Frontend - Configured via browser interface
 CLAUDE_API_KEY=your_anthropic_api_key_here
+
+// Backend - Python environment
+FLASK_ENV=development
+FLASK_DEBUG=True
+MODEL_PATH=./models/ocean_model/
+```
+
+## 🔌 API Documentation
+
+### Backend API Endpoints
+
+The Flask backend provides comprehensive personality analysis capabilities:
+
+#### Health Check
+```http
+GET /
+```
+Returns server status and analyzer readiness.
+
+#### Text Analysis
+```http
+POST /api/analyze
+Content-Type: application/json
+
+{
+  "text": "Your text to analyze for personality insights...",
+  "mode": "general|quest|conversation|jd",
+  "context": [optional conversation history]
+}
+```
+
+#### Quest Mode Analysis
+```http
+POST /api/quest
+Content-Type: application/json
+
+{
+  "responses": ["response1", "response2", "response3", "response4"],
+  "user_name": "UserName"
+}
+```
+
+#### Avatar Generation
+```http
+POST /api/generate_avatar
+Content-Type: application/json
+
+{
+  "personality_scores": {
+    "Openness": 0.7,
+    "Conscientiousness": 0.6,
+    "Extraversion": 0.8,
+    "Agreeableness": 0.5,
+    "Neuroticism": 0.3
+  },
+  "user_context": {}
+}
+```
+
+### Frontend API Integration
+
+The frontend integrates with both backend personality analysis and Claude API:
+
+```javascript
+// Personality Analysis
+const personalityResult = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: userInput, mode: 'general' })
+});
+
+// Claude Chat Integration
+const chatResponse = await fetch('/api/claude-stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+        message: userMessage,
+        character: selectedCharacter,
+        personality: personalityScores
+    })
+});
+```
+
+### Response Format
+
+All backend endpoints return structured JSON responses:
+
+```json
+{
+  "status": "success|error",
+  "personality_scores": {
+    "Openness": {
+      "score": 0.7,
+      "level": "High",
+      "description": "Curious, imaginative, open to new experiences",
+      "confidence": 0.8,
+      "percentile": 70.0
+    }
+    // ... additional Big Five traits
+  },
+  "avatar_data": {
+    "title": "Your Personal El: The Innovator",
+    "archetype": {
+      "name": "The Innovator",
+      "description": "Creative and organized, brings novel ideas to life",
+      "emoji": "💡"
+    },
+    "dominant_traits": ["Creative", "Organized"],
+    "working_style": {
+      "structure": "Prefers structured approaches",
+      "innovation": "Enjoys exploring new methods",
+      "energy": "Works best with collaboration"
+    }
+  },
+  "explanation": "Based on your input analysis..."
+}
 ```
 
 ## 🎯 Features Deep Dive

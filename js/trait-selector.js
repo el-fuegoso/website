@@ -242,16 +242,16 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             
             const data = await response.json();
             
-            // Option B: Check if we should generate an avatar after significant conversation
+            // Check if we should generate an avatar after significant conversation
             if (this.conversationHistory.length >= 6 && !this.hasGeneratedAvatar) {
                 await this.generateTerminalAvatar(data, userInput);
                 this.hasGeneratedAvatar = true;
-                return `${data.response || this.getFallbackResponse(userInput)}
+                return `${data.response || data.explanation || this.getFallbackResponse(userInput)}
 
 [COMPLETE] Big Five extracted. Generating your El persona...`;
             }
             
-            return data.response || this.getFallbackResponse(userInput);
+            return data.response || data.explanation || this.getFallbackResponse(userInput);
         } catch (error) {
             console.error('Error connecting to personality analyzer:', error);
             // Fallback to local analysis

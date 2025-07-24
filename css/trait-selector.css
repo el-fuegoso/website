@@ -600,6 +600,9 @@
     font-size: 12px;
     outline: none;
     caret-color: #ffffff;
+    visibility: visible !important;
+    display: block !important;
+    opacity: 1 !important;
 }
 
 .terminal-input::placeholder {

@@ -239,7 +239,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             
             const data = await response.json();
             
-            return data.response || this.getFallbackResponse(userInput);
+            return data.explanation || this.getFallbackResponse(userInput);
         } catch (error) {
             console.error('Error connecting to personality analyzer:', error);
             // Fallback to local analysis

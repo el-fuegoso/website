@@ -242,8 +242,14 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             
             const data = await response.json();
             
-            // Check if we should generate an avatar after significant conversation
-            if (this.conversationHistory.length >= 6 && !this.hasGeneratedAvatar) {
+            // Check if we should generate an avatar - trigger immediately for substantial text
+            const shouldAnalyze = !this.hasGeneratedAvatar && (
+                userInput.length > 100 || // Substantial text provided
+                userInput.toLowerCase().includes('analyze') || // User explicitly asks for analysis
+                this.conversationHistory.length >= 6 // Fallback: after extended conversation
+            );
+            
+            if (shouldAnalyze) {
                 await this.generateTerminalAvatar(data, userInput);
                 this.hasGeneratedAvatar = true;
                 return `${data.response || data.explanation || this.getFallbackResponse(userInput)}

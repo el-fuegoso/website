@@ -557,13 +557,11 @@
 }
 
 .cursor {
-    background: #ffffff;
-    color: #0d1117;
+    color: #ffffff;
     animation: blink 1s infinite;
     margin-left: 2px;
-    width: 8px;
-    height: 16px;
     display: inline-block;
+    font-family: 'Roboto Mono', monospace;
 }
 
 @keyframes blink {
@@ -578,8 +576,9 @@
     outline: none;
     font-family: 'Roboto Mono', monospace;
     font-size: 12px;
-    margin-left: 4px;
+    margin-left: -8px;
     flex: 1;
+    caret-color: transparent;
 }
 
 /* Scrollbar styling */

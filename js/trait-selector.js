@@ -1830,8 +1830,7 @@ function runTerminalAnimation() {
 █████   ██      ██      ██ ██    ██    ██   
 ██      ██      ██      ██ ██    ██    ██   
 ███████ ███████ ███████ ██  ██████     ██   `, 
-            delay: 1200,
-            typewriter: true
+            delay: 1200
         },
         { text: '', delay: 300 },
         { text: '**PERSONA GENERATOR v2.0**', delay: 100 },

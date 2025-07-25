@@ -43,7 +43,7 @@ class Terminal {
         
         elliotLines.forEach((line, index) => {
             setTimeout(() => {
-                this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; letter-spacing: 1px; white-space: pre;">${line}</span>`);
+                this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; letter-spacing: 0; white-space: pre; line-height: 1;">${line}</span>`);
             }, index * 150);
         });
         
@@ -306,11 +306,33 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             // Clear the input and focus it
             this.input.value = '';
             this.input.focus();
+            
+            // Add event listener for cursor positioning
+            this.input.addEventListener('input', this.updateCursorPosition.bind(this));
+            this.input.addEventListener('keyup', this.updateCursorPosition.bind(this));
+            
+            // Initialize cursor position
+            this.updateCursorPosition();
         }
         
         // Scroll output to bottom
         if (this.output) {
             this.output.scrollTop = this.output.scrollHeight;
+        }
+    }
+
+    updateCursorPosition() {
+        const cursor = document.querySelector('.cursor');
+        const input = this.input;
+        
+        if (cursor && input) {
+            // Calculate character width in Roboto Mono
+            const charWidth = 7.2; // pixels for 12px Roboto Mono
+            const inputLength = input.value.length;
+            const cursorPosition = inputLength * charWidth;
+            
+            // Update cursor position with margin-left
+            cursor.style.marginLeft = `${cursorPosition + 2}px`;
         }
     }
 

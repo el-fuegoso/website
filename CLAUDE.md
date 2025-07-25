@@ -95,3 +95,7 @@ Target modern browsers with ES6+ support:
 - Firefox 55+
 - Safari 12+
 - Edge 79+
+
+## Development Notes
+
+- Run local server using Python3 on port 8080

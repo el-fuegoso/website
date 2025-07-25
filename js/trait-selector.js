@@ -1670,7 +1670,7 @@ class TerminalIntelligence {
         this.pendingAnalysis = null;
     }
     
-    processInput(userInput) {
+    async processInput(userInput) {
         // Add to conversation history
         this.conversationHistory.push({
             type: 'user',
@@ -1682,7 +1682,33 @@ class TerminalIntelligence {
         const classification = classifyTextType(userInput);
         const context = getAnalysisContext(classification, userInput);
         
-        // Determine next action based on classification
+        // Use Claude for natural responses based on classification
+        try {
+            const claudeResponse = await this.callClaudeAPI({
+                message: userInput,
+                classification: classification,
+                context: context,
+                conversationHistory: this.conversationHistory
+            });
+            
+            // Add Claude response to conversation history
+            this.conversationHistory.push({
+                type: 'assistant',
+                content: claudeResponse.message,
+                timestamp: Date.now()
+            });
+            
+            return claudeResponse;
+            
+        } catch (error) {
+            console.error('Claude API error:', error);
+            // Fallback to original logic if Claude fails
+            return this.processInputFallback(userInput, classification, context);
+        }
+    }
+    
+    processInputFallback(userInput, classification, context) {
+        // Original logic as fallback
         if (classification.type === 'insufficient') {
             return {
                 action: 'request_more_info',
@@ -1706,6 +1732,48 @@ class TerminalIntelligence {
             context: context,
             text: userInput
         };
+    }
+    
+    async callClaudeAPI(data) {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: data.message,
+                character_name: 'TerminalAssistant',
+                terminal_context: {
+                    classification: data.classification,
+                    context: data.context,
+                    conversation_history: data.conversationHistory
+                }
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            // Determine action based on classification
+            let action = 'analyze';
+            if (data.classification.type === 'insufficient') {
+                action = 'request_more_info';
+            } else if (data.classification.type === 'ambiguous' && data.classification.confidence < 0.3) {
+                action = 'request_clarification';
+                this.pendingAnalysis = { text: data.message, classification: data.classification };
+                this.awaitingClarification = true;
+            }
+            
+            return {
+                action: action,
+                message: result.response.message,
+                classification: data.classification,
+                context: data.context,
+                text: data.message
+            };
+        } else {
+            throw new Error(result.error || 'Claude API call failed');
+        }
     }
     
     handleClarification(choice) {
@@ -1801,9 +1869,8 @@ function runTerminalAnimation() {
     }
     
     async function runLoadingSequence() {
-        // Clear existing content and hide prompt
+        // Clear existing content (prompt line now always visible)
         output.innerHTML = '';
-        promptLine.classList.add('hidden');
         
         for (let i = 0; i < loadingSequence.length; i++) {
             const item = loadingSequence[i];
@@ -1821,13 +1888,8 @@ function runTerminalAnimation() {
             await new Promise(resolve => setTimeout(resolve, item.delay));
         }
         
-        // Show prompt after loading is complete
-        console.log('Attempting to show prompt line:', promptLine);
-        console.log('Classes before:', promptLine.className);
-        promptLine.classList.remove('hidden');
-        console.log('Classes after:', promptLine.className);
-        promptLine.style.display = 'flex'; // Force display as backup
-        console.log('Final computed style:', window.getComputedStyle(promptLine).display);
+        // Focus terminal input (prompt line always visible now)
+        console.log('Focusing terminal input');
         focusTerminalInput();
     }
     
@@ -1962,18 +2024,84 @@ function focusTerminalInput() {
     }
 }
 
+// Terminal Debug System
+class TerminalDebugger {
+    constructor() {
+        this.enabled = true; // Set to false to disable debugging
+        this.steps = [];
+    }
+    
+    debug(step, data = {}) {
+        if (!this.enabled) return;
+        
+        const timestamp = new Date().toISOString().slice(11, 23);
+        const debugInfo = {
+            timestamp,
+            step,
+            data,
+            stackTrace: new Error().stack.split('\n').slice(2, 4)
+        };
+        
+        this.steps.push(debugInfo);
+        
+        console.group(`🔍 [${timestamp}] Terminal Debug: ${step}`);
+        console.log('Data:', data);
+        if (Object.keys(data).length > 0) {
+            Object.entries(data).forEach(([key, value]) => {
+                console.log(`  ${key}:`, value);
+            });
+        }
+        console.groupEnd();
+    }
+    
+    error(step, error, data = {}) {
+        if (!this.enabled) return;
+        
+        const timestamp = new Date().toISOString().slice(11, 23);
+        console.group(`❌ [${timestamp}] Terminal Error: ${step}`);
+        console.error('Error:', error);
+        console.log('Data:', data);
+        console.error('Stack:', error.stack);
+        console.groupEnd();
+    }
+    
+    success(step, data = {}) {
+        if (!this.enabled) return;
+        
+        const timestamp = new Date().toISOString().slice(11, 23);
+        console.group(`✅ [${timestamp}] Terminal Success: ${step}`);
+        console.log('Data:', data);
+        console.groupEnd();
+    }
+}
+
+// Global terminal intelligence and debugger
+let globalTerminalIntelligence = null;
+const terminalDebugger = new TerminalDebugger();
+
 // Terminal Mode Functionality
 function initializeTerminalMode() {
+    terminalDebugger.debug('Initializing Terminal Mode', {
+        timestamp: Date.now()
+    });
+    
     const terminalModeBtn = document.getElementById('terminalModeBtn');
     const terminalCloseBtn = document.getElementById('terminalCloseBtn');
     const terminalContainer = document.getElementById('terminalContainer');
-    const traitSelectorCard = document.querySelector('.trait-selector-card');
+    const traitSelectorCard = document.querySelector('.trait-panel');
     const terminalInput = document.getElementById('terminalInput');
     const advancedSection = document.querySelector('.advanced-section');
     const advancedHeader = document.querySelector('.advanced-header');
     
-    // Initialize terminal intelligence
-    let terminalIntelligence = null;
+    terminalDebugger.debug('Elements Found', {
+        terminalModeBtn: !!terminalModeBtn,
+        terminalCloseBtn: !!terminalCloseBtn,
+        terminalContainer: !!terminalContainer,
+        traitSelectorCard: !!traitSelectorCard,
+        terminalInput: !!terminalInput,
+        traitPanelSelector: '.trait-panel',
+        actualElement: traitSelectorCard ? traitSelectorCard.className : 'null'
+    });
     
     // Advanced dropdown functionality
     if (advancedHeader && advancedSection) {
@@ -1982,59 +2110,126 @@ function initializeTerminalMode() {
         });
     }
     
+    terminalDebugger.debug('Event Handler Setup Check', {
+        terminalModeBtn: !!terminalModeBtn,
+        terminalContainer: !!terminalContainer,
+        traitSelectorCard: !!traitSelectorCard,
+        willSetupHandlers: !!(terminalModeBtn && terminalContainer && traitSelectorCard)
+    });
+    
     if (terminalModeBtn && terminalContainer && traitSelectorCard) {
+        terminalDebugger.success('Setting Up Terminal Event Handlers');
         // Enter terminal mode
         terminalModeBtn.addEventListener('click', () => {
-            console.log('Terminal mode button clicked - starting setup');
+            terminalDebugger.debug('Terminal Mode Button Clicked', {
+                timestamp: Date.now()
+            });
             
-            // Initialize terminal intelligence
-            terminalIntelligence = new TerminalIntelligence();
-            console.log('Terminal intelligence initialized');
-            
-            // Trigger flip animation to show the terminal
-            traitSelectorCard.classList.add('flipped');
-            terminalContainer.classList.add('flipped');
-            console.log('Terminal flipped, checking if runTerminalAnimation exists:', typeof runTerminalAnimation);
-            
-            // Test direct call first
-            console.log('Calling runTerminalAnimation directly');
-            runTerminalAnimation();
+            try {
+                // Initialize terminal intelligence
+                globalTerminalIntelligence = new TerminalIntelligence();
+                terminalDebugger.success('TerminalIntelligence Created', {
+                    instance: !!globalTerminalIntelligence,
+                    type: typeof globalTerminalIntelligence
+                });
+                
+                // Trigger flip animation to show the terminal
+                traitSelectorCard.classList.add('flipped');
+                terminalContainer.classList.add('flipped');
+                terminalDebugger.debug('Terminal Flip Animation Started', {
+                    traitSelectorFlipped: traitSelectorCard.classList.contains('flipped'),
+                    terminalContainerFlipped: terminalContainer.classList.contains('flipped')
+                });
+                
+                // Check and run terminal animation
+                terminalDebugger.debug('Checking runTerminalAnimation', {
+                    functionExists: typeof runTerminalAnimation === 'function',
+                    functionType: typeof runTerminalAnimation
+                });
+                
+                if (typeof runTerminalAnimation === 'function') {
+                    runTerminalAnimation();
+                    terminalDebugger.success('Terminal Animation Started');
+                } else {
+                    terminalDebugger.error('Terminal Animation Function Missing', new Error('runTerminalAnimation not found'));
+                }
+                
+            } catch (error) {
+                terminalDebugger.error('Terminal Mode Initialization Failed', error);
+            }
         });
 
         terminalCloseBtn.addEventListener('click', () => {
+            terminalDebugger.debug('Terminal Close Button Clicked');
+            
             // Trigger flip animation to show the trait selector card
             traitSelectorCard.classList.remove('flipped');
             terminalContainer.classList.remove('flipped');
             
             // Reset terminal intelligence
-            terminalIntelligence = null;
+            globalTerminalIntelligence = null;
+            terminalDebugger.success('Terminal Closed and Reset', {
+                terminalIntelligence: globalTerminalIntelligence
+            });
         });
         
         // Handle terminal input processing
         async function processTerminalInput(userInput) {
-            if (!terminalIntelligence) return;
+            terminalDebugger.debug('Processing Terminal Input', {
+                userInput,
+                inputLength: userInput.length,
+                terminalIntelligenceExists: !!globalTerminalIntelligence
+            });
             
-            // Add user input to terminal display
-            addTerminalLine(userInput, true);
+            if (!globalTerminalIntelligence) {
+                terminalDebugger.error('Terminal Intelligence Not Available', new Error('globalTerminalIntelligence is null'), {
+                    userInput
+                });
+                return;
+            }
             
-            // Process input through intelligence layer
-            const result = terminalIntelligence.processInput(userInput);
-            
-            switch (result.action) {
+            try {
+                // Add user input to terminal display
+                addTerminalLine(userInput, true);
+                terminalDebugger.debug('User Input Added to Display', { userInput });
+                
+                // Process input through intelligence layer (now async)
+                terminalDebugger.debug('Calling processInput on TerminalIntelligence');
+                const result = await globalTerminalIntelligence.processInput(userInput);
+                terminalDebugger.success('Terminal Intelligence Process Complete', {
+                    action: result.action,
+                    hasMessage: !!result.message,
+                    messageLength: result.message ? result.message.length : 0
+                });
+                
+                switch (result.action) {
                 case 'request_more_info':
+                    terminalDebugger.debug('Action: Request More Info', { message: result.message });
                     addTerminalLine(result.message);
                     break;
                     
                 case 'request_clarification':
+                    terminalDebugger.debug('Action: Request Clarification', { message: result.message });
                     addTerminalLine(result.message);
                     break;
                     
                 case 'analyze':
+                    terminalDebugger.debug('Action: Analyze', {
+                        text: result.text,
+                        mode: result.context.mode,
+                        classification: result.classification
+                    });
+                    
                     // Show analysis message
                     addTerminalLine(result.context.instruction);
                     showTypingIndicator();
                     
                     try {
+                        terminalDebugger.debug('Calling Personality API', {
+                            text: result.text.substring(0, 100) + '...',
+                            mode: result.context.mode
+                        });
+                        
                         // Call Python backend
                         const analysisResult = await callPersonalityAPI(
                             result.text, 
@@ -2043,6 +2238,10 @@ function initializeTerminalMode() {
                         );
                         
                         removeTypingIndicator();
+                        terminalDebugger.success('API Call Complete', {
+                            status: analysisResult.status,
+                            hasData: !!analysisResult.data
+                        });
                         
                         // Process successful analysis
                         if (analysisResult.status === 'success') {
@@ -2050,23 +2249,35 @@ function initializeTerminalMode() {
                             
                             // Update avatar card with results
                             updateAvatarCard(analysisResult);
+                            terminalDebugger.success('Avatar Card Updated');
                             
                             // Add response to conversation history
-                            terminalIntelligence.addAssistantResponse('Analysis completed successfully');
+                            globalTerminalIntelligence.addAssistantResponse('Analysis completed successfully');
                         } else {
                             addTerminalLine('Analysis failed: ' + (analysisResult.error || 'Unknown error'));
                         }
                         
                     } catch (error) {
                         removeTypingIndicator();
+                        terminalDebugger.error('Analysis API Call Failed', error);
                         addTerminalLine('Error connecting to analysis service. Please try again.');
-                        console.error('Analysis error:', error);
                     }
                     break;
                     
                 case 'error':
+                    terminalDebugger.error('Action: Error', new Error(result.message));
                     addTerminalLine(result.message);
                     break;
+                    
+                default:
+                    terminalDebugger.error('Unknown Action', new Error(`Unknown action: ${result.action}`), result);
+                    addTerminalLine('An unexpected error occurred. Please try again.');
+                    break;
+            }
+            
+            } catch (error) {
+                terminalDebugger.error('Terminal Processing Failed', error, { userInput });
+                addTerminalLine('An error occurred while processing your input. Please try again.');
             }
         }
         
@@ -2074,25 +2285,65 @@ function initializeTerminalMode() {
         const inputLine = document.querySelector('.input-line');
         const inputElement = terminalInput || inputLine;
         
+        terminalDebugger.debug('Input Element Setup', {
+            terminalInput: !!terminalInput,
+            inputLine: !!inputLine,
+            inputElement: !!inputElement,
+            elementId: inputElement ? inputElement.id : 'none',
+            elementClass: inputElement ? inputElement.className : 'none'
+        });
+        
         if (inputElement) {
+            terminalDebugger.success('Attaching Keydown Event Handler to Input Element');
             inputElement.addEventListener('keydown', async (e) => {
+                terminalDebugger.debug('Keydown Event Detected', {
+                    key: e.key,
+                    inputValue: inputElement.value,
+                    terminalIntelligenceExists: !!globalTerminalIntelligence
+                });
+                
                 if (e.key === 'Enter') {
+                    terminalDebugger.debug('Enter Key Pressed', {
+                        inputValue: inputElement.value
+                    });
+                    
                     const value = inputElement.value.trim();
-                    if (value && terminalIntelligence) {
-                        // Clear input immediately
-                        inputElement.value = '';
-                        
-                        // Handle clarification responses
-                        if (terminalIntelligence.awaitingClarification) {
-                            const clarificationResult = terminalIntelligence.handleClarification(value);
-                            if (clarificationResult.action === 'analyze') {
-                                await processTerminalInput(clarificationResult.text);
+                    terminalDebugger.debug('Input Value Processed', {
+                        originalValue: inputElement.value,
+                        trimmedValue: value,
+                        hasValue: !!value,
+                        terminalIntelligenceExists: !!globalTerminalIntelligence
+                    });
+                    
+                    if (value && globalTerminalIntelligence) {
+                        try {
+                            // Clear input immediately
+                            inputElement.value = '';
+                            terminalDebugger.debug('Input Field Cleared');
+                            
+                            // Handle clarification responses
+                            if (globalTerminalIntelligence.awaitingClarification) {
+                                terminalDebugger.debug('Handling Clarification Response');
+                                const clarificationResult = globalTerminalIntelligence.handleClarification(value);
+                                if (clarificationResult.action === 'analyze') {
+                                    await processTerminalInput(clarificationResult.text);
+                                } else {
+                                    addTerminalLine(clarificationResult.message);
+                                }
                             } else {
-                                addTerminalLine(clarificationResult.message);
+                                // Process normal input
+                                terminalDebugger.debug('Processing Normal Input');
+                                await processTerminalInput(value);
                             }
-                        } else {
-                            // Process normal input
-                            await processTerminalInput(value);
+                        } catch (error) {
+                            terminalDebugger.error('Input Processing Failed', error, { value });
+                        }
+                    } else {
+                        if (!value) {
+                            terminalDebugger.debug('Empty Input - No Action Taken');
+                        }
+                        if (!globalTerminalIntelligence) {
+                            terminalDebugger.error('Terminal Intelligence Missing', new Error('globalTerminalIntelligence is null'));
                         }
                     }
                 }

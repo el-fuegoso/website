@@ -337,6 +337,7 @@ def chat_with_character():
         character_name = data.get('character_name', 'TheBuilder')
         character_context = data.get('character_context', {})
         conversation_history = data.get('conversation_history', [])
+        terminal_context = data.get('terminal_context', None)
         
         if not user_message.strip():
             return jsonify({
@@ -345,6 +346,33 @@ def chat_with_character():
             }), 400
 
         logger.info(f"Chat request for {character_name}: {user_message[:100]}...")
+        
+        # Enhanced context for TerminalAssistant
+        if character_name == 'TerminalAssistant' and terminal_context:
+            # Add terminal-specific context to character context
+            character_context.update({
+                'terminal_mode': True,
+                'text_classification': terminal_context.get('classification', {}),
+                'analysis_context': terminal_context.get('context', {}),
+                'terminal_conversation_history': terminal_context.get('conversation_history', [])
+            })
+            
+            # Modify conversation history to include terminal context
+            if terminal_context.get('classification'):
+                classification = terminal_context['classification']
+                context_message = f"Text classification: {classification.get('type', 'unknown')} (confidence: {classification.get('confidence', 0):.2f})"
+                
+                # Add context message to conversation history
+                enhanced_history = conversation_history.copy()
+                if enhanced_history:
+                    enhanced_history.insert(-1, {
+                        'role': 'system',
+                        'content': context_message
+                    })
+                else:
+                    enhanced_history = [{'role': 'system', 'content': context_message}]
+                
+                conversation_history = enhanced_history
 
         # Import Claude API for character chat
         from personality_analyzer.claude_chat import generate_character_response

@@ -547,11 +547,9 @@
     margin-top: 20px;
     display: flex;
     align-items: center;
+    font-size: 12px;
 }
 
-.prompt-line.hidden {
-    display: none !important;
-}
 
 .prompt {
     color: #ffffff;
@@ -579,7 +577,7 @@
     border: none;
     outline: none;
     font-family: 'Roboto Mono', monospace;
-    font-size: 14px;
+    font-size: 12px;
     margin-left: 4px;
     flex: 1;
 }

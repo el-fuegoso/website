@@ -1,0 +1,16 @@
+# Core Flask application
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# ML/AI Dependencies - Core
+transformers>=4.30.0
+torch>=2.0.0
+numpy>=1.21.0
+
+# HTTP requests for GitHub releases
+requests>=2.25.0
+
+# Character data and chat functionality
+# Note: Removed heavy dependencies for Vercel optimization
+# spacy and nltk removed to reduce size
+# scikit-learn removed as not essential for model inference

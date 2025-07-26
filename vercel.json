@@ -1,5 +1,9 @@
 {
   "functions": {
+    "api/index.py": {
+      "runtime": "python3.9",
+      "maxDuration": 60
+    },
     "api/claude.js": {
       "maxDuration": 30
     },
@@ -10,6 +14,36 @@
       "maxDuration": 30
     }
   },
+  "rewrites": [
+    {
+      "source": "/api/analyze",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/quest", 
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/analyze_traits",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/generate_avatar",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/characters",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/match_character",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/chat",
+      "destination": "/api/index.py"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

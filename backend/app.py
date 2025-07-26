@@ -3,6 +3,7 @@ from flask_cors import CORS
 from personality_analyzer.analyzer import PersonalityAnalyzer
 import logging
 import traceback
+import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend integration
@@ -429,4 +430,7 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"   • Error loading characters: {e}")
     
-    app.run(debug=True, host='0.0.0.0', port=5002)
+    # Heroku provides PORT environment variable
+    port = int(os.environ.get('PORT', 5002))
+    debug_mode = os.environ.get('FLASK_ENV', 'production') == 'development'
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)

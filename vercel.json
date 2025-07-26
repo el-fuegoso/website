@@ -2,7 +2,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
-      "excludeFiles": ["backend/**", "scripts/**", "*.md", "MANUAL_RELEASE_STEPS.md", "DEPLOYMENT.md"]
+      "excludeFiles": "{backend/**,scripts/**,*.md}"
     },
     "api/claude.js": {
       "maxDuration": 30

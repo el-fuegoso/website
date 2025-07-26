@@ -40,23 +40,57 @@ export default async function handler(req, res) {
         }
 
         // Build system prompt with character context
-        let systemPrompt = `You are ${character_name || 'an AI assistant'}.`;
+        let systemPrompt;
         
-        if (character_context) {
-            systemPrompt += `\n\nCHARACTER CONTEXT:\n`;
-            systemPrompt += `Name: ${character_context.name || character_name}\n`;
-            if (character_context.title) systemPrompt += `Title: ${character_context.title}\n`;
-            if (character_context.summary) systemPrompt += `Personality: ${character_context.summary}\n`;
-            if (character_context.workingStyle) systemPrompt += `Working Style: ${character_context.workingStyle}\n`;
-            if (character_context.personality_traits) {
-                systemPrompt += `\nPersonality Traits:\n`;
-                Object.entries(character_context.personality_traits).forEach(([trait, value]) => {
-                    systemPrompt += `- ${trait}: ${value}\n`;
-                });
-            }
-        }
+        // Special handling for TerminalAssistant with updated personality analysis prompt
+        if (character_name === 'TerminalAssistant') {
+            systemPrompt = `You are ELLIOT's personality analysis terminal. Collect text from users and immediately trigger OCEAN analysis when you have enough content.
 
-        systemPrompt += `\n\nRespond in character, keeping your responses conversational and engaging. Match the personality traits and working style described above.`;
+IMMEDIATE TRIGGERS FOR ANALYSIS:
+- Any text >100 characters 
+- User says "analyze", "personality", "traits"
+- Job descriptions, resumes, cover letters, personal writing
+- Substantial self-descriptions
+
+WHEN SUFFICIENT TEXT PROVIDED:
+> processing text through OCEAN backend...
+> analyzing personality patterns...
+> [avatar will generate on right panel]
+
+WHEN INSUFFICIENT TEXT (<100 chars or vague):
+> need more text - paste a cover letter, resume, or email you wrote
+> or describe yourself: work style, interests, how you handle challenges
+
+AVAILABLE EL CHARACTERS: CONSPIRACYEL, THEBUILDER, THEDETECTIVE, GRUMPYOLDMANEL, PIRATEEL, GYMBRO, FREAKYEL, COFFEEADDICT, AGIEL
+
+RESPONSE RULES:
+- Keep responses 1-2 lines maximum
+- Don't chat or ask follow-up questions about hobbies  
+- Either "need more text" or "processing for analysis"
+- Avatar generation happens automatically on right panel
+- BE DIRECT: collect text → trigger analysis → done
+
+Focus: Get substantial text → Process immediately → Generate EL character match.`;
+        } else {
+            // Default system prompt for other characters
+            systemPrompt = `You are ${character_name || 'an AI assistant'}.`;
+            
+            if (character_context) {
+                systemPrompt += `\n\nCHARACTER CONTEXT:\n`;
+                systemPrompt += `Name: ${character_context.name || character_name}\n`;
+                if (character_context.title) systemPrompt += `Title: ${character_context.title}\n`;
+                if (character_context.summary) systemPrompt += `Personality: ${character_context.summary}\n`;
+                if (character_context.workingStyle) systemPrompt += `Working Style: ${character_context.workingStyle}\n`;
+                if (character_context.personality_traits) {
+                    systemPrompt += `\nPersonality Traits:\n`;
+                    Object.entries(character_context.personality_traits).forEach(([trait, value]) => {
+                        systemPrompt += `- ${trait}: ${value}\n`;
+                    });
+                }
+            }
+
+            systemPrompt += `\n\nRespond in character, keeping your responses conversational and engaging. Match the personality traits and working style described above.`;
+        }
 
         // Build messages array
         const messages = [];

@@ -429,4 +429,4 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"   • Error loading characters: {e}")
     
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5002)

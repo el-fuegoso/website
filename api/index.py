@@ -16,17 +16,17 @@ logger = logging.getLogger(__name__)
 analyzer = None
 
 def init_analyzer():
-    """Initialize GitHub model handler for personality analysis"""
+    """Initialize ONNX model handler for personality analysis"""
     global analyzer
     if analyzer is None:
         try:
-            # Use GitHub releases model handler
-            from model_handler import model_handler
-            analyzer = model_handler
-            logger.info("✅ GitHub model handler initialized successfully")
+            # Use ONNX model handler for optimized inference
+            from onnx_model_handler import onnx_model_handler
+            analyzer = onnx_model_handler
+            logger.info("✅ ONNX model handler initialized successfully")
         except Exception as e:
-            logger.error(f"❌ Error initializing GitHub model handler: {e}")
-            raise Exception(f"Model handler initialization failed: {str(e)}")
+            logger.error(f"❌ Error initializing ONNX model handler: {e}")
+            raise Exception(f"ONNX model handler initialization failed: {str(e)}")
     return analyzer
 
 def create_response(data: Dict[str, Any], status_code: int = 200) -> Dict[str, Any]:
@@ -77,7 +77,7 @@ def analyze_text_handler(body: Dict[str, Any]) -> Dict[str, Any]:
         avatar_data = {
             "avatar_style": "personality_based",
             "personality_scores": personality_scores,
-            "generated_from": "ocean_model",
+            "generated_from": "onnx_ocean_model",
             "dominant_traits": sorted(personality_scores.items(), key=lambda x: x[1], reverse=True)[:2]
         }
         
@@ -88,7 +88,7 @@ def analyze_text_handler(body: Dict[str, Any]) -> Dict[str, Any]:
             "avatar_data": avatar_data,
             "analysis_mode": mode,
             "text_length": len(user_text),
-            "model_source": "github_releases"
+            "model_source": "onnx_github_releases"
         })
 
     except Exception as e:
@@ -140,7 +140,7 @@ def analyze_quest_handler(body: Dict[str, Any]) -> Dict[str, Any]:
             "analysis": quest_analysis,
             "user_name": user_name,
             "response_count": len(responses),
-            "model_source": "github_releases"
+            "model_source": "onnx_github_releases"
         })
 
     except Exception as e:
@@ -309,7 +309,7 @@ def generate_avatar_handler(body: Dict[str, Any]) -> Dict[str, Any]:
         return create_response({
             "status": "success",
             "avatar": avatar_data,
-            "model_source": "github_releases"
+            "model_source": "onnx_github_releases"
         })
 
     except Exception as e:
@@ -400,7 +400,7 @@ def health_check_handler() -> Dict[str, Any]:
         return create_response({
             "status": "healthy",
             "service": "Elliot Personality Analyzer API",
-            "model_handler": "github_releases",
+            "model_handler": "onnx_github_releases",
             "model_status": model_status,
             "analyzer_status": "ready"
         })

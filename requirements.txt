@@ -1,7 +1,5 @@
-# CPU-only PyTorch for Vercel size optimization
---extra-index-url https://download.pytorch.org/whl/cpu
-torch>=2.0.0
-transformers>=4.30.0
+# ONNX Runtime for optimized ML inference (lightweight)
+onnxruntime>=1.15.0
 
 # Core Flask application
 flask>=2.3.0
@@ -11,4 +9,4 @@ flask-cors>=4.0.0
 numpy>=1.21.0
 requests>=2.25.0
 
-# Optimized for Vercel 250MB limit with CPU-only inference
+# Optimized for Vercel 250MB limit with ONNX model (~60-80MB total)

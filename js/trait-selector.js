@@ -987,25 +987,25 @@ class ElliotGenerator {
         };
         
         const traitMappings = {
-            "innovation": {"Openness": 0.3, "Conscientiousness": 0.1},
-            "energy": {"Extraversion": 0.3, "Neuroticism": -0.1},
-            "intensity": {"Conscientiousness": 0.3, "Neuroticism": -0.05},
-            "cooperative": {"Agreeableness": 0.3, "Extraversion": 0.1},
-            "calm": {"Neuroticism": -0.3, "Conscientiousness": 0.1},
-            "technical": {"Conscientiousness": 0.25, "Openness": 0.1},
+            "innovation": {"Openness": 0.3},
+            "energy": {"Extraversion": 0.3},
+            "intensity": {"Conscientiousness": 0.3},
+            "cooperative": {"Agreeableness": 0.3},
+            "calm": {"Neuroticism": -0.3},
+            "technical": {"Conscientiousness": 0.25},
             "creativity": {"Openness": 0.25},
-            "leadership": {"Extraversion": 0.25, "Conscientiousness": 0.1},
-            "collaborative": {"Agreeableness": 0.25, "Extraversion": 0.1},
-            "adventure": {"Openness": 0.2, "Extraversion": 0.15},
+            "leadership": {"Extraversion": 0.25},
+            "collaborative": {"Agreeableness": 0.25},
+            "adventure": {"Openness": 0.2},
             "empathetic": {"Agreeableness": 0.3},
-            "discipline": {"Conscientiousness": 0.25, "Neuroticism": -0.1},
-            "harmonious": {"Agreeableness": 0.25, "Neuroticism": -0.1},
-            "hustle": {"Extraversion": 0.2, "Conscientiousness": 0.2},
-            "speed": {"Extraversion": 0.15, "Neuroticism": 0.1},
+            "discipline": {"Conscientiousness": 0.25},
+            "harmonious": {"Agreeableness": 0.25},
+            "hustle": {"Extraversion": 0.2},
+            "speed": {"Extraversion": 0.15},
             "experimental": {"Openness": 0.3},
-            "paranoia": {"Neuroticism": 0.25, "Conscientiousness": 0.1},
+            "paranoia": {"Neuroticism": 0.25},
             "anxious": {"Neuroticism": 0.3},
-            "supportive": {"Agreeableness": 0.25, "Extraversion": 0.1}
+            "supportive": {"Agreeableness": 0.25}
         };
         
         // Apply trait effects
@@ -1290,6 +1290,9 @@ class ElliotGenerator {
             // Update radar charts with Big Five scores
             this.updateRadarCharts(elliotData);
             
+            // Add Chat Now button after character generation
+            this.addChatNowButton(waterAsciiContainer, elliotData);
+            
             console.log('Avatar component rendered');
         } else {
             console.log('Missing data for avatar render:', {
@@ -1297,6 +1300,150 @@ class ElliotGenerator {
                 hasAvatarGenerator: !!window.avatarGenerator
             });
         }
+    }
+
+    addChatNowButton(container, elliotData) {
+        // Check if button already exists to avoid duplicates
+        if (container.querySelector('.chat-now-btn')) {
+            return;
+        }
+
+        // Create Chat Now button
+        const chatButton = document.createElement('button');
+        chatButton.className = 'chat-now-btn';
+        chatButton.innerHTML = 'CHAT NOW';
+        chatButton.style.cssText = `
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            border-radius: 0;
+            width: 100%;
+        `;
+        
+        // Add hover effects
+        chatButton.addEventListener('mouseenter', () => {
+            chatButton.style.background = 'var(--amber)';
+            chatButton.style.transform = 'translateY(-1px)';
+            chatButton.style.boxShadow = '0 2px 8px rgba(0, 66, 37, 0.3)';
+        });
+        
+        chatButton.addEventListener('mouseleave', () => {
+            chatButton.style.background = 'var(--green)';
+            chatButton.style.transform = 'translateY(0)';
+            chatButton.style.boxShadow = 'none';
+        });
+        
+        chatButton.addEventListener('click', () => {
+            this.openChatWithCharacter(elliotData);
+        });
+        
+        // Find the best place to insert the button within the avatar container
+        const cardContent = container.querySelector('.card-content') || container;
+        cardContent.appendChild(chatButton);
+        
+        console.log('Chat Now button added to character card');
+    }
+
+    openChatWithCharacter(elliotData) {
+        // Initialize conversation manager if it doesn't exist
+        if (!window.conversationManager) {
+            console.log('Initializing conversation manager...');
+            window.conversationManager = new window.ConversationManager();
+            
+            // Initialize chat UI
+            if (!window.chatUI) {
+                window.chatUI = new window.ChatUI();
+                window.conversationManager.initialize(window.chatUI);
+            }
+        }
+        
+        // Prepare character data in the format expected by chat UI
+        if (window.chatUI && elliotData) {
+            const characterName = elliotData.characterName || elliotData.name;
+            const characterData = {
+                title: elliotData.title,
+                description: elliotData.description,
+                // Extract personality traits from the generated character data
+                personality: this.extractPersonalityFromElliotData(elliotData),
+                // Extract expertise from character data or title
+                expertise: this.extractExpertiseFromElliotData(elliotData)
+            };
+            
+            // Use initializeChatWithCharacter to properly set character context
+            window.chatUI.initializeChatWithCharacter(characterName, characterData);
+            console.log('Character initialized for chat:', characterName, characterData);
+        }
+        
+        // Open the chat modal
+        if (window.chatUI) {
+            window.chatUI.show();
+            console.log('Chat modal opened with character:', elliotData.characterName || elliotData.name);
+        } else {
+            console.error('Chat UI not available');
+        }
+    }
+
+    extractPersonalityFromElliotData(elliotData) {
+        // Try to get personality from various sources in the elliotData
+        if (elliotData.personality) {
+            return elliotData.personality;
+        }
+        
+        // Fallback: generate personality description from character data
+        const characterData = this.getCharacterData()[elliotData.characterName];
+        if (characterData) {
+            return `${elliotData.description} I have a personality that combines ` +
+                   `${characterData.O > 3 ? 'high openness to new experiences' : 'practical thinking'}, ` +
+                   `${characterData.C > 3 ? 'strong organization skills' : 'flexible approaches'}, ` +
+                   `${characterData.E > 3 ? 'energetic social engagement' : 'thoughtful communication'}, ` +
+                   `${characterData.A > 3 ? 'collaborative teamwork' : 'direct problem-solving'}, and ` +
+                   `${characterData.N < 3 ? 'calm under pressure' : 'passionate intensity'}.`;
+        }
+        
+        // Ultimate fallback
+        return elliotData.description || 'A helpful AI assistant with unique personality traits.';
+    }
+
+    extractExpertiseFromElliotData(elliotData) {
+        // Try to get expertise from various sources
+        if (elliotData.expertise) {
+            return elliotData.expertise;
+        }
+        
+        // Extract from title or generate based on character type
+        const title = elliotData.title || '';
+        if (title.includes('Builder') || title.includes('Engineering')) {
+            return 'Software engineering, system architecture, problem-solving, and building innovative solutions';
+        } else if (title.includes('Detective') || title.includes('Analyst')) {
+            return 'Investigation, analysis, debugging, and systematic problem resolution';
+        } else if (title.includes('Pirate') || title.includes('Adventure')) {
+            return 'Creative problem-solving, resourcefulness, and navigating complex challenges';
+        } else if (title.includes('Gym') || title.includes('Fitness')) {
+            return 'Performance optimization, discipline, goal achievement, and systematic improvement';
+        }
+        
+        // Fallback based on selected traits
+        const selectedTraits = Array.from(this.selectedTraits);
+        const expertiseAreas = [];
+        
+        if (selectedTraits.includes('technical')) expertiseAreas.push('technical implementation');
+        if (selectedTraits.includes('innovation')) expertiseAreas.push('innovative solutions');
+        if (selectedTraits.includes('leadership')) expertiseAreas.push('team leadership');
+        if (selectedTraits.includes('creativity')) expertiseAreas.push('creative problem-solving');
+        if (selectedTraits.includes('collaborative')) expertiseAreas.push('team collaboration');
+        
+        return expertiseAreas.length > 0 
+            ? expertiseAreas.join(', ') 
+            : 'General problem-solving and helpful assistance';
     }
 
     updateRadarCharts(elliotData) {
@@ -2024,8 +2171,15 @@ function updateAvatarCard(analysisResult) {
             
             chatButton.addEventListener('click', () => {
                 // Trigger existing chat modal
-                if (window.conversationManager) {
-                    window.conversationManager.openChat();
+                if (window.chatUI) {
+                    window.chatUI.show();
+                } else if (window.conversationManager) {
+                    console.warn('Chat UI not found, initializing...');
+                    if (!window.chatUI) {
+                        window.chatUI = new window.ChatUI();
+                        window.conversationManager.initialize(window.chatUI);
+                    }
+                    window.chatUI.show();
                 }
             });
             

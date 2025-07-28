@@ -79,8 +79,19 @@ Focus: Get substantial text → Process immediately → Generate EL character ma
                 systemPrompt += `\n\nCHARACTER CONTEXT:\n`;
                 systemPrompt += `Name: ${character_context.name || character_name}\n`;
                 if (character_context.title) systemPrompt += `Title: ${character_context.title}\n`;
-                if (character_context.summary) systemPrompt += `Personality: ${character_context.summary}\n`;
-                if (character_context.workingStyle) systemPrompt += `Working Style: ${character_context.workingStyle}\n`;
+                
+                // Handle personality from chat UI format
+                if (character_context.personality) systemPrompt += `Personality: ${character_context.personality}\n`;
+                else if (character_context.summary) systemPrompt += `Personality: ${character_context.summary}\n`;
+                
+                // Handle expertise from chat UI format
+                if (character_context.expertise) systemPrompt += `Expertise: ${character_context.expertise}\n`;
+                else if (character_context.workingStyle) systemPrompt += `Working Style: ${character_context.workingStyle}\n`;
+                
+                // Handle communication style
+                if (character_context.communicationStyle) systemPrompt += `Communication Style: ${character_context.communicationStyle}\n`;
+                
+                // Handle legacy personality traits format
                 if (character_context.personality_traits) {
                     systemPrompt += `\nPersonality Traits:\n`;
                     Object.entries(character_context.personality_traits).forEach(([trait, value]) => {

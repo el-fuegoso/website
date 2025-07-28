@@ -585,6 +585,46 @@ class ThemeManager {
     }
 }
 
+// Chat System Early Initialization
+function initializeChatSystem() {
+    console.log('🗣️ Initializing chat system...');
+    
+    // Check if chat dependencies are loaded
+    const dependencies = ['ChatUI', 'ConversationManager', 'ClaudeClient', 'AvatarGenerator'];
+    const missing = dependencies.filter(dep => !window[dep]);
+    
+    if (missing.length > 0) {
+        console.warn('⚠️ Missing chat dependencies:', missing);
+        console.warn('💡 Chat functionality may not work until all dependencies are loaded');
+        return;
+    }
+    
+    try {
+        // Pre-initialize chat system components
+        if (!window.conversationManager) {
+            console.log('📞 Creating ConversationManager instance...');
+            window.conversationManager = new window.ConversationManager();
+        }
+        
+        if (!window.chatUI) {
+            console.log('💬 Creating ChatUI instance...');
+            window.chatUI = new window.ChatUI();
+            
+            // Initialize the conversation manager with the chat UI
+            if (window.conversationManager) {
+                window.conversationManager.initialize(window.chatUI);
+                console.log('🔗 Chat system components linked successfully');
+            }
+        }
+        
+        console.log('✅ Chat system initialized successfully');
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize chat system:', error);
+        console.warn('💡 Chat functionality will use fallback lazy initialization');
+    }
+}
+
 // Initialize managers when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize performance monitoring
@@ -595,6 +635,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize theme management
     window.themeManager = new ThemeManager();
+    
+    // Initialize chat system early to avoid race conditions
+    initializeChatSystem();
     
     // Add performance info display
     const perfInfo = document.createElement('div');

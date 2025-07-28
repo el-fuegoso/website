@@ -1353,41 +1353,90 @@ class ElliotGenerator {
     }
 
     openChatWithCharacter(elliotData) {
+        console.log('🎯 Opening chat with character...', elliotData);
+        
+        // Check if chat system is properly initialized
+        if (!window.ChatUI || !window.ConversationManager) {
+            console.error('❌ CRITICAL: Chat system classes not loaded!');
+            console.error('💡 Make sure all chat dependencies are included in HTML');
+            alert('Chat system is not available. Please refresh the page and try again.');
+            return;
+        }
+        
         // Initialize conversation manager if it doesn't exist
         if (!window.conversationManager) {
-            console.log('Initializing conversation manager...');
-            window.conversationManager = new window.ConversationManager();
-            
-            // Initialize chat UI
-            if (!window.chatUI) {
-                window.chatUI = new window.ChatUI();
-                window.conversationManager.initialize(window.chatUI);
+            console.log('📞 Creating ConversationManager instance (fallback)...');
+            try {
+                window.conversationManager = new window.ConversationManager();
+            } catch (error) {
+                console.error('❌ Failed to create ConversationManager:', error);
+                alert('Failed to initialize chat system. Please refresh the page.');
+                return;
             }
         }
         
+        // Initialize chat UI if it doesn't exist
+        if (!window.chatUI) {
+            console.log('💬 Creating ChatUI instance (fallback)...');
+            try {
+                window.chatUI = new window.ChatUI();
+                window.conversationManager.initialize(window.chatUI);
+            } catch (error) {
+                console.error('❌ Failed to create ChatUI:', error);
+                alert('Failed to initialize chat interface. Please refresh the page.');
+                return;
+            }
+        }
+        
+        // Validate character data
+        if (!elliotData) {
+            console.error('❌ No character data provided to chat system');
+            alert('No character data available. Please generate a character first.');
+            return;
+        }
+        
         // Prepare character data in the format expected by chat UI
-        if (window.chatUI && elliotData) {
-            const characterName = elliotData.characterName || elliotData.name;
+        try {
+            const characterName = elliotData.characterName || elliotData.name || 'Unknown Character';
             const characterData = {
-                title: elliotData.title,
-                description: elliotData.description,
+                title: elliotData.title || 'AI Assistant',
+                description: elliotData.description || 'A helpful AI assistant',
                 // Extract personality traits from the generated character data
                 personality: this.extractPersonalityFromElliotData(elliotData),
                 // Extract expertise from character data or title
                 expertise: this.extractExpertiseFromElliotData(elliotData)
             };
             
+            console.log('🔧 Prepared character data:', { characterName, characterData });
+            
             // Use initializeChatWithCharacter to properly set character context
-            window.chatUI.initializeChatWithCharacter(characterName, characterData);
-            console.log('Character initialized for chat:', characterName, characterData);
+            if (typeof window.chatUI.initializeChatWithCharacter === 'function') {
+                window.chatUI.initializeChatWithCharacter(characterName, characterData);
+                console.log('✅ Character initialized for chat:', characterName);
+            } else {
+                console.error('❌ initializeChatWithCharacter method not found');
+                alert('Chat system error. Please refresh the page.');
+                return;
+            }
+            
+        } catch (error) {
+            console.error('❌ Failed to prepare character data:', error);
+            alert('Failed to set up character for chat. Please try again.');
+            return;
         }
         
         // Open the chat modal
-        if (window.chatUI) {
-            window.chatUI.show();
-            console.log('Chat modal opened with character:', elliotData.characterName || elliotData.name);
-        } else {
-            console.error('Chat UI not available');
+        try {
+            if (window.chatUI && typeof window.chatUI.show === 'function') {
+                window.chatUI.show();
+                console.log('✅ Chat modal opened successfully');
+            } else {
+                console.error('❌ Chat UI show method not available');
+                alert('Failed to open chat modal. Please refresh the page.');
+            }
+        } catch (error) {
+            console.error('❌ Failed to open chat modal:', error);
+            alert('Error opening chat. Please try again.');
         }
     }
 

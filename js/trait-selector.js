@@ -1303,49 +1303,40 @@ class ElliotGenerator {
     }
 
     addChatNowButton(container, elliotData) {
-        // Check if button already exists to avoid duplicates
-        if (container.querySelector('.chat-now-btn')) {
-            return;
-        }
-
-        // Find the character name element
-        const characterNameElement = container.querySelector('.artwork-title') || container.querySelector('#personaName');
-        if (!characterNameElement) {
-            console.warn('Character name element not found, cannot add chat button');
-            return;
-        }
-
-        // Create Chat Now button with same styling as generate button
-        const chatButton = document.createElement('button');
-        chatButton.className = 'action-btn generate-btn chat-now-btn';
-        chatButton.innerHTML = 'CHAT NOW';
+        console.log('Adding chat button...');
         
-        chatButton.addEventListener('click', () => {
+        // Find character name element directly - we know it exists because character is displayed
+        const nameElement = document.getElementById('personaName');
+        console.log('Found nameElement:', nameElement);
+        
+        if (!nameElement) {
+            console.warn('personaName element not found');
+            return;
+        }
+        
+        // Check if button already exists
+        if (document.querySelector('.chat-now-btn')) {
+            console.log('Chat button already exists');
+            return;
+        }
+        
+        // Create simple button with same styling as generate button
+        const chatBtn = document.createElement('button');
+        chatBtn.textContent = 'CHAT NOW';
+        chatBtn.className = 'action-btn generate-btn chat-now-btn';
+        chatBtn.style.marginLeft = '15px';
+        chatBtn.style.fontSize = '10px';
+        
+        // Add click handler
+        chatBtn.onclick = () => {
+            console.log('Chat button clicked');
             this.openChatWithCharacter(elliotData);
-        });
+        };
         
-        // Create a flex container for the character name and button
-        const nameButtonContainer = document.createElement('div');
-        nameButtonContainer.style.cssText = `
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-        `;
+        // Insert button right after character name
+        nameElement.insertAdjacentElement('afterend', chatBtn);
         
-        // Get the parent of the character name element
-        const nameParent = characterNameElement.parentNode;
-        
-        // Insert the container before the character name element
-        nameParent.insertBefore(nameButtonContainer, characterNameElement);
-        
-        // Move the character name into the container
-        nameButtonContainer.appendChild(characterNameElement);
-        
-        // Add the chat button to the container
-        nameButtonContainer.appendChild(chatButton);
-        
-        console.log('Chat Now button added next to character name');
+        console.log('Chat button added successfully');
     }
 
     openChatWithCharacter(elliotData) {

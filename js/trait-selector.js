@@ -1290,8 +1290,8 @@ class ElliotGenerator {
             // Update radar charts with Big Five scores
             this.updateRadarCharts(elliotData);
             
-            // Add Chat Now button after character generation
-            this.addChatNowButton(document.querySelector('.avatar-card') || document, elliotData);
+            // Enable Chat Now button after character generation
+            this.enableChatButton(elliotData);
             
             console.log('Avatar component rendered');
         } else {
@@ -1302,41 +1302,29 @@ class ElliotGenerator {
         }
     }
 
-    addChatNowButton(container, elliotData) {
-        console.log('Adding chat button...');
+    enableChatButton(elliotData) {
+        console.log('Enabling chat button after character generation...');
         
-        // Find character name element directly - we know it exists because character is displayed
-        const nameElement = document.getElementById('personaName');
-        console.log('Found nameElement:', nameElement);
+        // Find the static chat button
+        const chatBtn = document.getElementById('chatNowBtn');
+        console.log('Found chat button:', chatBtn);
         
-        if (!nameElement) {
-            console.warn('personaName element not found');
+        if (!chatBtn) {
+            console.warn('Chat button not found in HTML');
             return;
         }
         
-        // Check if button already exists
-        if (document.querySelector('.chat-now-btn')) {
-            console.log('Chat button already exists');
-            return;
-        }
-        
-        // Create simple button with same styling as generate button
-        const chatBtn = document.createElement('button');
-        chatBtn.textContent = 'CHAT NOW';
-        chatBtn.className = 'action-btn generate-btn chat-now-btn';
-        chatBtn.style.marginLeft = '15px';
-        chatBtn.style.fontSize = '10px';
+        // Enable the button and make it fully visible
+        chatBtn.disabled = false;
+        chatBtn.style.opacity = '1';
         
         // Add click handler
         chatBtn.onclick = () => {
-            console.log('Chat button clicked');
+            console.log('Chat button clicked!');
             this.openChatWithCharacter(elliotData);
         };
         
-        // Insert button right after character name
-        nameElement.insertAdjacentElement('afterend', chatBtn);
-        
-        console.log('Chat button added successfully');
+        console.log('Chat button enabled successfully');
     }
 
     openChatWithCharacter(elliotData) {

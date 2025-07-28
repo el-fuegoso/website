@@ -388,7 +388,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                 const avatarData = await window.avatarGenerator.generateAvatar(characterName);
                 
                 // Replace the water ASCII animation with avatar (same as trait selector)
-                const waterAsciiContainer = document.getElementById('waterAscii');
+                const waterAsciiContainer = document.getElementById('avatarCard');
                 if (waterAsciiContainer) {
                     // Stop any running water animation
                     if (window.elliotGenerator && window.elliotGenerator.waterAscii) {
@@ -580,7 +580,7 @@ class ElliotGenerator {
         });
 
         // Add click handler for water ascii
-        const waterAscii = document.getElementById('waterAscii');
+        const waterAscii = document.getElementById('avatarCard');
         if (waterAscii) {
             waterAscii.addEventListener('click', () => this.generateElliot());
         }
@@ -787,7 +787,7 @@ class ElliotGenerator {
             }
         });
 
-        const waterAscii = document.getElementById('waterAscii');
+        const waterAscii = document.getElementById('avatarCard');
         if (waterAscii) {
             if (count > 0) {
                 waterAscii.classList.add('active');
@@ -1174,7 +1174,7 @@ class ElliotGenerator {
         if (generationPath) generationPath.classList.add('active');
         
         // Activate water ascii generating animation
-        const waterAscii = document.getElementById('waterAscii');
+        const waterAscii = document.getElementById('avatarCard');
         if (waterAscii) waterAscii.classList.add('generating');
 
         // Update generate button
@@ -1197,7 +1197,7 @@ class ElliotGenerator {
         if (generationPath) generationPath.classList.remove('active');
         
         // Remove water ascii generating state
-        const waterAscii = document.getElementById('waterAscii');
+        const waterAscii = document.getElementById('avatarCard');
         if (waterAscii) waterAscii.classList.remove('generating');
         
         // Reset generate button
@@ -1250,7 +1250,7 @@ class ElliotGenerator {
         console.log('showAvatarResults called with:', elliotData);
         
         // Replace the water ASCII animation with avatar
-        const waterAsciiContainer = document.getElementById('waterAscii');
+        const waterAsciiContainer = document.getElementById('avatarCard');
         console.log('waterAscii container found:', !!waterAsciiContainer);
         if (!waterAsciiContainer) return;
 
@@ -1303,28 +1303,53 @@ class ElliotGenerator {
     }
 
     enableChatButton(elliotData) {
-        console.log('Enabling chat button after character generation...');
+        console.log('🔍 DEBUGGING: Enabling chat button after character generation...');
+        console.log('🔍 DEBUGGING: elliotData received:', elliotData);
         
         // Find the static chat button
         const chatBtn = document.getElementById('chatNowBtn');
-        console.log('Found chat button:', chatBtn);
+        console.log('🔍 DEBUGGING: Found chat button element:', chatBtn);
+        console.log('🔍 DEBUGGING: Button current state:', {
+            disabled: chatBtn?.disabled,
+            opacity: chatBtn?.style.opacity,
+            display: chatBtn?.style.display,
+            visibility: chatBtn?.style.visibility
+        });
         
         if (!chatBtn) {
-            console.warn('Chat button not found in HTML');
+            console.error('❌ CRITICAL: Chat button not found in HTML - ID chatNowBtn missing!');
+            // Let's check what elements DO exist
+            const allButtons = document.querySelectorAll('button');
+            console.log('🔍 DEBUGGING: All buttons found:', allButtons);
+            const avatarCard = document.querySelector('.avatar-card');
+            console.log('🔍 DEBUGGING: Avatar card content:', avatarCard?.innerHTML);
             return;
         }
+        
+        // Check parent container
+        const parentContainer = chatBtn.parentElement;
+        console.log('🔍 DEBUGGING: Button parent container:', parentContainer);
+        console.log('🔍 DEBUGGING: Parent container styles:', {
+            display: parentContainer?.style.display,
+            visibility: parentContainer?.style.visibility
+        });
         
         // Enable the button and make it fully visible
         chatBtn.disabled = false;
         chatBtn.style.opacity = '1';
         
+        console.log('🔍 DEBUGGING: Button enabled, new state:', {
+            disabled: chatBtn.disabled,
+            opacity: chatBtn.style.opacity
+        });
+        
         // Add click handler
         chatBtn.onclick = () => {
-            console.log('Chat button clicked!');
+            console.log('🎯 CHAT BUTTON CLICKED!');
             this.openChatWithCharacter(elliotData);
         };
         
-        console.log('Chat button enabled successfully');
+        console.log('✅ SUCCESS: Chat button enabled successfully');
     }
 
     openChatWithCharacter(elliotData) {
@@ -1556,7 +1581,7 @@ class ElliotGenerator {
 
     restoreWaterAnimation() {
         // Restore the water ASCII animation
-        const waterAsciiContainer = document.getElementById('waterAscii');
+        const waterAsciiContainer = document.getElementById('avatarCard');
         if (!waterAsciiContainer) return;
 
         // Show the matrix label and generation path
@@ -2126,42 +2151,6 @@ function updateAvatarCard(analysisResult) {
             personaDescription.textContent = analysisResult.explanation;
         }
         
-        // Add chat button if not exists
-        if (avatarCard && !avatarCard.querySelector('.chat-avatar-btn')) {
-            const chatButton = document.createElement('button');
-            chatButton.className = 'chat-avatar-btn';
-            chatButton.textContent = 'CHAT';
-            chatButton.style.cssText = `
-                background: var(--green);
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                font-family: 'Roboto Mono', monospace;
-                font-weight: 600;
-                cursor: pointer;
-                margin-top: 15px;
-                text-transform: uppercase;
-            `;
-            
-            chatButton.addEventListener('click', () => {
-                // Trigger existing chat modal
-                if (window.chatUI) {
-                    window.chatUI.show();
-                } else if (window.conversationManager) {
-                    console.warn('Chat UI not found, initializing...');
-                    if (!window.chatUI) {
-                        window.chatUI = new window.ChatUI();
-                        window.conversationManager.initialize(window.chatUI);
-                    }
-                    window.chatUI.show();
-                }
-            });
-            
-            const cardContent = avatarCard.querySelector('.card-content');
-            if (cardContent) {
-                cardContent.appendChild(chatButton);
-            }
-        }
     }
     
     // Update radar charts if personality scores exist

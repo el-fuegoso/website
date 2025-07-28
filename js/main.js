@@ -625,6 +625,40 @@ function initializeChatSystem() {
     }
 }
 
+// Test Chat Button Setup (for debugging)
+function setupTestChatButton() {
+    console.log('🧪 Setting up test chat button...');
+    
+    const testBtn = document.getElementById('testChatBtn');
+    if (!testBtn) {
+        console.warn('⚠️ Test chat button not found');
+        return;
+    }
+    
+    testBtn.onclick = () => {
+        console.log('🧪 TEST CHAT BUTTON CLICKED!');
+        console.log('🔍 DEBUG: window.chatUI exists:', !!window.chatUI);
+        console.log('🔍 DEBUG: window.conversationManager exists:', !!window.conversationManager);
+        
+        // Try to show chat modal directly without any character setup
+        if (window.chatUI) {
+            console.log('🧪 Attempting direct ChatUI.show()...');
+            try {
+                window.chatUI.show();
+                console.log('✅ Direct show() call completed');
+            } catch (error) {
+                console.error('❌ Error in direct show():', error);
+                alert('Direct show error: ' + error.message);
+            }
+        } else {
+            console.error('❌ ChatUI not available for direct test');
+            alert('ChatUI not initialized - check console for errors');
+        }
+    };
+    
+    console.log('✅ Test chat button setup complete');
+}
+
 // Initialize managers when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize performance monitoring
@@ -638,6 +672,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize chat system early to avoid race conditions
     initializeChatSystem();
+    
+    // Add test chat button functionality
+    setupTestChatButton();
     
     // Add performance info display
     const perfInfo = document.createElement('div');

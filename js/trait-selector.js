@@ -1291,6 +1291,13 @@ class ElliotGenerator {
             this.updateRadarCharts(elliotData);
             
             // Enable Chat Now button after character generation
+            console.log('🔍 DEBUG: About to enable chat button with elliotData:', elliotData);
+            console.log('🔍 DEBUG: elliotData keys:', Object.keys(elliotData || {}));
+            console.log('🔍 DEBUG: elliotData.characterName:', elliotData?.characterName);
+            console.log('🔍 DEBUG: elliotData.name:', elliotData?.name);
+            console.log('🔍 DEBUG: elliotData.title:', elliotData?.title);
+            console.log('🔍 DEBUG: elliotData.description:', elliotData?.description);
+            
             this.enableChatButton(elliotData);
             
             console.log('Avatar component rendered');
@@ -1346,7 +1353,17 @@ class ElliotGenerator {
         // Add click handler
         chatBtn.onclick = () => {
             console.log('🎯 CHAT BUTTON CLICKED!');
-            this.openChatWithCharacter(elliotData);
+            console.log('🔍 DEBUG: Button click event fired');
+            console.log('🔍 DEBUG: elliotData at click time:', elliotData);
+            console.log('🔍 DEBUG: this context:', this);
+            console.log('🔍 DEBUG: About to call openChatWithCharacter...');
+            
+            try {
+                this.openChatWithCharacter(elliotData);
+            } catch (error) {
+                console.error('❌ CRITICAL: Error in button click handler:', error);
+                alert('Error opening chat: ' + error.message);
+            }
         };
         
         console.log('✅ SUCCESS: Chat button enabled successfully');

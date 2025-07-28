@@ -1291,7 +1291,7 @@ class ElliotGenerator {
             this.updateRadarCharts(elliotData);
             
             // Add Chat Now button after character generation
-            this.addChatNowButton(waterAsciiContainer, elliotData);
+            this.addChatNowButton(document.querySelector('.avatar-card') || document, elliotData);
             
             console.log('Avatar component rendered');
         } else {

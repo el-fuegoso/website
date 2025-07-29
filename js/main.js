@@ -608,30 +608,39 @@ function initializeChatSystem() {
     }
 }
 
-// Test Chat Button Setup (for debugging)
-function setupTestChatButton() {
-    
-    const testBtn = document.getElementById('testChatBtn');
-    if (!testBtn) {
+// Main Chat Button Setup
+function setupMainChatButton() {
+    const chatBtn = document.getElementById('chatNowBtn');
+    if (!chatBtn) {
         return;
     }
     
-    testBtn.onclick = () => {
+    chatBtn.onclick = () => {
+        console.log('🎯 Main chat button clicked');
         
-        // Try to show chat modal directly without any character setup
-        if (window.chatUI) {
+        // Initialize chat system if needed
+        const chatComponents = ensureChatInitialized();
+        if (!chatComponents) {
+            console.error('❌ Chat system not available');
+            alert('Chat system is initializing. Please try again in a moment.');
+            return;
+        }
+        
+        // Start chat with current persona or default character
+        const currentPersona = document.getElementById('personaName')?.textContent || 'ConspiracyEl';
+        
+        if (window.avatarGenerator && typeof window.avatarGenerator.startChatWithCharacter === 'function') {
             try {
-                window.chatUI.show();
+                window.avatarGenerator.startChatWithCharacter(currentPersona);
             } catch (error) {
-                console.error('❌ Error in direct show():', error);
-                alert('Direct show error: ' + error.message);
+                console.error('❌ Error starting character chat:', error);
+                alert('Failed to start chat. Please try again.');
             }
         } else {
-            console.error('❌ ChatUI not available for direct test');
-            alert('ChatUI not initialized - check console for errors');
+            console.error('❌ Avatar generator not available');
+            alert('Chat system not ready. Please refresh the page.');
         }
     };
-    
 }
 
 // Initialize managers when DOM is loaded
@@ -648,8 +657,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize chat system early to avoid race conditions
     initializeChatSystem();
     
-    // Add test chat button functionality
-    setupTestChatButton();
+    // Add main chat button functionality
+    setupMainChatButton();
     
     // Add performance info display
     const perfInfo = document.createElement('div');

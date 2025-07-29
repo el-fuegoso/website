@@ -4,7 +4,6 @@
  */
 class AvatarGenerator {
     constructor() {
-        this.apiKey = null; // User will need to set this
         this.isGenerating = false;
         this.generatedAvatars = new Map();
         this.avatarCache = new Map(); // Keep for backward compatibility
@@ -12,16 +11,8 @@ class AvatarGenerator {
     }
 
     init() {
-        // Check if API key is set
-        this.apiKey = localStorage.getItem('google_imagen_api_key');
-        if (!this.apiKey) {
-            console.warn('Google Imagen API key not set. Avatar generation will use placeholder.');
-        }
-    }
-
-    setApiKey(apiKey) {
-        this.apiKey = apiKey;
-        localStorage.setItem('google_imagen_api_key', apiKey);
+        // Server-side API key management - no client-side storage needed
+        console.log('Avatar generator initialized with server-side API integration');
     }
 
     /**
@@ -31,16 +22,21 @@ class AvatarGenerator {
      * @returns {Promise<Object>} Avatar data with image URL
      */
     async generateAvatar(matchedCharacterName = "TheBuilder", options = {}) {
+        console.log(`🎨 Starting avatar generation for: ${matchedCharacterName}`);
+        
         if (this.isGenerating) {
+            console.log('⚠️ Avatar generation already in progress, skipping');
             return null;
         }
 
         // Check cache first
         if (this.generatedAvatars.has(matchedCharacterName)) {
+            console.log(`✅ Found cached avatar for: ${matchedCharacterName}`);
             return this.generatedAvatars.get(matchedCharacterName);
         }
 
         this.isGenerating = true;
+        console.log(`🔄 Starting fresh avatar generation for: ${matchedCharacterName}`);
 
         try {
             const characterDescriptions = {
@@ -56,71 +52,77 @@ class AvatarGenerator {
             };
 
             const description = characterDescriptions[matchedCharacterName] || characterDescriptions["TheBuilder"];
+            console.log(`📝 Using description: ${description.substring(0, 50)}...`);
             
             let avatarData;
             
-            if (this.apiKey && this.apiKey !== 'placeholder') {
-                // Use real Google Imagen API
-                avatarData = await this.callImagenAPI(description, matchedCharacterName);
-            } else {
-                // Use placeholder
+            try {
+                console.log('🚀 Attempting server-side avatar generation via API...');
+                // Try to use server-side Google Imagen API first
+                avatarData = await this.callServerSideImagenAPI(description, matchedCharacterName);
+                console.log('✅ Server-side avatar generation successful!');
+            } catch (error) {
+                console.warn('❌ Server-side avatar generation failed, using placeholder:', error.message);
+                console.log('🎭 Creating placeholder avatar...');
+                // Fall back to placeholder
                 avatarData = this.createPlaceholderAvatar(matchedCharacterName, description);
+                console.log('✅ Placeholder avatar created');
             }
 
             // Cache the result
+            console.log(`💾 Caching avatar for ${matchedCharacterName}`);
             this.generatedAvatars.set(matchedCharacterName, avatarData);
 
+            console.log(`🎉 Avatar generation completed for ${matchedCharacterName}`);
             return avatarData;
 
         } catch (error) {
-            console.error('Avatar generation failed:', error);
+            console.error('❌ Critical avatar generation error:', error);
+            console.log('🚨 Creating error avatar as final fallback');
             return this.createErrorAvatar(matchedCharacterName);
         } finally {
             this.isGenerating = false;
+            console.log(`🔓 Avatar generation lock released for ${matchedCharacterName}`);
         }
     }
 
-    async callImagenAPI(description, characterName) {
-        // You need to replace YOUR_PROJECT_ID with your actual Google Cloud Project ID
-        const projectId = 'YOUR_PROJECT_ID'; // Replace with your actual project ID
-        const prompt = `Professional headshot portrait of ${description}, high quality, digital art style, clean background, 512x512 resolution`;
-
-        const response = await fetch(`https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/imagen-3.0-generate-001:predict`, {
+    async callServerSideImagenAPI(description, characterName) {
+        console.log(`🌐 Making API request to /api/generate-avatar for ${characterName}`);
+        
+        // Call our secure server-side API endpoint
+        const response = await fetch('/api/generate-avatar', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${this.apiKey}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                instances: [{
-                    prompt: prompt
-                }],
-                parameters: {
-                    sampleCount: 1,
-                    aspectRatio: "1:1",
-                    safetyFilterLevel: "block_some",
-                    personGeneration: "allow_adult"
-                }
+                characterName: characterName,
+                description: description
             })
         });
 
+        console.log(`📡 API response status: ${response.status}`);
+
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Imagen API error: ${response.status} - ${errorText}`);
+            const errorData = await response.json();
+            console.error('❌ API error response:', errorData);
+            throw new Error(`Server avatar generation error: ${response.status} - ${errorData.error}`);
         }
 
         const data = await response.json();
-        const imageUrl = data.predictions[0]?.bytesBase64Encoded 
-            ? `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`
-            : null;
+        console.log(`📊 API response data:`, { 
+            status: data.status, 
+            hasAvatar: !!data.avatar,
+            avatarSource: data.avatar?.source,
+            hasImageUrl: !!data.avatar?.imageUrl
+        });
+        
+        if (data.status !== 'success') {
+            throw new Error(data.error || 'Avatar generation failed');
+        }
 
-        return {
-            characterName,
-            imageUrl,
-            description,
-            timestamp: new Date().toISOString(),
-            source: 'google_imagen'
-        };
+        console.log(`✅ Avatar data received for ${characterName}`);
+        return data.avatar;
     }
 
     createPlaceholderAvatar(characterName, description) {
@@ -253,24 +255,42 @@ class AvatarGenerator {
     }
 
     startChatWithCharacter(characterName) {
+        console.log(`💬 Starting chat with character: ${characterName}`);
         
         // Get character data for context
         const characterData = this.getCharacterDataForChat(characterName);
+        console.log(`📋 Character data loaded:`, { 
+            name: characterName, 
+            title: characterData.title,
+            hasDescription: !!characterData.description 
+        });
         
         // Initialize chat UI if not already done
         if (typeof window.ChatUI !== 'undefined') {
+            console.log('🎯 ChatUI available, initializing...');
             if (!window.chatUI) {
+                console.log('🔧 Creating new ChatUI instance');
                 window.chatUI = new window.ChatUI();
             }
             
-            // Initialize chat with character
-            window.chatUI.initializeChatWithCharacter(characterName, characterData);
-            window.chatUI.show();
+            try {
+                console.log('⚡ Initializing chat with character...');
+                // Initialize chat with character
+                window.chatUI.initializeChatWithCharacter(characterName, characterData);
+                console.log('👁️ Showing chat modal...');
+                window.chatUI.show();
+                console.log('✅ Chat modal should now be visible');
+            } catch (error) {
+                console.error('❌ Error initializing chat UI:', error);
+                alert(`Failed to start chat with ${characterName}. Please try again.`);
+            }
         } else if (typeof window.ConversationManager !== 'undefined') {
+            console.log('🎯 Using ConversationManager fallback...');
             // Alternative: use conversation manager
             const conversationManager = new window.ConversationManager();
             conversationManager.startCharacterChat(characterName, characterData);
         } else {
+            console.warn('⚠️ No chat system available, using alert fallback');
             // Fallback: simple alert with character info
             alert(`Chat with ${characterName}\n\n${characterData.title}\n\n${characterData.description}\n\nChat system initializing...`);
             console.warn('Chat system not found. Make sure chat-ui.js is loaded.');
@@ -339,38 +359,7 @@ class AvatarGenerator {
         return characterData[characterName] || characterData["TheBuilder"];
     }
 
-    // API key management methods
-    showApiKeyDialog() {
-        const dialog = document.createElement('div');
-        dialog.className = 'api-key-dialog';
-        dialog.innerHTML = `
-            <div class="dialog-overlay">
-                <div class="dialog-content">
-                    <h3>Set Google API Key</h3>
-                    <p>To generate custom avatars, please enter your Google Cloud API key:</p>
-                    <input type="password" id="apiKeyInput" placeholder="Enter your API key..." />
-                    <div class="dialog-actions">
-                        <button onclick="this.closest('.api-key-dialog').remove()">Cancel</button>
-                        <button onclick="avatarGenerator.setApiKeyFromDialog()">Save</button>
-                    </div>
-                    <p class="api-note">Your API key is stored locally and never sent to our servers.</p>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(dialog);
-        document.getElementById('apiKeyInput').focus();
-    }
-
-    setApiKeyFromDialog() {
-        const input = document.getElementById('apiKeyInput');
-        const apiKey = input.value.trim();
-        
-        if (apiKey) {
-            this.setApiKey(apiKey);
-            document.querySelector('.api-key-dialog').remove();
-        }
-    }
+    // Server-side avatar generation - no client-side API key management needed
 
     // Backward compatibility methods for existing chat system
     createSVGAvatar(name) {

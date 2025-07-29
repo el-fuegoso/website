@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar System Debug Console</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .debug-section {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .debug-title {
+            color: #ff6600;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #004400;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #006600;
+        }
+        .output {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff4444; }
+        .warning { color: #ffaa00; }
+        .info { color: #4444ff; }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🐛 Avatar System Debug Console</h1>
+        <p>Use this console to debug avatar generation and chat functionality</p>
+
+        <div class="debug-section">
+            <div class="debug-title">🔧 System Status Check</div>
+            <button onclick="checkSystemStatus()">Check All Systems</button>
+            <button onclick="clearOutput('systemStatus')">Clear</button>
+            <div id="systemStatus" class="output">Click "Check All Systems" to see status...</div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">🎨 Avatar Generation Test</div>
+            <button onclick="testAvatarGeneration('TheBuilder')">Test TheBuilder</button>
+            <button onclick="testAvatarGeneration('TheNurturer')">Test TheNurturer</button>
+            <button onclick="testAvatarGeneration('TheAnalyst')">Test TheAnalyst</button>
+            <button onclick="clearOutput('avatarTest')">Clear</button>
+            <div id="avatarTest" class="output">Click any character button to test avatar generation...</div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">🌐 API Test</div>
+            <button onclick="testAPIDirectly()">Test API Directly</button>
+            <button onclick="clearOutput('apiTest')">Clear</button>
+            <div id="apiTest" class="output">Click "Test API Directly" to test the /api/generate-avatar endpoint...</div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">💬 Chat System Test</div>
+            <button onclick="testChatSystem()">Test Chat Init</button>
+            <button onclick="testChatWithCharacter('TheBuilder')">Test Chat with TheBuilder</button>
+            <button onclick="clearOutput('chatTest')">Clear</button>
+            <div id="chatTest" class="output">Click buttons to test chat system...</div>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-title">🎯 Complete Flow Test</div>
+            <button onclick="testCompleteFlow()">Run Complete Flow</button>
+            <button onclick="clearOutput('flowTest')">Clear</button>
+            <div id="flowTest" class="output">Click "Run Complete Flow" to test avatar generation → chat...</div>
+        </div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="js/conversation/avatar-generator.js"></script>
+    <script src="js/conversation/chat-ui.js"></script>
+    <script src="js/conversation/conversation-manager.js"></script>
+
+    <script>
+        let avatarGenerator;
+        let chatUI;
+
+        // Initialize components
+        window.addEventListener('DOMContentLoaded', () => {
+            log('systemStatus', '🚀 Initializing debug console...\n');
+            
+            if (window.AvatarGenerator) {
+                avatarGenerator = new window.AvatarGenerator();
+                window.avatarGenerator = avatarGenerator; // Make globally available
+                log('systemStatus', '✅ AvatarGenerator initialized\n');
+            } else {
+                log('systemStatus', '❌ AvatarGenerator not available\n', 'error');
+            }
+
+            if (window.ChatUI) {
+                chatUI = new window.ChatUI();
+                window.chatUI = chatUI; // Make globally available
+                log('systemStatus', '✅ ChatUI initialized\n');
+            } else {
+                log('systemStatus', '⚠️ ChatUI not available\n', 'warning');
+            }
+
+            log('systemStatus', '🎯 Debug console ready!\n', 'success');
+        });
+
+        function log(outputId, message, type = 'info') {
+            const output = document.getElementById(outputId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = logEntry;
+            
+            output.appendChild(span);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput(outputId) {
+            document.getElementById(outputId).innerHTML = '';
+        }
+
+        async function checkSystemStatus() {
+            clearOutput('systemStatus');
+            log('systemStatus', '🔍 Checking system status...\n');
+
+            // Check AvatarGenerator
+            if (window.AvatarGenerator) {
+                log('systemStatus', '✅ AvatarGenerator class available\n', 'success');
+                if (avatarGenerator) {
+                    log('systemStatus', '✅ AvatarGenerator instance created\n', 'success');
+                    log('systemStatus', `📊 Cache size: ${avatarGenerator.generatedAvatars.size}\n`);
+                }
+            } else {
+                log('systemStatus', '❌ AvatarGenerator class missing\n', 'error');
+            }
+
+            // Check ChatUI
+            if (window.ChatUI) {
+                log('systemStatus', '✅ ChatUI class available\n', 'success');
+                if (chatUI) {
+                    log('systemStatus', '✅ ChatUI instance created\n', 'success');
+                }
+            } else {
+                log('systemStatus', '❌ ChatUI class missing\n', 'error');
+            }
+
+            // Check global references
+            log('systemStatus', `🌍 window.avatarGenerator: ${!!window.avatarGenerator}\n`);
+            log('systemStatus', `🌍 window.chatUI: ${!!window.chatUI}\n`);
+
+            log('systemStatus', '🎯 System status check complete!\n', 'success');
+        }
+
+        async function testAvatarGeneration(characterName) {
+            clearOutput('avatarTest');
+            log('avatarTest', `🎨 Testing avatar generation for: ${characterName}\n`);
+
+            if (!avatarGenerator) {
+                log('avatarTest', '❌ AvatarGenerator not available\n', 'error');
+                return;
+            }
+
+            try {
+                log('avatarTest', '🔄 Starting avatar generation...\n');
+                const avatarData = await avatarGenerator.generateAvatar(characterName);
+                
+                if (avatarData) {
+                    log('avatarTest', '✅ Avatar generation successful!\n', 'success');
+                    log('avatarTest', `📋 Character: ${avatarData.characterName}\n`);
+                    log('avatarTest', `📋 Source: ${avatarData.source}\n`);
+                    log('avatarTest', `📋 Has Image: ${!!avatarData.imageUrl}\n`);
+                    log('avatarTest', `📋 Timestamp: ${avatarData.timestamp}\n`);
+                    
+                    if (avatarData.imageUrl) {
+                        log('avatarTest', `📏 Image URL length: ${avatarData.imageUrl.length} chars\n`);
+                    } else if (avatarData.placeholderColor) {
+                        log('avatarTest', `🎭 Placeholder color: ${avatarData.placeholderColor}\n`);
+                    }
+                } else {
+                    log('avatarTest', '❌ Avatar generation returned null\n', 'error');
+                }
+            } catch (error) {
+                log('avatarTest', `❌ Avatar generation failed: ${error.message}\n`, 'error');
+            }
+        }
+
+        async function testAPIDirectly() {
+            clearOutput('apiTest');
+            log('apiTest', '🌐 Testing /api/generate-avatar directly...\n');
+
+            try {
+                const response = await fetch('/api/generate-avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        characterName: 'TestCharacter',
+                        description: 'a test character for debugging purposes'
+                    })
+                });
+
+                log('apiTest', `📡 Response status: ${response.status}\n`);
+                log('apiTest', `📡 Response ok: ${response.ok}\n`);
+
+                const data = await response.json();
+                log('apiTest', `📊 Response data:\n${JSON.stringify(data, null, 2)}\n`);
+
+                if (data.status === 'success') {
+                    log('apiTest', '✅ API test successful!\n', 'success');
+                } else {
+                    log('apiTest', `⚠️ API returned error: ${data.error}\n`, 'warning');
+                }
+            } catch (error) {
+                log('apiTest', `❌ API test failed: ${error.message}\n`, 'error');
+            }
+        }
+
+        async function testChatSystem() {
+            clearOutput('chatTest');
+            log('chatTest', '💬 Testing chat system initialization...\n');
+
+            if (typeof window.ChatUI !== 'undefined') {
+                log('chatTest', '✅ ChatUI class available\n', 'success');
+                
+                if (!window.chatUI) {
+                    log('chatTest', '🔧 Creating ChatUI instance...\n');
+                    window.chatUI = new window.ChatUI();
+                }
+                
+                log('chatTest', '✅ ChatUI instance ready\n', 'success');
+            } else {
+                log('chatTest', '❌ ChatUI class not available\n', 'error');
+            }
+
+            // Test character data retrieval
+            if (avatarGenerator) {
+                const characterData = avatarGenerator.getCharacterDataForChat('TheBuilder');
+                log('chatTest', `📋 Character data for TheBuilder: ${characterData.title}\n`);
+            }
+        }
+
+        async function testChatWithCharacter(characterName) {
+            log('chatTest', `💬 Testing chat initialization with ${characterName}...\n`);
+
+            if (!avatarGenerator) {
+                log('chatTest', '❌ AvatarGenerator not available\n', 'error');
+                return;
+            }
+
+            try {
+                avatarGenerator.startChatWithCharacter(characterName);
+                log('chatTest', '✅ Chat initialization completed\n', 'success');
+            } catch (error) {
+                log('chatTest', `❌ Chat initialization failed: ${error.message}\n`, 'error');
+            }
+        }
+
+        async function testCompleteFlow() {
+            clearOutput('flowTest');
+            log('flowTest', '🎯 Testing complete avatar generation → chat flow...\n');
+
+            if (!avatarGenerator) {
+                log('flowTest', '❌ AvatarGenerator not available\n', 'error');
+                return;
+            }
+
+            try {
+                // Step 1: Generate avatar
+                log('flowTest', '🎨 Step 1: Generating avatar...\n');
+                const avatarData = await avatarGenerator.generateAvatar('TheBuilder');
+                
+                if (!avatarData) {
+                    log('flowTest', '❌ Avatar generation failed\n', 'error');
+                    return;
+                }
+                
+                log('flowTest', `✅ Avatar generated: ${avatarData.source}\n`, 'success');
+
+                // Step 2: Test chat initialization
+                log('flowTest', '💬 Step 2: Testing chat initialization...\n');
+                const characterData = avatarGenerator.getCharacterDataForChat('TheBuilder');
+                
+                if (!characterData) {
+                    log('flowTest', '❌ Character data not available\n', 'error');
+                    return;
+                }
+                
+                log('flowTest', `✅ Character data loaded: ${characterData.title}\n`, 'success');
+
+                // Step 3: Test chat system
+                log('flowTest', '🚀 Step 3: Testing chat system...\n');
+                if (typeof avatarGenerator.startChatWithCharacter === 'function') {
+                    log('flowTest', '✅ Chat method available\n', 'success');
+                    log('flowTest', '🎉 Complete flow test successful!\n', 'success');
+                } else {
+                    log('flowTest', '❌ Chat method not available\n', 'error');
+                }
+
+            } catch (error) {
+                log('flowTest', `❌ Complete flow test failed: ${error.message}\n`, 'error');
+            }
+        }
+
+        // Global debug functions
+        window.debugAvatarSystem = {
+            checkStatus: checkSystemStatus,
+            testAvatar: testAvatarGeneration,
+            testAPI: testAPIDirectly,
+            testChat: testChatSystem,
+            testComplete: testCompleteFlow
+        };
+
+        console.log('🐛 Debug console loaded - use window.debugAvatarSystem for manual testing');
+    </script>
+</body>
+</html>

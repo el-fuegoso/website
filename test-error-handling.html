@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .result-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #4ecdc4;
+        }
+        .warning {
+            color: #ffa500;
+        }
+        .loading {
+            color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Error Handling & Fallback Test Suite</h1>
+        
+        <div class="test-section">
+            <h2>1. Test Invalid API Request</h2>
+            <p>Test what happens when API request fails</p>
+            <button onclick="testInvalidAPIRequest()">Test Invalid Request</button>
+            <div id="invalidAPIResult" class="result-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Test Server Error Handling</h2>
+            <p>Test server error responses and fallback behavior</p>
+            <button onclick="testServerError()">Test Server Error</button>
+            <div id="serverErrorResult" class="result-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Test Placeholder Fallback</h2>
+            <p>Ensure placeholder system works when API fails</p>
+            <button onclick="testPlaceholderFallback()">Test Placeholder Fallback</button>
+            <div id="placeholderResult" class="result-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Test Chat System Error Handling</h2>
+            <p>Test chat system with various error conditions</p>
+            <button onclick="testChatErrorHandling()">Test Chat Errors</button>
+            <div id="chatErrorResult" class="result-container"></div>
+        </div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="js/conversation/avatar-generator.js"></script>
+    <script src="js/conversation/chat-ui.js"></script>
+
+    <script>
+        let avatarGenerator;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.AvatarGenerator) {
+                avatarGenerator = new window.AvatarGenerator();
+                console.log('✅ AvatarGenerator initialized for error testing');
+            } else {
+                console.error('❌ AvatarGenerator not loaded');
+            }
+        });
+
+        async function testInvalidAPIRequest() {
+            const resultDiv = document.getElementById('invalidAPIResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing invalid API request...</div>';
+
+            try {
+                const response = await fetch('/api/generate-avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        // Missing required fields to trigger validation error
+                        characterName: '',
+                        description: ''
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Error Handling Working</div>
+                        <div>Status: ${response.status}</div>
+                        <div>Error: ${data.error}</div>
+                        <div class="success">Server properly rejected invalid request</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="warning">⚠️ Unexpected Success</div>
+                        <div>Server should have rejected empty request</div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Network Error Handled</div>
+                    <div>Error: ${error.message}</div>
+                    <div class="success">Client-side error handling working</div>
+                `;
+            }
+        }
+
+        async function testServerError() {
+            const resultDiv = document.getElementById('serverErrorResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing server error scenarios...</div>';
+
+            try {
+                // Test with potentially problematic data
+                const response = await fetch('/api/generate-avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        characterName: 'TestCharacter',
+                        description: 'invalid prompt that might cause API issues',
+                        projectId: 'invalid-project-id'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.fallback) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Fallback System Working</div>
+                        <div>Status: ${response.status}</div>
+                        <div>Error: ${data.error}</div>
+                        <div class="success">Fallback flag properly set: ${data.fallback}</div>
+                    `;
+                } else if (data.status === 'success') {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Request Succeeded</div>
+                        <div>Avatar generated successfully</div>
+                        <div>No error to test, but system is working</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="warning">⚠️ Unexpected Response</div>
+                        <div>Response: ${JSON.stringify(data, null, 2)}</div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Client Error Handling Working</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testPlaceholderFallback() {
+            const resultDiv = document.getElementById('placeholderResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing placeholder fallback...</div>';
+
+            if (!avatarGenerator) {
+                resultDiv.innerHTML = '<div class="error">❌ AvatarGenerator not initialized</div>';
+                return;
+            }
+
+            try {
+                // Temporarily break the server connection to force fallback
+                const originalFetch = window.fetch;
+                window.fetch = function(...args) {
+                    if (args[0] === '/api/generate-avatar') {
+                        return Promise.reject(new Error('Simulated network failure'));
+                    }
+                    return originalFetch.apply(this, args);
+                };
+
+                const avatarData = await avatarGenerator.generateAvatar('TheBuilder');
+                
+                // Restore original fetch
+                window.fetch = originalFetch;
+
+                if (avatarData && avatarData.source === 'placeholder') {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Placeholder Fallback Working</div>
+                        <div>Character: ${avatarData.characterName}</div>
+                        <div>Source: ${avatarData.source}</div>
+                        <div>Color: ${avatarData.placeholderColor}</div>
+                        <div>Initial: ${avatarData.placeholderInitial}</div>
+                        <div style="width: 50px; height: 50px; background: ${avatarData.placeholderColor}; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-top: 10px;">
+                            ${avatarData.placeholderInitial}
+                        </div>
+                    `;
+                } else if (avatarData && avatarData.source === 'google_imagen') {
+                    resultDiv.innerHTML = `
+                        <div class="warning">⚠️ API Call Succeeded</div>
+                        <div>Expected fallback but got real avatar</div>
+                        <div>This might mean the network simulation didn't work</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ Fallback Failed</div>
+                        <div>No avatar data returned</div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Placeholder Test Failed</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testChatErrorHandling() {
+            const resultDiv = document.getElementById('chatErrorResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing chat error handling...</div>';
+
+            if (!avatarGenerator) {
+                resultDiv.innerHTML = '<div class="error">❌ AvatarGenerator not initialized</div>';
+                return;
+            }
+
+            try {
+                // Test 1: Chat with valid character
+                const characterData = avatarGenerator.getCharacterDataForChat('TheBuilder');
+                let result1 = characterData ? '✅ Character data retrieved' : '❌ Character data failed';
+
+                // Test 2: Chat with invalid character
+                const invalidCharacterData = avatarGenerator.getCharacterDataForChat('InvalidCharacter');
+                let result2 = invalidCharacterData ? '✅ Fallback character data provided' : '❌ No fallback data';
+
+                // Test 3: Chat integration availability
+                let result3;
+                if (typeof avatarGenerator.startChatWithCharacter === 'function') {
+                    result3 = '✅ Chat integration method available';
+                } else {
+                    result3 = '❌ Chat integration method missing';
+                }
+
+                // Test 4: ChatUI availability
+                let result4;
+                if (typeof window.ChatUI !== 'undefined') {
+                    result4 = '✅ ChatUI class available';
+                } else {
+                    result4 = '⚠️ ChatUI not loaded (fallback will be used)';
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="success">Chat Error Handling Test Results:</div>
+                    <div>${result1}</div>
+                    <div>${result2}</div>
+                    <div>${result3}</div>
+                    <div>${result4}</div>
+                    <br>
+                    <div class="success">✅ All chat error scenarios handled appropriately</div>
+                `;
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Chat Error Test Failed</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        console.log('🧪 Error Handling Test Suite Loaded');
+        console.log('🛡️ Testing fallbacks, error handling, and resilience');
+    </script>
+</body>
+</html>

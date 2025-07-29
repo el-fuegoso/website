@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Generation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .result-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .avatar-display {
+            margin: 20px 0;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #4ecdc4;
+        }
+        .loading {
+            color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Avatar Generation Test Suite</h1>
+        
+        <div class="test-section">
+            <h2>1. Test Server-Side Avatar Generation API</h2>
+            <p>This will test the new /api/generate-avatar endpoint</p>
+            <button onclick="testServerAPI()">Test Server API</button>
+            <div id="serverAPIResult" class="result-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Test AvatarGenerator Class</h2>
+            <p>This will test the updated AvatarGenerator class with server-side integration</p>
+            <button onclick="testAvatarGenerator()">Test Avatar Generator</button>
+            <div id="avatarGeneratorResult" class="result-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Test All Character Types</h2>
+            <p>Generate avatars for all character archetypes</p>
+            <button onclick="testAllCharacters()">Test All Characters</button>
+            <div id="allCharactersResult" class="result-container"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Test Chat Integration</h2>
+            <p>Test that chat system initializes properly with generated avatars</p>
+            <button onclick="testChatIntegration()">Test Chat Integration</button>
+            <div id="chatIntegrationResult" class="result-container"></div>
+        </div>
+    </div>
+
+    <!-- Load the avatar generator -->
+    <script src="js/conversation/avatar-generator.js"></script>
+    <script src="js/conversation/chat-ui.js"></script>
+
+    <script>
+        // Initialize avatar generator
+        let avatarGenerator;
+        let chatUI;
+
+        // Test results storage
+        const testResults = {
+            serverAPI: null,
+            avatarGenerator: null,
+            allCharacters: [],
+            chatIntegration: null
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize components
+            if (window.AvatarGenerator) {
+                avatarGenerator = new window.AvatarGenerator();
+                console.log('✅ AvatarGenerator initialized');
+            } else {
+                console.error('❌ AvatarGenerator not loaded');
+            }
+
+            if (window.ChatUI) {
+                chatUI = new window.ChatUI();
+                console.log('✅ ChatUI initialized');
+            } else {
+                console.log('⚠️ ChatUI not loaded (optional for avatar tests)');
+            }
+        });
+
+        async function testServerAPI() {
+            const resultDiv = document.getElementById('serverAPIResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing server API...</div>';
+
+            try {
+                const response = await fetch('/api/generate-avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        characterName: 'TheBuilder',
+                        description: 'a digital MacGyver with engineering precision, confident posture, wearing practical tech gear, cyberpunk aesthetic with warm colors',
+                        projectId: 'test-project'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    testResults.serverAPI = data;
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Server API Test Passed</div>
+                        <div>Character: ${data.avatar.characterName}</div>
+                        <div>Source: ${data.avatar.source}</div>
+                        <div>Timestamp: ${data.avatar.timestamp}</div>
+                        ${data.avatar.imageUrl ? '<div>✅ Image URL generated</div>' : '<div>⚠️ No image URL (fallback used)</div>'}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ Server API Test Failed</div>
+                        <div>Status: ${response.status}</div>
+                        <div>Error: ${data.error || 'Unknown error'}</div>
+                        ${data.fallback ? '<div>ℹ️ Fallback mode activated</div>' : ''}
+                    `;
+                }
+            } catch (error) {
+                testResults.serverAPI = { error: error.message };
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Server API Test Failed</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testAvatarGenerator() {
+            const resultDiv = document.getElementById('avatarGeneratorResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing AvatarGenerator class...</div>';
+
+            if (!avatarGenerator) {
+                resultDiv.innerHTML = '<div class="error">❌ AvatarGenerator not initialized</div>';
+                return;
+            }
+
+            try {
+                const avatarData = await avatarGenerator.generateAvatar('TheBuilder');
+                
+                if (avatarData) {
+                    testResults.avatarGenerator = avatarData;
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ AvatarGenerator Test Passed</div>
+                        <div>Character: ${avatarData.characterName}</div>
+                        <div>Source: ${avatarData.source}</div>
+                        <div>Timestamp: ${avatarData.timestamp}</div>
+                        ${avatarData.imageUrl ? 
+                            '<div>✅ Real image generated</div>' : 
+                            `<div>⚠️ Placeholder used (${avatarData.placeholderColor})</div>`
+                        }
+                        <div class="avatar-display">
+                            ${avatarData.imageUrl ? 
+                                `<img src="${avatarData.imageUrl}" alt="Generated Avatar" style="max-width: 200px; border-radius: 8px;">` :
+                                `<div style="width: 100px; height: 100px; background: ${avatarData.placeholderColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">${avatarData.placeholderInitial}</div>`
+                            }
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">❌ No avatar data returned</div>';
+                }
+            } catch (error) {
+                testResults.avatarGenerator = { error: error.message };
+                resultDiv.innerHTML = `
+                    <div class="error">❌ AvatarGenerator Test Failed</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testAllCharacters() {
+            const resultDiv = document.getElementById('allCharactersResult');
+            const characters = [
+                'TheBuilder', 'TheNurturer', 'TheTrailblazer', 'TheAnalyst', 
+                'TheConnector', 'TheVanguard', 'TheHarmonizer', 'TheCatalyst', 'TheArchitect'
+            ];
+
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing all character types...</div>';
+
+            if (!avatarGenerator) {
+                resultDiv.innerHTML = '<div class="error">❌ AvatarGenerator not initialized</div>';
+                return;
+            }
+
+            try {
+                let results = '';
+                for (const character of characters) {
+                    try {
+                        const avatarData = await avatarGenerator.generateAvatar(character);
+                        testResults.allCharacters.push(avatarData);
+                        
+                        const status = avatarData.imageUrl ? '✅' : '⚠️';
+                        results += `<div>${status} ${character}: ${avatarData.source}</div>`;
+                    } catch (error) {
+                        results += `<div class="error">❌ ${character}: ${error.message}</div>`;
+                    }
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">Character Generation Test Complete</div>
+                    ${results}
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Character Generation Test Failed</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testChatIntegration() {
+            const resultDiv = document.getElementById('chatIntegrationResult');
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing chat integration...</div>';
+
+            if (!avatarGenerator) {
+                resultDiv.innerHTML = '<div class="error">❌ AvatarGenerator not initialized</div>';
+                return;
+            }
+
+            try {
+                // Generate an avatar first
+                const avatarData = await avatarGenerator.generateAvatar('TheBuilder');
+                
+                if (!avatarData) {
+                    resultDiv.innerHTML = '<div class="error">❌ Failed to generate avatar for chat test</div>';
+                    return;
+                }
+
+                // Test chat initialization
+                if (avatarGenerator.startChatWithCharacter) {
+                    // Test the chat initialization method
+                    const characterData = avatarGenerator.getCharacterDataForChat('TheBuilder');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Chat Integration Test Passed</div>
+                        <div>Avatar generated: ${avatarData.characterName}</div>
+                        <div>Chat data available: ${characterData.title}</div>
+                        <div>Chat method available: ✅</div>
+                        <button onclick="avatarGenerator.startChatWithCharacter('TheBuilder')">🚀 Launch Chat</button>
+                    `;
+                    
+                    testResults.chatIntegration = { success: true, avatarData, characterData };
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">❌ Chat integration method not found</div>
+                        <div>Avatar generated successfully but chat system unavailable</div>
+                    `;
+                }
+            } catch (error) {
+                testResults.chatIntegration = { error: error.message };
+                resultDiv.innerHTML = `
+                    <div class="error">❌ Chat Integration Test Failed</div>
+                    <div>Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Export test results for debugging
+        window.getTestResults = () => testResults;
+        
+        console.log('🧪 Avatar Generation Test Suite Loaded');
+        console.log('💡 Run tests using the buttons or call test functions directly');
+        console.log('📊 Access results with: window.getTestResults()');
+    </script>
+</body>
+</html>

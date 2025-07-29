@@ -2,25 +2,7 @@
 
 // CONFIG object is defined in the inline script block in index.html
 
-// Performance monitoring configuration
-const PERFORMANCE_CONFIG = {
-    battery: {
-        lowThreshold: 0.2,
-        criticalThreshold: 0.1
-    },
-    thermal: {
-        throttleTemp: 45, // Celsius
-        shutdownTemp: 55
-    },
-    network: {
-        slowConnection: ['slow-2g', '2g'],
-        fastConnection: ['4g', '5g']
-    },
-    performance: {
-        targetFPS: 60,
-        minFPS: 30
-    }
-};
+// Performance monitoring configuration (defined in index.html inline script)
 
 // Mobile Performance Manager
 class MobilePerformanceManager {
@@ -671,4 +653,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for global access
 window.CONFIG = CONFIG;
-window.PERFORMANCE_CONFIG = PERFORMANCE_CONFIG;
+// PERFORMANCE_CONFIG is exported from index.html inline script

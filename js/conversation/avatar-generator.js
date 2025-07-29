@@ -90,10 +90,17 @@ class AvatarGenerator {
     }
 
     async callServerSideImagenAPI(description, characterName) {
-        console.log(`🌐 Making API request to /api/generate_avatar for ${characterName}`);
+        console.log(`🌐 Backend migration in progress - temporarily using placeholder for ${characterName}`);
         
-        // Call our secure server-side API endpoint
-        const response = await fetch('/api/generate_avatar', {
+        // TODO: Update this URL when HF Spaces backend is deployed
+        // const HF_BACKEND_URL = 'https://your-username-your-flask-api.hf.space';
+        
+        // Temporarily throw error to use placeholder system during migration
+        throw new Error('Backend migration in progress - using placeholder avatars');
+        
+        // Future HF Spaces API call (commented out for now):
+        /*
+        const response = await fetch(`${HF_BACKEND_URL}/api/generate_avatar`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -126,6 +133,7 @@ class AvatarGenerator {
 
         console.log(`✅ Avatar data received for ${characterName}`);
         return data.avatar;
+        */
     }
 
     createPlaceholderAvatar(characterName, description) {

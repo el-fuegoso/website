@@ -29,13 +29,9 @@ class ChatUI {
     }
 
     createChatInterface() {
-        console.log('🏗️ Creating chat interface...');
         this.container = document.createElement('div');
         this.container.id = 'chat-interface';
         this.container.className = 'chat-interface hidden';
-        console.log('🔍 DEBUG: Container created:', this.container);
-        console.log('🔍 DEBUG: Container ID set to:', this.container.id);
-        console.log('🔍 DEBUG: Container className:', this.container.className);
         
         this.container.innerHTML = `
             <div class="chat-header">
@@ -88,16 +84,11 @@ class ChatUI {
             </div>
         `;
         
-        console.log('🔍 DEBUG: Container HTML set, now appending to body...');
-        console.log('🔍 DEBUG: document.body exists:', !!document.body);
         
         document.body.appendChild(this.container);
-        console.log('✅ Container appended to document.body');
         
         // Verify it was actually added
         const addedElement = document.getElementById('chat-interface');
-        console.log('🔍 DEBUG: Container found in DOM after append:', !!addedElement);
-        console.log('🔍 DEBUG: Container in DOM matches our container:', addedElement === this.container);
         
         this.setupReferences();
     }
@@ -143,26 +134,15 @@ class ChatUI {
 
 
     show() {
-        console.log('🎬 ChatUI.show() called');
-        console.log('🔍 DEBUG: isInitialized:', this.isInitialized);
-        console.log('🔍 DEBUG: container exists:', !!this.container);
         
         if (!this.isInitialized) {
-            console.log('🔧 Initializing chat UI...');
             this.initialize();
         }
         
-        console.log('🔍 DEBUG: Container before show:', this.container);
-        console.log('🔍 DEBUG: Container classList before:', this.container?.classList?.toString());
         
         if (this.container) {
             this.container.classList.remove('hidden');
             this.isVisible = true;
-            console.log('✅ Container hidden class removed');
-            console.log('🔍 DEBUG: Container classList after:', this.container.classList.toString());
-            console.log('🔍 DEBUG: Container style display:', getComputedStyle(this.container).display);
-            console.log('🔍 DEBUG: Container style visibility:', getComputedStyle(this.container).visibility);
-            console.log('🔍 DEBUG: Container style opacity:', getComputedStyle(this.container).opacity);
         } else {
             console.error('❌ CRITICAL: Container not found in show()');
         }
@@ -170,13 +150,10 @@ class ChatUI {
         setTimeout(() => {
             if (this.messageInput) {
                 this.messageInput.focus();
-                console.log('🎯 Message input focused');
             } else {
-                console.warn('⚠️ Message input not found for focus');
             }
         }, 100);
         
-        console.log('✅ ChatUI.show() completed');
     }
 
     hide() {
@@ -218,7 +195,6 @@ class ChatUI {
             // Update the welcome message with avatar's conversation starter
             this.updateWelcomeMessage(avatarData);
             
-            console.log(`🎨 Chat UI updated for avatar: ${avatarData.name}`);
         }
     }
 
@@ -254,7 +230,6 @@ class ChatUI {
 
     showCharacterProfile() {
         if (!this.currentAvatar) {
-            console.warn('No avatar data available for character profile');
             return;
         }
 
@@ -263,12 +238,9 @@ class ChatUI {
             const characterTerminal = window.ensureCharacterTerminalInitialized();
             if (characterTerminal) {
                 characterTerminal.show(this.currentAvatar);
-                console.log(`🖥️ Character terminal opened for ${this.currentAvatar.name}`);
             } else {
-                console.warn('CharacterTerminal not available');
             }
         } else {
-            console.warn('ensureCharacterTerminalInitialized function not available');
         }
     }
 
@@ -516,7 +488,6 @@ class ChatUI {
     }
 
     initializeChatWithCharacter(characterName, characterData) {
-        console.log(`Initializing chat with ${characterName}`, characterData);
         
         // Create avatar data format expected by chat UI
         const avatarData = {
@@ -554,7 +525,6 @@ class ChatUI {
             communicationStyle: this.getCharacterCommunicationStyle(characterName)
         };
         
-        console.log('Character context set:', this.characterContext);
     }
 
     addCharacterIntroMessage(avatarData) {

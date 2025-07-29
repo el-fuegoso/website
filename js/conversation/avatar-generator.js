@@ -32,13 +32,11 @@ class AvatarGenerator {
      */
     async generateAvatar(matchedCharacterName = "TheBuilder", options = {}) {
         if (this.isGenerating) {
-            console.log('Avatar generation already in progress');
             return null;
         }
 
         // Check cache first
         if (this.generatedAvatars.has(matchedCharacterName)) {
-            console.log(`Using cached avatar for ${matchedCharacterName}`);
             return this.generatedAvatars.get(matchedCharacterName);
         }
 
@@ -255,7 +253,6 @@ class AvatarGenerator {
     }
 
     startChatWithCharacter(characterName) {
-        console.log(`Starting chat with ${characterName}`);
         
         // Get character data for context
         const characterData = this.getCharacterDataForChat(characterName);
@@ -372,7 +369,6 @@ class AvatarGenerator {
         if (apiKey) {
             this.setApiKey(apiKey);
             document.querySelector('.api-key-dialog').remove();
-            console.log('API key saved successfully');
         }
     }
 

@@ -45,7 +45,6 @@ class MobilePerformanceManager {
                 const battery = await navigator.getBattery();
                 this.monitorBattery(battery);
             } catch (e) {
-                console.log('Battery API not available');
             }
         }
         
@@ -159,7 +158,6 @@ class MobilePerformanceManager {
         // Restart current artifact with new settings
         this.restartCurrentArtifact();
         
-        console.log('Low power mode enabled', batteryInfo);
     }
     
     enableCriticalMode(batteryInfo) {
@@ -174,7 +172,6 @@ class MobilePerformanceManager {
             '#ff3300'
         );
         
-        console.log('Critical battery mode enabled', batteryInfo);
     }
     
     enablePerformanceMode() {
@@ -188,7 +185,6 @@ class MobilePerformanceManager {
         this.showPowerModeIndicator('Performance Mode: Optimizing for smooth playback', '#ffa500');
         this.restartCurrentArtifact();
         
-        console.log('Performance mode enabled due to low FPS');
     }
     
     enableLowMemoryMode() {
@@ -198,13 +194,11 @@ class MobilePerformanceManager {
         
         this.showPowerModeIndicator('Low Memory Mode: Optimized for your device', '#00bcd4');
         
-        console.log('Low memory mode enabled');
     }
     
     enableLowBandwidthMode() {
         // Reduce any network-dependent features
         this.showPowerModeIndicator('Slow Connection: Optimized experience', '#ff9800');
-        console.log('Low bandwidth mode enabled');
     }
     
     disableLowPowerMode() {
@@ -218,12 +212,10 @@ class MobilePerformanceManager {
         this.hidePowerModeIndicator();
         this.restartCurrentArtifact();
         
-        console.log('Low power mode disabled');
     }
     
     disableLowBandwidthMode() {
         this.hidePowerModeIndicator();
-        console.log('Low bandwidth mode disabled');
     }
     
     pauseHeavyAnimations() {
@@ -514,7 +506,6 @@ class ThemeManager {
         try {
             localStorage.setItem('preferred-theme', theme);
         } catch (e) {
-            console.log('localStorage not available');
         }
     }
     
@@ -587,65 +578,50 @@ class ThemeManager {
 
 // Chat System Early Initialization
 function initializeChatSystem() {
-    console.log('🗣️ Initializing chat system...');
     
     // Check if chat dependencies are loaded
     const dependencies = ['ChatUI', 'ConversationManager', 'ClaudeClient', 'AvatarGenerator'];
     const missing = dependencies.filter(dep => !window[dep]);
     
     if (missing.length > 0) {
-        console.warn('⚠️ Missing chat dependencies:', missing);
-        console.warn('💡 Chat functionality may not work until all dependencies are loaded');
         return;
     }
     
     try {
         // Pre-initialize chat system components
         if (!window.conversationManager) {
-            console.log('📞 Creating ConversationManager instance...');
             window.conversationManager = new window.ConversationManager();
         }
         
         if (!window.chatUI) {
-            console.log('💬 Creating ChatUI instance...');
             window.chatUI = new window.ChatUI();
             
             // Initialize the conversation manager with the chat UI
             if (window.conversationManager) {
                 window.conversationManager.initialize(window.chatUI);
-                console.log('🔗 Chat system components linked successfully');
             }
         }
         
-        console.log('✅ Chat system initialized successfully');
         
     } catch (error) {
         console.error('❌ Failed to initialize chat system:', error);
-        console.warn('💡 Chat functionality will use fallback lazy initialization');
     }
 }
 
 // Test Chat Button Setup (for debugging)
 function setupTestChatButton() {
-    console.log('🧪 Setting up test chat button...');
     
     const testBtn = document.getElementById('testChatBtn');
     if (!testBtn) {
-        console.warn('⚠️ Test chat button not found');
         return;
     }
     
     testBtn.onclick = () => {
-        console.log('🧪 TEST CHAT BUTTON CLICKED!');
-        console.log('🔍 DEBUG: window.chatUI exists:', !!window.chatUI);
-        console.log('🔍 DEBUG: window.conversationManager exists:', !!window.conversationManager);
         
         // Try to show chat modal directly without any character setup
         if (window.chatUI) {
-            console.log('🧪 Attempting direct ChatUI.show()...');
             try {
                 window.chatUI.show();
-                console.log('✅ Direct show() call completed');
             } catch (error) {
                 console.error('❌ Error in direct show():', error);
                 alert('Direct show error: ' + error.message);
@@ -656,7 +632,6 @@ function setupTestChatButton() {
         }
     };
     
-    console.log('✅ Test chat button setup complete');
 }
 
 // Initialize managers when DOM is loaded
@@ -683,7 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
     perfInfo.textContent = 'Performance: Optimized';
     document.body.appendChild(perfInfo);
     
-    console.log('🚀 Main application initialized');
 });
 
 // Export for global access

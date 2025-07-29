@@ -378,7 +378,6 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                             }
                         }
                     } catch (matchError) {
-                        console.log('Character matching failed, using default');
                     }
                 }
             }
@@ -867,19 +866,15 @@ class ElliotGenerator {
                     }
                 }
             } catch (apiError) {
-                console.log('Backend API not available, using demo generation');
             }
 
             // Fallback to demo generation with proper character matching
-            console.log('Using demo mode with proper Big Five character matching');
             
             // Use our character matching logic instead of hardcoded demo
             const bestMatch = this.findBestCharacterMatch();
             
             if (bestMatch && window.avatarGenerator) {
-                console.log('Generating avatar for matched character:', bestMatch.name);
                 const avatarData = await window.avatarGenerator.generateAvatar(bestMatch.name);
-                console.log('Avatar data:', avatarData);
                 
                 // Display with avatar using real character data
                 this.displayElliotWithAvatar({
@@ -897,7 +892,6 @@ class ElliotGenerator {
                     }
                 });
             } else {
-                console.log('Character matching failed, using fallback');
                 // Ultra fallback - just use TheBuilder
                 if (window.avatarGenerator) {
                     const avatarData = await window.avatarGenerator.generateAvatar('TheBuilder');
@@ -1081,10 +1075,8 @@ class ElliotGenerator {
             selectedTraitsObj[trait] = true;
         });
         
-        console.log('Selected traits:', selectedTraitsObj);
         
         const userBigFive = this.mapUITraitsToBigFive(selectedTraitsObj);
-        console.log('User Big Five scores:', userBigFive);
         
         const characters = this.getCharacterData();
         let bestMatch = null;
@@ -1092,7 +1084,6 @@ class ElliotGenerator {
         
         for (const [charName, charData] of Object.entries(characters)) {
             const similarity = this.calculateSimilarity(userBigFive, charData);
-            console.log(`${charName} similarity:`, similarity);
             
             if (similarity > bestSimilarity) {
                 bestSimilarity = similarity;
@@ -1100,7 +1091,6 @@ class ElliotGenerator {
             }
         }
         
-        console.log('Best match:', bestMatch);
         return bestMatch;
     }
 
@@ -1223,7 +1213,6 @@ class ElliotGenerator {
         });
 
         // Show success message in console
-        console.log('Generated Elliot:', elliotData);
     }
 
     displayElliotWithAvatar(elliotData) {
@@ -1243,20 +1232,16 @@ class ElliotGenerator {
         // Show avatar generation results
         this.showAvatarResults(elliotData);
 
-        console.log('Generated Elliot with Avatar:', elliotData);
     }
 
     showAvatarResults(elliotData) {
-        console.log('showAvatarResults called with:', elliotData);
         
         // Replace the water ASCII animation with avatar
         const waterAsciiContainer = document.getElementById('avatarCard');
-        console.log('waterAscii container found:', !!waterAsciiContainer);
         if (!waterAsciiContainer) return;
 
         // Stop the water animation
         if (this.waterAscii) {
-            console.log('Stopping water animation');
             this.waterAscii.stopAnimation();
         }
 
@@ -1272,11 +1257,9 @@ class ElliotGenerator {
         // Clear the water ASCII content and replace with avatar
         waterAsciiContainer.innerHTML = '';
         waterAsciiContainer.className = 'avatar-display-container';
-        console.log('Container cleared and class set to avatar-display-container');
 
         // Render the avatar component
         if (elliotData.avatarData && window.avatarGenerator) {
-            console.log('Rendering avatar component');
             window.avatarGenerator.renderAvatarComponent(
                 waterAsciiContainer, 
                 elliotData.avatarData, 
@@ -1291,72 +1274,36 @@ class ElliotGenerator {
             this.updateRadarCharts(elliotData);
             
             // Enable Chat Now button after character generation
-            console.log('🔍 DEBUG: About to enable chat button with elliotData:', elliotData);
-            console.log('🔍 DEBUG: elliotData keys:', Object.keys(elliotData || {}));
-            console.log('🔍 DEBUG: elliotData.characterName:', elliotData?.characterName);
-            console.log('🔍 DEBUG: elliotData.name:', elliotData?.name);
-            console.log('🔍 DEBUG: elliotData.title:', elliotData?.title);
-            console.log('🔍 DEBUG: elliotData.description:', elliotData?.description);
             
             this.enableChatButton(elliotData);
             
-            console.log('Avatar component rendered');
         } else {
-            console.log('Missing data for avatar render:', {
-                hasAvatarData: !!elliotData.avatarData,
-                hasAvatarGenerator: !!window.avatarGenerator
-            });
         }
     }
 
     enableChatButton(elliotData) {
-        console.log('🔍 DEBUGGING: Enabling chat button after character generation...');
-        console.log('🔍 DEBUGGING: elliotData received:', elliotData);
         
         // Find the static chat button
         const chatBtn = document.getElementById('chatNowBtn');
-        console.log('🔍 DEBUGGING: Found chat button element:', chatBtn);
-        console.log('🔍 DEBUGGING: Button current state:', {
-            disabled: chatBtn?.disabled,
-            opacity: chatBtn?.style.opacity,
-            display: chatBtn?.style.display,
-            visibility: chatBtn?.style.visibility
-        });
         
         if (!chatBtn) {
             console.error('❌ CRITICAL: Chat button not found in HTML - ID chatNowBtn missing!');
             // Let's check what elements DO exist
             const allButtons = document.querySelectorAll('button');
-            console.log('🔍 DEBUGGING: All buttons found:', allButtons);
             const avatarCard = document.querySelector('.avatar-card');
-            console.log('🔍 DEBUGGING: Avatar card content:', avatarCard?.innerHTML);
             return;
         }
         
         // Check parent container
         const parentContainer = chatBtn.parentElement;
-        console.log('🔍 DEBUGGING: Button parent container:', parentContainer);
-        console.log('🔍 DEBUGGING: Parent container styles:', {
-            display: parentContainer?.style.display,
-            visibility: parentContainer?.style.visibility
-        });
         
         // Enable the button and make it fully visible
         chatBtn.disabled = false;
         chatBtn.style.opacity = '1';
         
-        console.log('🔍 DEBUGGING: Button enabled, new state:', {
-            disabled: chatBtn.disabled,
-            opacity: chatBtn.style.opacity
-        });
         
         // Add click handler
         chatBtn.onclick = () => {
-            console.log('🎯 CHAT BUTTON CLICKED!');
-            console.log('🔍 DEBUG: Button click event fired');
-            console.log('🔍 DEBUG: elliotData at click time:', elliotData);
-            console.log('🔍 DEBUG: this context:', this);
-            console.log('🔍 DEBUG: About to call openChatWithCharacter...');
             
             try {
                 this.openChatWithCharacter(elliotData);
@@ -1366,11 +1313,9 @@ class ElliotGenerator {
             }
         };
         
-        console.log('✅ SUCCESS: Chat button enabled successfully');
     }
 
     openChatWithCharacter(elliotData) {
-        console.log('🎯 Opening chat with character...', elliotData);
         
         // Check if chat system is properly initialized
         if (!window.ChatUI || !window.ConversationManager) {
@@ -1382,7 +1327,6 @@ class ElliotGenerator {
         
         // Initialize conversation manager if it doesn't exist
         if (!window.conversationManager) {
-            console.log('📞 Creating ConversationManager instance (fallback)...');
             try {
                 window.conversationManager = new window.ConversationManager();
             } catch (error) {
@@ -1394,7 +1338,6 @@ class ElliotGenerator {
         
         // Initialize chat UI if it doesn't exist
         if (!window.chatUI) {
-            console.log('💬 Creating ChatUI instance (fallback)...');
             try {
                 window.chatUI = new window.ChatUI();
                 window.conversationManager.initialize(window.chatUI);
@@ -1424,12 +1367,10 @@ class ElliotGenerator {
                 expertise: this.extractExpertiseFromElliotData(elliotData)
             };
             
-            console.log('🔧 Prepared character data:', { characterName, characterData });
             
             // Use initializeChatWithCharacter to properly set character context
             if (typeof window.chatUI.initializeChatWithCharacter === 'function') {
                 window.chatUI.initializeChatWithCharacter(characterName, characterData);
-                console.log('✅ Character initialized for chat:', characterName);
             } else {
                 console.error('❌ initializeChatWithCharacter method not found');
                 alert('Chat system error. Please refresh the page.');
@@ -1446,7 +1387,6 @@ class ElliotGenerator {
         try {
             if (window.chatUI && typeof window.chatUI.show === 'function') {
                 window.chatUI.show();
-                console.log('✅ Chat modal opened successfully');
             } else {
                 console.error('❌ Chat UI show method not available');
                 alert('Failed to open chat modal. Please refresh the page.');
@@ -1764,7 +1704,6 @@ class ElliotGenerator {
     saveElliot() {
         if (this.currentElliot) {
             const data = JSON.stringify(this.currentElliot, null, 2);
-            console.log('Saved Elliot:', data);
             
             // Visual feedback
             const btn = document.getElementById('saveBtn');
@@ -1779,12 +1718,9 @@ class ElliotGenerator {
             // Try to copy to clipboard
             try {
                 navigator.clipboard.writeText(data);
-                console.log('Elliot data copied to clipboard');
             } catch (err) {
-                console.log('Clipboard access not available');
             }
         } else {
-            console.log('No Elliot to save - generate one first!');
         }
     }
 }
@@ -2050,11 +1986,9 @@ class TerminalIntelligence {
 
 // Terminal Animation
 function runTerminalAnimation() {
-    console.log('runTerminalAnimation function started');
     const output = document.getElementById('terminal-output');
     const promptLine = document.getElementById('prompt-line');
     
-    console.log('Elements found - output:', !!output, 'promptLine:', !!promptLine);
     
     if (!output || !promptLine) {
         console.error('Missing terminal elements - output:', !!output, 'promptLine:', !!promptLine);
@@ -2128,7 +2062,6 @@ function runTerminalAnimation() {
         }
         
         // Focus terminal input (prompt line always visible now)
-        console.log('Focusing terminal input');
         focusTerminalInput();
     }
     
@@ -2222,7 +2155,6 @@ function updateAvatarCard(analysisResult) {
     // Update radar charts if personality scores exist
     if (analysisResult.personality_scores) {
         // This would integrate with existing radar chart code
-        console.log('Personality scores:', analysisResult.personality_scores);
     }
 }
 
@@ -2254,34 +2186,24 @@ class TerminalDebugger {
         
         this.steps.push(debugInfo);
         
-        console.group(`🔍 [${timestamp}] Terminal Debug: ${step}`);
-        console.log('Data:', data);
         if (Object.keys(data).length > 0) {
             Object.entries(data).forEach(([key, value]) => {
-                console.log(`  ${key}:`, value);
             });
         }
-        console.groupEnd();
     }
     
     error(step, error, data = {}) {
         if (!this.enabled) return;
         
         const timestamp = new Date().toISOString().slice(11, 23);
-        console.group(`❌ [${timestamp}] Terminal Error: ${step}`);
         console.error('Error:', error);
-        console.log('Data:', data);
         console.error('Stack:', error.stack);
-        console.groupEnd();
     }
     
     success(step, data = {}) {
         if (!this.enabled) return;
         
         const timestamp = new Date().toISOString().slice(11, 23);
-        console.group(`✅ [${timestamp}] Terminal Success: ${step}`);
-        console.log('Data:', data);
-        console.groupEnd();
     }
 }
 
@@ -2570,12 +2492,9 @@ function initializeTerminalMode() {
 // Initialize trait selector when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize global avatar generator first
-    console.log('Initializing avatar generator, AvatarGenerator available:', typeof window.AvatarGenerator !== 'undefined');
     if (typeof window.AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
         window.avatarGenerator = new window.AvatarGenerator();
-        console.log('Avatar generator initialized:', !!window.avatarGenerator);
     } else if (typeof window.AvatarGenerator === 'undefined') {
-        console.warn('AvatarGenerator class not found - make sure avatar-generator.js is loaded');
     }
 
     // Only initialize if trait selector elements exist

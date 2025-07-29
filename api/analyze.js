@@ -45,7 +45,6 @@ export default async function handler(req, res) {
         const flaskData = await flaskResponse.json();
         
         // Log successful analysis for monitoring
-        console.log(`✅ OCEAN analysis completed - Status: ${flaskData.status}`);
         
         return res.status(200).json(flaskData);
 

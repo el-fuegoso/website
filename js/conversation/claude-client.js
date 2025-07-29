@@ -14,7 +14,6 @@ class ClaudeClient {
     setApiKey(key) {
         // API key is now handled server-side via environment variables
         // This method is kept for backward compatibility but does nothing
-        console.log('ℹ️  API key is now handled server-side automatically');
     }
 
     setAvatarData(avatarData) {

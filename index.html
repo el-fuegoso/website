@@ -697,7 +697,6 @@
                         const battery = await navigator.getBattery();
                         this.monitorBattery(battery);
                     } catch (e) {
-                        console.log('Battery API not available');
                     }
                 }
                 
@@ -811,7 +810,6 @@
                 // Restart current artifact with new settings
                 this.restartCurrentArtifact();
                 
-                console.log('Low power mode enabled', batteryInfo);
             }
             
             enableCriticalMode(batteryInfo) {
@@ -825,7 +823,6 @@
                     `Critical Battery: ${Math.round(batteryInfo.level * 100)}% - Animations Paused`, 
                     '#ff3300'
                 );
-                console.log('Critical battery mode enabled', batteryInfo);
             }
             
             enablePerformanceMode() {
@@ -843,7 +840,6 @@
                 CONFIG.artifacts.ascii.height = Math.floor(CONFIG.artifacts.ascii.height * 0.8);
                 
                 this.showPowerModeIndicator('Low Memory Mode', '#ff6600');
-                console.log('Low memory mode enabled');
             }
             
             enableLowBandwidthMode() {
@@ -862,7 +858,6 @@
                 
                 this.hidePowerModeIndicator();
                 this.restartCurrentArtifact();
-                console.log('Low power mode disabled');
             }
             
             disableLowBandwidthMode() {
@@ -1305,7 +1300,6 @@
             try {
                 artifactFunction();
             } catch (error) {
-                console.warn(`Artifact ${artifactId} initialization failed:`, error);
                 if (fallback) {
                     fallback();
                 } else {
@@ -2232,7 +2226,6 @@
             // Initialize enhanced mobile accessibility
             if (typeof MobileAccessibilityManager !== 'undefined') {
                 window.accessibilityManager = new MobileAccessibilityManager();
-                console.log('✅ Mobile accessibility manager initialized');
             }
 
             // Add click effects to buttons
@@ -2523,16 +2516,13 @@
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 // Page is hidden, consider pausing heavy animations
-                console.log('Page hidden - animations continue for demo purposes');
             } else {
                 // Page is visible again
-                console.log('Page visible - all animations active');
             }
         });
 
         // Error boundary for global errors
         window.addEventListener('error', (e) => {
-            console.warn('Global error caught:', e.error);
             // Could implement fallback here
         });
 
@@ -2557,7 +2547,6 @@
             }
             
             if (window.ConversationManager && window.ChatUI) {
-                console.log('🔧 Initializing global chat system...');
                 globalChatUI = new ChatUI();
                 globalConversationManager = new ConversationManager();
                 
@@ -2566,12 +2555,10 @@
                 globalConversationManager.loadStoredApiKey();
                 
                 chatInitialized = true;
-                console.log('✅ Global chat system initialized');
                 
                 return { chatUI: globalChatUI, conversationManager: globalConversationManager };
             }
             
-            console.warn('⚠️ Chat classes not available yet');
             return null;
         }
 
@@ -2715,20 +2702,11 @@
     
     <script>
         // Cache busting and debugging
-        console.log('🔄 Cache busted: 20250720');
-        console.log('🎯 OCEAN Personality System loading...');
         
         // Debug function to check if system is working
         window.debugOcean = function() {
-            console.log('🔍 Debug Info:');
-            console.log('- oceanSystem exists:', !!window.oceanSystem);
-            console.log('- Toggle switches found:', document.querySelectorAll('.toggle-switch').length);
-            console.log('- Trait options found:', document.querySelectorAll('.trait-option').length);
-            console.log('- Action buttons found:', document.querySelectorAll('.action-btn').length);
             
             if (window.oceanSystem) {
-                console.log('- Selected traits:', Array.from(window.oceanSystem.selectedTraits));
-                console.log('- OCEAN scores:', window.oceanSystem.userScores);
             }
         };
         
@@ -2788,7 +2766,6 @@
                 terminalModeBtn.addEventListener('click', () => {
                     if (traitPanel) {
                         traitPanel.classList.add('flipped');
-                        console.log('🔄 Flipped to terminal mode');
                         
                         // Start printer animation after flip completes
                         setTimeout(() => {
@@ -2803,7 +2780,6 @@
                 terminalCloseBtn.addEventListener('click', () => {
                     if (traitPanel) {
                         traitPanel.classList.remove('flipped');
-                        console.log('🔄 Flipped back to trait selector');
                     }
                 });
             }
@@ -2811,7 +2787,6 @@
         
         // Initialize the application after DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 Application initializing...');
             window.initialize();
         });
     </script>

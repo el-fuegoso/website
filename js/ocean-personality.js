@@ -825,7 +825,6 @@ class OceanPersonalitySystem {
         };
         
         localStorage.setItem('oceanProfile', JSON.stringify(profile));
-        console.log('Profile saved:', profile);
     }
 }
 

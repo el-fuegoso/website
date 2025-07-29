@@ -24,7 +24,6 @@ class ConversationManager {
 
     setApiKey(key) {
         // API key is now handled server-side via environment variables
-        console.log('ℹ️  API key is now handled server-side automatically');
     }
 
     loadStoredApiKey() {

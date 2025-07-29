@@ -3,6 +3,9 @@
  * Maps trait selections to Big Five personality dimensions and matches characters
  */
 
+// Debug: Verify script is loading
+console.log('🌊 ocean-personality.js script loaded');
+
 class OceanPersonalitySystem {
     constructor() {
         this.userScores = {
@@ -587,9 +590,14 @@ class OceanPersonalitySystem {
     }
 
     async generateCharacter() {
-        if (this.isGenerating) return;
+        console.log('🎯 GENERATE button clicked - starting character generation');
+        if (this.isGenerating) {
+            console.log('⚠️ Generation already in progress, skipping');
+            return;
+        }
         
         this.isGenerating = true;
+        console.log('🔄 Character generation started');
         const generateBtn = document.querySelector('.generate-btn');
         
         // Stop shuffling
@@ -694,6 +702,32 @@ class OceanPersonalitySystem {
             const traitsText = `${traitsList}.<br>An expert in pattern recognition, system thinking, uncovering hidden issues.`;
             traitsElement.innerHTML = traitsText;
             traitsElement.style.display = 'block'; // Show the traits when character is generated
+        }
+
+        // Generate avatar for the matched character
+        console.log('🎨 Starting avatar generation for matched character:', match.character.name);
+        if (window.avatarGenerator) {
+            try {
+                const avatarData = await window.avatarGenerator.generateAvatar(match.character.name);
+                console.log('✅ Avatar generated successfully:', avatarData);
+                
+                // Replace the portrait text with the actual avatar
+                if (imageContainer && avatarData) {
+                    imageContainer.innerHTML = `
+                        <div class="avatar-container">
+                            ${avatarData.imageUrl ? 
+                                `<img src="${avatarData.imageUrl}" alt="${match.character.name} Avatar" class="generated-avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" />` : 
+                                `<div class="placeholder-avatar" style="background: linear-gradient(45deg, #004225, #0066ff); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; border-radius: 8px;">${match.character.name.charAt(0)}</div>`
+                            }
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Avatar generation failed:', error);
+                // Keep the text fallback
+            }
+        } else {
+            console.error('❌ Avatar generator not available - window.avatarGenerator is undefined');
         }
     }
 

@@ -2,6 +2,9 @@
  * Avatar Generator Component
  * Generates character avatars using Google Imagen API based on matched personality analysis
  */
+
+// Debug: Verify script is loading
+console.log('🔨 avatar-generator.js script loaded');
 class AvatarGenerator {
     constructor() {
         this.isGenerating = false;
@@ -87,10 +90,10 @@ class AvatarGenerator {
     }
 
     async callServerSideImagenAPI(description, characterName) {
-        console.log(`🌐 Making API request to /api/generate-avatar for ${characterName}`);
+        console.log(`🌐 Making API request to /api/generate_avatar for ${characterName}`);
         
         // Call our secure server-side API endpoint
-        const response = await fetch('/api/generate-avatar', {
+        const response = await fetch('/api/generate_avatar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

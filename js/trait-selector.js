@@ -562,6 +562,7 @@ class ElliotGenerator {
         const saveBtn = document.getElementById('saveBtn');
 
         if (generateBtn) generateBtn.addEventListener('click', () => {
+            console.log('🎯 Trait selector GENERATE button clicked');
             this.triggerSoundbarPulse();
             this.generateElliot();
         });
@@ -819,9 +820,15 @@ class ElliotGenerator {
     }
 
     async generateElliot() {
-        if (this.isGenerating) return;
+        console.log('🔧 generateElliot() called - starting trait-based generation');
+        if (this.isGenerating) {
+            console.log('⚠️ Generation already in progress, skipping');
+            return;
+        }
 
         this.isGenerating = true;
+        console.log('✅ Starting Elliot generation process');
+        console.log('🔍 Checking if avatarGenerator is available:', !!window.avatarGenerator);
         this.showGeneratingState();
 
         try {
@@ -2489,22 +2496,45 @@ function initializeTerminalMode() {
     }
 }
 
-// Initialize trait selector when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize global avatar generator first
+// Add basic console test to verify script is loading
+console.log('🚀 trait-selector.js script loaded and executing');
+
+// Initialize function
+function initializeTraitSelector() {
+    console.log('🔧 Initializing avatar generator system...');
     if (typeof window.AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
-        window.avatarGenerator = new window.AvatarGenerator();
+        try {
+            window.avatarGenerator = new window.AvatarGenerator();
+            console.log('✅ Avatar generator initialized successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize avatar generator:', error);
+        }
     } else if (typeof window.AvatarGenerator === 'undefined') {
+        console.error('❌ AvatarGenerator class not loaded - check script imports');
+    } else {
+        console.log('ℹ️ Avatar generator already initialized');
     }
 
     // Only initialize if trait selector elements exist
     if (document.querySelector('.trait-selector-container')) {
         window.elliotGenerator = new ElliotGenerator();
+        console.log('✅ ElliotGenerator initialized');
     }
     
     // Initialize terminal mode functionality
     initializeTerminalMode();
-});
+    console.log('✅ Trait selector initialization complete');
+}
+
+// Initialize trait selector - DOM is already ready since script loads at bottom of HTML
+// But add both immediate execution and DOMContentLoaded fallback for safety
+if (document.readyState === 'loading') {
+    console.log('📅 DOM still loading, waiting for DOMContentLoaded...');
+    document.addEventListener('DOMContentLoaded', initializeTraitSelector);
+} else {
+    console.log('📅 DOM already ready, initializing immediately...');
+    initializeTraitSelector();
+}
 
 // Export for global access
 window.ElliotGenerator = ElliotGenerator;

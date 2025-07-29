@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick API Test</title>
+    <style>
+        body { background: #1a1a1a; color: #00ff00; font-family: monospace; padding: 20px; }
+        button { background: #004400; color: #00ff00; border: 1px solid #00ff00; padding: 10px; margin: 5px; }
+        .output { background: #000; border: 1px solid #333; padding: 15px; margin: 10px 0; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Quick API & JavaScript Test</h1>
+    
+    <button onclick="testJS()">Test JavaScript Loading</button>
+    <button onclick="testAPI()">Test Avatar API</button>
+    <button onclick="clearOutput()">Clear</button>
+    
+    <div id="output" class="output">Click buttons to test...</div>
+
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+        }
+
+        function testJS() {
+            log('Testing JavaScript environment...');
+            
+            // Test global variables
+            log(`CONFIG available: ${typeof window.CONFIG !== 'undefined'}`);
+            log(`PERFORMANCE_CONFIG available: ${typeof window.PERFORMANCE_CONFIG !== 'undefined'}`);
+            
+            // Test console functionality
+            console.log('🧪 Test console logging from quick test');
+            log('Console test completed - check browser console');
+            
+            log('✅ JavaScript test completed');
+        }
+
+        async function testAPI() {
+            log('Testing /api/generate-avatar endpoint...');
+            
+            try {
+                const response = await fetch('/api/generate-avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        characterName: 'TestCharacter',
+                        description: 'a simple test character'
+                    })
+                });
+
+                log(`Response status: ${response.status}`);
+                log(`Response ok: ${response.ok}`);
+
+                const data = await response.json();
+                log(`Response: ${JSON.stringify(data, null, 2)}`);
+
+                if (data.status === 'success') {
+                    log('✅ API test successful!');
+                } else {
+                    log(`⚠️ API returned error: ${data.error}`);
+                    if (data.fallback) {
+                        log('ℹ️ Fallback mode available');
+                    }
+                }
+            } catch (error) {
+                log(`❌ API test failed: ${error.message}`);
+            }
+        }
+
+        // Auto-run JS test on load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🔧 Quick test page loaded');
+            testJS();
+        });
+    </script>
+</body>
+</html>

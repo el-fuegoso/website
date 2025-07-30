@@ -47,24 +47,22 @@ export default async function handler(req, res) {
         console.log(`🔑 API Key present: ${!!googleApiKey} (length: ${googleApiKey?.length || 0})`);
 
         const requestBody = {
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
+            instances: [{
+                prompt: prompt
             }],
-            generationConfig: {
-                responseModalities: ["IMAGE"],
+            parameters: {
+                sampleCount: 1,
                 aspectRatio: "1:1",
-                safetyFilterLevel: "BLOCK_SOME"
+                personGeneration: "allow_adult"
             }
         };
 
         console.log(`📤 Request body:`, JSON.stringify(requestBody, null, 2));
-        console.log(`📡 Making request to: https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent`);
+        console.log(`📡 Making request to: https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-preview-06-06:predict`);
 
         // Call Google Imagen API via Gemini API endpoint
         const imageGenResponse = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent',
+            'https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-preview-06-06:predict',
             {
                 method: 'POST',
                 headers: {
@@ -127,12 +125,30 @@ export default async function handler(req, res) {
         }
 
         const data = JSON.parse(responseText);
-        console.log(`📊 Parsed API response - has candidates: ${!!data.candidates}`);
+        console.log(`📊 Parsed API response structure:`, Object.keys(data));
+        console.log(`📊 Full response data:`, JSON.stringify(data, null, 2).substring(0, 1000) + '...');
         
-        // Extract the generated image from Gemini API response format
-        const imageUrl = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
-            ? `data:${data.candidates[0].content.parts[0].inlineData.mimeType};base64,${data.candidates[0].content.parts[0].inlineData.data}`
-            : null;
+        // Extract the generated image from Imagen API response format
+        // Try multiple possible response structures
+        let imageUrl = null;
+        
+        // Check for predictions array (typical for predict endpoint)
+        if (data.predictions && data.predictions.length > 0) {
+            const prediction = data.predictions[0];
+            console.log(`📊 Prediction structure:`, Object.keys(prediction));
+            
+            // Look for base64 encoded image data
+            if (prediction.imageBytes) {
+                imageUrl = `data:image/jpeg;base64,${prediction.imageBytes}`;
+            } else if (prediction.bytesBase64Encoded) {
+                imageUrl = `data:image/jpeg;base64,${prediction.bytesBase64Encoded}`;
+            }
+        }
+        
+        // Fallback: check for candidates format (if still using that)
+        if (!imageUrl && data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data) {
+            imageUrl = `data:${data.candidates[0].content.parts[0].inlineData.mimeType};base64,${data.candidates[0].content.parts[0].inlineData.data}`;
+        }
 
         if (!imageUrl) {
             console.error('❌ No image data returned from Google Imagen API');

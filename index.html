@@ -2278,18 +2278,6 @@
 
         // Navigation handlers
         document.addEventListener('DOMContentLoaded', function() {
-            // Meet Your El button handler (now goes to trait selector)
-            const meetYourElBtn = document.getElementById('meetYourElBtn');
-            if (meetYourElBtn) {
-                meetYourElBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    // Scroll to trait selector section
-                    const traitSection = document.getElementById('build-your-el');
-                    if (traitSection) {
-                        traitSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-            }
         });
 
         

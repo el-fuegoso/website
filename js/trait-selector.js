@@ -157,23 +157,12 @@ class Terminal {
 
     async generateFinalQuestResponse() {
         try {
-            // Send quest responses to backend for analysis
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    responses: this.userResponses,
-                    questions: this.questions
-                })
+            // Send quest responses to backend for analysis using HF backend
+            const questText = this.userResponses.join('\n\n');
+            const data = await callPersonalityAPI(questText, 'conversation', {
+                responses: this.userResponses,
+                questions: this.questions
             });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
             
             // Option B: Generate avatar after terminal analysis
             await this.generateTerminalAvatar(data);
@@ -223,24 +212,10 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                 mode = 'job_description';
             }
             
-            // Send to backend for analysis
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: userInput,
-                    mode: mode,
-                    context: this.conversationHistory
-                })
+            // Send to backend for analysis using HF backend
+            const data = await callPersonalityAPI(userInput, mode, {
+                conversationHistory: this.conversationHistory
             });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
             
             // Let the main terminal processing handle avatar generation
             // Remove old flow that shows results in terminal instead of character card
@@ -332,88 +307,23 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
 
     async generateTerminalAvatar(analysisData, userText = null) {
         try {
-            // Option B: Generate avatar after terminal analysis
-            let characterName = 'TheBuilder'; // Default
-            let characterData = {};
-
-            // Try to extract character match from analysis data
-            if (analysisData && analysisData.matched_character) {
-                characterName = analysisData.matched_character.name;
-                characterData = analysisData.matched_character.data;
-            } else if (analysisData && analysisData.analysis && analysisData.analysis.matched_character) {
-                characterName = analysisData.analysis.matched_character.name;
-                characterData = analysisData.analysis.matched_character.data;
-            } else {
-                // Fallback: try to analyze text for character matching
-                if (userText) {
-                    try {
-                        const matchResponse = await fetch('/api/chat', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                text: userText,
-                                mode: 'conversation'
-                            })
-                        });
-                        
-                        if (matchResponse.ok) {
-                            const matchData = await matchResponse.json();
-                            if (matchData.status === 'success' && matchData.matched_character) {
-                                characterName = matchData.matched_character.name;
-                                characterData = matchData.matched_character.data;
-                            }
-                        }
-                    } catch (matchError) {
-                    }
-                }
-            }
-
-            // Generate avatar and replace water ASCII animation
-            if (window.avatarGenerator) {
-                // Pass the Flask analysis data to avatar generator for backend-powered generation
-                const avatarOptions = {
-                    personalityScores: analysisData?.personality_scores || {},
+            // Follow the exact same pattern as trait selector
+            if (analysisData && analysisData.status === 'success' && analysisData.matched_character) {
+                // Generate avatar for matched character (same as trait selector)
+                const characterName = analysisData.matched_character.name;
+                const characterData = analysisData.matched_character.data;
+                
+                const avatarData = await window.avatarGenerator.generateAvatar(characterName);
+                
+                // Display the result with avatar (same as trait selector)
+                this.displayElliotWithAvatar({
+                    ...characterData,
+                    characterName: characterName,
                     analysisData: analysisData,
-                    userText: userText,
-                    source: 'terminal_analysis'
-                };
-                
-                const avatarData = await window.avatarGenerator.generateAvatar(characterName, avatarOptions);
-                
-                // Replace the water ASCII animation with avatar (same as trait selector)
-                const waterAsciiContainer = document.getElementById('avatarCard');
-                if (waterAsciiContainer) {
-                    // Stop any running water animation
-                    if (window.elliotGenerator && window.elliotGenerator.waterAscii) {
-                        window.elliotGenerator.waterAscii.stopAnimation();
-                    }
-
-                    // Hide the matrix label and generation path
-                    const matrixLabel = document.querySelector('.matrix-label');
-                    const generationPath = document.getElementById('generationPath');
-                    const avatarLabel = document.querySelector('.avatar-label');
-                    
-                    if (matrixLabel) matrixLabel.style.display = 'none';
-                    if (generationPath) generationPath.style.display = 'none';
-                    if (avatarLabel) avatarLabel.style.display = 'none';
-
-                    // Clear the water ASCII content and replace with avatar
-                    waterAsciiContainer.innerHTML = '';
-                    waterAsciiContainer.className = 'avatar-display-container';
-
-                    // Render the avatar component
-                    window.avatarGenerator.renderAvatarComponent(
-                        waterAsciiContainer,
-                        avatarData,
-                        {
-                            title: characterData.title || characterName,
-                            description: characterData.description || 'Your matched character profile',
-                            similarity_score: characterData.similarity_score || analysisData?.matched_character?.similarity_score
-                        }
-                    );
-                }
+                    avatarData: avatarData
+                });
+            } else {
+                console.error('Terminal analysis failed - no matched character in response:', analysisData);
             }
         } catch (error) {
             console.error('Terminal avatar generation failed:', error);
@@ -1914,23 +1824,15 @@ class TerminalIntelligence {
     }
     
     async callClaudeAPI(data) {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: data.message,
-                character_name: 'TerminalAssistant',
-                terminal_context: {
-                    classification: data.classification,
-                    context: data.context,
-                    conversation_history: data.conversationHistory
-                }
-            })
+        // Use HF backend for terminal API calls
+        const result = await callPersonalityAPI(data.message, 'conversation', {
+            character_name: 'TerminalAssistant',
+            terminal_context: {
+                classification: data.classification,
+                context: data.context,
+                conversation_history: data.conversationHistory
+            }
         });
-        
-        const result = await response.json();
         
         if (result.status === 'success') {
             // Determine action based on classification
@@ -1945,7 +1847,7 @@ class TerminalIntelligence {
             
             return {
                 action: action,
-                message: result.response.message,
+                message: result.response?.message || result.response || 'Analysis complete',
                 classification: data.classification,
                 context: data.context,
                 text: data.message

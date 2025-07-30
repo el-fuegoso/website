@@ -58,13 +58,12 @@ export default async function handler(req, res) {
         console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);
         console.log(`🏗️ Project ID: ${gcloudProjectId}`);
 
-        // Call Google Imagen API
+        // Call Google Imagen API using API key as query parameter
         const imageGenResponse = await fetch(
-            `https://us-central1-aiplatform.googleapis.com/v1/projects/${gcloudProjectId}/locations/us-central1/publishers/google/models/imagen-3.0-generate-001:predict`,
+            `https://us-central1-aiplatform.googleapis.com/v1/projects/${gcloudProjectId}/locations/us-central1/publishers/google/models/imagen-3.0-generate-001:predict?key=${googleApiKey}`,
             {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${googleApiKey}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({

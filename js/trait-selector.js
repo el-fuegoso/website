@@ -1880,9 +1880,9 @@ class TerminalIntelligence {
             return claudeResponse;
             
         } catch (error) {
-            console.error('Claude API error:', error);
-            // Fallback to original logic if Claude fails
-            return this.processInputFallback(userInput, classification, context);
+            console.error('❌ Claude API FAILED:', error);
+            // NO FALLBACKS - show the real error
+            throw new Error(`Claude API failed: ${error.message}`);
         }
     }
     
@@ -2074,31 +2074,66 @@ function runTerminalAnimation() {
 
 // Python Backend Integration
 async function callPersonalityAPI(text, mode = 'general', context = {}) {
+    const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
+    const fullUrl = `${HF_BACKEND_URL}/api/analyze`;
+    
+    console.log('🚀 FLASK API CALL START');
+    console.log('📡 URL:', fullUrl);
+    console.log('📝 Request payload:', { text: text.substring(0, 100) + '...', mode, context });
+    
+    const requestBody = {
+        text: text,
+        mode: mode,
+        context: context
+    };
+    
     try {
-        // Use the same HF backend URL as avatar generation
-        const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
-        console.log(`📡 Calling Flask backend for personality analysis: ${HF_BACKEND_URL}/api/analyze`);
+        const startTime = performance.now();
         
-        const response = await fetch(`${HF_BACKEND_URL}/api/analyze`, {
+        const response = await fetch(fullUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                text: text,
-                mode: mode,
-                context: context
-            })
+            body: JSON.stringify(requestBody)
         });
+        
+        const endTime = performance.now();
+        console.log(`⏱️ API call took: ${Math.round(endTime - startTime)}ms`);
+        console.log(`📊 Response status: ${response.status}`);
+        console.log(`📊 Response headers:`, Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Get the error response body for debugging
+            let errorBody = '';
+            try {
+                errorBody = await response.text();
+                console.error('❌ Error response body:', errorBody);
+            } catch (e) {
+                console.error('❌ Could not read error response body');
+            }
+            
+            throw new Error(`Flask API HTTP ${response.status}: ${response.statusText}${errorBody ? ' - ' + errorBody : ''}`);
         }
 
-        return await response.json();
+        const jsonResponse = await response.json();
+        console.log('✅ Flask API SUCCESS - Response:', jsonResponse);
+        return jsonResponse;
+        
     } catch (error) {
-        console.error('API call failed:', error);
-        throw error;
+        console.error('🔥 FLASK API CALL FAILED:');
+        console.error('🔗 URL:', fullUrl);
+        console.error('📤 Request:', requestBody);
+        console.error('💥 Error:', error);
+        
+        // Enhanced error message based on error type
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error(`Network error - Cannot reach Flask backend at ${fullUrl}. Check if Hugging Face Space is running.`);
+        } else if (error.message.includes('HTTP')) {
+            throw error; // Already has good HTTP error info
+        } else {
+            throw new Error(`Flask API error: ${error.message}`);
+        }
     }
 }
 
@@ -2396,8 +2431,17 @@ function initializeTerminalMode() {
                 terminalDebugger.debug('User Input Added to Display', { userInput });
                 
                 // Process input through intelligence layer (now async)
+                console.log('🎯 STEP 1: Calling TerminalIntelligence.processInput()');
+                console.log('📝 Input text:', userInput.substring(0, 100) + '...');
+                
                 terminalDebugger.debug('Calling processInput on TerminalIntelligence');
                 const result = await globalTerminalIntelligence.processInput(userInput);
+                
+                console.log('✅ STEP 2: TerminalIntelligence response received');
+                console.log('📊 Result action:', result.action);
+                console.log('📄 Result message:', result.message?.substring(0, 200) + '...');
+                console.log('🔍 Full result object:', result);
+                
                 terminalDebugger.success('Terminal Intelligence Process Complete', {
                     action: result.action,
                     hasMessage: !!result.message,
@@ -2416,6 +2460,11 @@ function initializeTerminalMode() {
                     break;
                     
                 case 'analyze':
+                    console.log('🎯 STEP 3: Action is ANALYZE - calling Flask backend');
+                    console.log('📝 Text to analyze:', result.text?.substring(0, 100) + '...');
+                    console.log('⚙️ Analysis mode:', result.context?.mode);
+                    console.log('🏷️ Classification:', result.classification);
+                    
                     terminalDebugger.debug('Action: Analyze', {
                         text: result.text,
                         mode: result.context.mode,
@@ -2427,6 +2476,7 @@ function initializeTerminalMode() {
                     showTypingIndicator();
                     
                     try {
+                        console.log('🎯 STEP 4: Starting Flask API call...');
                         terminalDebugger.debug('Calling Personality API', {
                             text: result.text.substring(0, 100) + '...',
                             mode: result.context.mode
@@ -2439,6 +2489,8 @@ function initializeTerminalMode() {
                             { classification: result.classification }
                         );
                         
+                        console.log('✅ STEP 5: Flask API call completed successfully');
+                        
                         removeTypingIndicator();
                         terminalDebugger.success('API Call Complete', {
                             status: analysisResult.status,
@@ -2447,11 +2499,15 @@ function initializeTerminalMode() {
                         
                         // Process successful analysis
                         if (analysisResult.status === 'success') {
+                            console.log('🎯 STEP 6: Processing successful Flask response');
                             console.log('🎉 Flask analysis successful! Result:', analysisResult);
-                            addTerminalLine('Analysis complete! Your personalized avatar has been generated.');
+                            addTerminalLine('✅ Analysis complete! Your personalized avatar has been generated.');
                             
+                            console.log('🎯 STEP 7: Updating character card...');
                             // Update avatar card with results
                             updateAvatarCard(analysisResult);
+                            
+                            console.log('🎯 STEP 8: Character card update completed');
                             terminalDebugger.success('Avatar Card Updated', {
                                 hasAvatarData: !!analysisResult.avatar_data,
                                 hasExplanation: !!analysisResult.explanation,
@@ -2466,8 +2522,11 @@ function initializeTerminalMode() {
                         
                     } catch (error) {
                         removeTypingIndicator();
-                        terminalDebugger.error('Analysis API Call Failed', error);
-                        addTerminalLine('Error connecting to analysis service. Please try again.');
+                        terminalDebugger.error('❌ FLASK API CALL FAILED:', error);
+                        // Show the EXACT error message with red styling
+                        const errorMessage = error.message || error.toString();
+                        addTerminalLine(`<span style="color: #ff4444; font-weight: bold;">❌ FLASK API FAILED: ${errorMessage}</span>`);
+                        console.error('🔥 Complete Flask API error details:', error);
                     }
                     break;
                     
@@ -2483,8 +2542,11 @@ function initializeTerminalMode() {
             }
             
             } catch (error) {
-                terminalDebugger.error('Terminal Processing Failed', error, { userInput });
-                addTerminalLine('An error occurred while processing your input. Please try again.');
+                terminalDebugger.error('❌ TERMINAL PROCESSING FAILED:', error, { userInput });
+                // Show the EXACT error with red styling
+                const errorMessage = error.message || error.toString();
+                addTerminalLine(`<span style="color: #ff4444; font-weight: bold;">❌ TERMINAL ERROR: ${errorMessage}</span>`);
+                console.error('🔥 Terminal processing error details:', error);
             }
         }
         

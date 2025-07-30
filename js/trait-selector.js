@@ -2075,7 +2075,11 @@ function runTerminalAnimation() {
 // Python Backend Integration
 async function callPersonalityAPI(text, mode = 'general', context = {}) {
     try {
-        const response = await fetch('/api/analyze', {
+        // Use the same HF backend URL as avatar generation
+        const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
+        console.log(`📡 Calling Flask backend for personality analysis: ${HF_BACKEND_URL}/api/analyze`);
+        
+        const response = await fetch(`${HF_BACKEND_URL}/api/analyze`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2149,18 +2153,26 @@ function updateAvatarCard(analysisResult) {
         let characterDescription = analysisResult.explanation || 'Analysis complete';
         
         if (analysisResult.avatar_data) {
+            console.log('📊 Processing avatar_data:', analysisResult.avatar_data);
             // Handle different avatar_data formats
             if (typeof analysisResult.avatar_data === 'string') {
+                console.log('🔍 Parsing string avatar_data:', analysisResult.avatar_data);
                 // Parse "FREAKYEL avatar activating: Creative, unconventional thinker..."
                 const match = analysisResult.avatar_data.match(/(\w+)\s+avatar\s+activating:\s*(.+)/i);
                 if (match) {
                     characterName = match[1];
                     characterDescription = match[2];
+                    console.log('✅ Extracted character:', { characterName, characterDescription });
+                } else {
+                    console.log('⚠️ String format did not match expected pattern');
                 }
             } else if (analysisResult.avatar_data.title) {
                 characterName = analysisResult.avatar_data.title;
                 characterTitle = analysisResult.avatar_data.archetype?.description || characterTitle;
+                console.log('✅ Used object format:', { characterName, characterTitle });
             }
+        } else {
+            console.log('⚠️ No avatar_data found in analysis result');
         }
         
         // Update the card elements
@@ -2435,11 +2447,16 @@ function initializeTerminalMode() {
                         
                         // Process successful analysis
                         if (analysisResult.status === 'success') {
+                            console.log('🎉 Flask analysis successful! Result:', analysisResult);
                             addTerminalLine('Analysis complete! Your personalized avatar has been generated.');
                             
                             // Update avatar card with results
                             updateAvatarCard(analysisResult);
-                            terminalDebugger.success('Avatar Card Updated');
+                            terminalDebugger.success('Avatar Card Updated', {
+                                hasAvatarData: !!analysisResult.avatar_data,
+                                hasExplanation: !!analysisResult.explanation,
+                                hasPersonalityScores: !!analysisResult.personality_scores
+                            });
                             
                             // Add response to conversation history
                             globalTerminalIntelligence.addAssistantResponse('Analysis completed successfully');

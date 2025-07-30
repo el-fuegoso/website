@@ -62,7 +62,7 @@ class AvatarGenerator {
             try {
                 console.log('🚀 Attempting server-side avatar generation via API...');
                 // Try to use server-side Google Imagen API first
-                avatarData = await this.callServerSideImagenAPI(description, matchedCharacterName);
+                avatarData = await this.callServerSideImagenAPI(description, matchedCharacterName, options);
                 console.log('✅ Server-side avatar generation successful!');
             } catch (error) {
                 console.warn('❌ Server-side avatar generation failed, using placeholder:', error.message);
@@ -89,34 +89,56 @@ class AvatarGenerator {
         }
     }
 
-    async callServerSideImagenAPI(description, characterName) {
-        console.log(`🌐 Backend migration in progress - temporarily using placeholder for ${characterName}`);
+    async callServerSideImagenAPI(description, characterName, options = {}) {
+        console.log(`🌐 Calling Flask backend for avatar generation: ${characterName}`);
         
-        // TODO: Update this URL when HF Spaces backend is deployed
-        // const HF_BACKEND_URL = 'https://your-username-your-flask-api.hf.space';
+        // Get the HF Space URL from environment or use localhost for development
+        const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
         
-        // Temporarily throw error to use placeholder system during migration
-        throw new Error('Backend migration in progress - using placeholder avatars');
+        console.log(`📡 Making request to: ${HF_BACKEND_URL}/api/generate_avatar`);
         
-        // Future HF Spaces API call (commented out for now):
-        /*
+        // Prepare request body with personality data if available from terminal analysis
+        const requestBody = {
+            characterName: characterName,
+            description: description,
+            personality_scores: options.personalityScores || {},
+            user_context: { 
+                characterName, 
+                description,
+                source: options.source || 'ui_traits',
+                userText: options.userText || null,
+                analysisData: options.analysisData || null
+            }
+        };
+        
+        console.log(`📊 Request data:`, {
+            characterName,
+            hasPersonalityScores: !!options.personalityScores && Object.keys(options.personalityScores).length > 0,
+            source: options.source,
+            hasUserText: !!options.userText,
+            hasAnalysisData: !!options.analysisData
+        });
+        
         const response = await fetch(`${HF_BACKEND_URL}/api/generate_avatar`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                characterName: characterName,
-                description: description
-            })
+            body: JSON.stringify(requestBody)
         });
 
         console.log(`📡 API response status: ${response.status}`);
 
         if (!response.ok) {
-            const errorData = await response.json();
-            console.error('❌ API error response:', errorData);
-            throw new Error(`Server avatar generation error: ${response.status} - ${errorData.error}`);
+            let errorMessage;
+            try {
+                const errorData = await response.json();
+                console.error('❌ API error response:', errorData);
+                errorMessage = errorData.error || `HTTP ${response.status}`;
+            } catch (e) {
+                errorMessage = `HTTP ${response.status} - ${response.statusText}`;
+            }
+            throw new Error(`Server avatar generation error: ${errorMessage}`);
         }
 
         const data = await response.json();
@@ -133,7 +155,6 @@ class AvatarGenerator {
 
         console.log(`✅ Avatar data received for ${characterName}`);
         return data.avatar;
-        */
     }
 
     createPlaceholderAvatar(characterName, description) {

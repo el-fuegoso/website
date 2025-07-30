@@ -384,7 +384,15 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
 
             // Generate avatar and replace water ASCII animation
             if (window.avatarGenerator) {
-                const avatarData = await window.avatarGenerator.generateAvatar(characterName);
+                // Pass the Flask analysis data to avatar generator for backend-powered generation
+                const avatarOptions = {
+                    personalityScores: analysisData?.personality_scores || {},
+                    analysisData: analysisData,
+                    userText: userText,
+                    source: 'terminal_analysis'
+                };
+                
+                const avatarData = await window.avatarGenerator.generateAvatar(characterName, avatarOptions);
                 
                 // Replace the water ASCII animation with avatar (same as trait selector)
                 const waterAsciiContainer = document.getElementById('avatarCard');

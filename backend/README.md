@@ -1,6 +1,18 @@
-# Elliot Personality Analyzer Backend
+---
+title: Personality API
+emoji: 🧠
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: 4.12.0
+app_file: app.py
+pinned: false
+license: mit
+---
 
-A Flask-based personality analysis API that integrates with the Elliot terminal experience to provide Big Five personality insights and generate personalized avatars.
+# Personality API
+
+An AI-powered personality analysis service that analyzes text input and generates personality profiles based on the Big Five personality traits model.
 
 ## Features
 

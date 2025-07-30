@@ -19,23 +19,14 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Get API key and project ID from environment variables
+        // Get API key from environment variables (no project ID needed for Gemini API)
         const googleApiKey = process.env.GOOGLE_API_KEY;
-        const googleProjectId = process.env.GOOGLE_CLOUD_PROJECT_ID || process.env.GOOGLE_PROJECT_ID;
         
         if (!googleApiKey) {
             console.error('GOOGLE_API_KEY environment variable not set');
             return res.status(500).json({ 
                 status: 'error',
                 error: 'Server configuration error: Google API key not configured'
-            });
-        }
-
-        if (!googleProjectId) {
-            console.error('GOOGLE_CLOUD_PROJECT_ID environment variable not set');
-            return res.status(500).json({ 
-                status: 'error',
-                error: 'Server configuration error: Google Cloud Project ID not configured'
             });
         }
 
@@ -48,33 +39,31 @@ export default async function handler(req, res) {
             });
         }
 
-        // Use project ID from environment variable
-        const gcloudProjectId = googleProjectId;
-        
         // Build the prompt for Google Imagen
         const prompt = `Professional headshot portrait of ${description}, high quality, digital art style, clean background, 512x512 resolution`;
 
-        console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API`);
+        console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API via Gemini`);
         console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);
-        console.log(`🏗️ Project ID: ${gcloudProjectId}`);
 
-        // Call Google Imagen API using API key as query parameter
+        // Call Google Imagen API via Gemini API endpoint
         const imageGenResponse = await fetch(
-            `https://us-central1-aiplatform.googleapis.com/v1/projects/${gcloudProjectId}/locations/us-central1/publishers/google/models/imagen-3.0-generate-001:predict?key=${googleApiKey}`,
+            'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent',
             {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'x-goog-api-key': googleApiKey,
                 },
                 body: JSON.stringify({
-                    instances: [{
-                        prompt: prompt
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
                     }],
-                    parameters: {
-                        sampleCount: 1,
+                    generationConfig: {
+                        responseModalities: ["IMAGE"],
                         aspectRatio: "1:1",
-                        safetyFilterLevel: "block_some",
-                        personGeneration: "allow_adult"
+                        safetyFilterLevel: "BLOCK_SOME"
                     }
                 })
             }
@@ -106,11 +95,11 @@ export default async function handler(req, res) {
         }
 
         const data = JSON.parse(responseText);
-        console.log(`📊 Parsed API response - has predictions: ${!!data.predictions}`);
+        console.log(`📊 Parsed API response - has candidates: ${!!data.candidates}`);
         
-        // Extract the generated image
-        const imageUrl = data.predictions?.[0]?.bytesBase64Encoded 
-            ? `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`
+        // Extract the generated image from Gemini API response format
+        const imageUrl = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+            ? `data:${data.candidates[0].content.parts[0].inlineData.mimeType};base64,${data.candidates[0].content.parts[0].inlineData.data}`
             : null;
 
         if (!imageUrl) {

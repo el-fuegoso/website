@@ -51,7 +51,14 @@ class AvatarGenerator {
                 "TheVanguard": "a bold risk-taking pioneer with determined expression, edgy modern style, red and black color scheme, confident stance facing forward",
                 "TheHarmonizer": "a balanced wise advisor with calm peaceful expression, neutral elegant tones, serene background, embodying stability and wisdom",
                 "TheCatalyst": "a high-energy motivator with dynamic pose, bright energetic colors, action-oriented stance, inspiring leadership presence",
-                "TheArchitect": "a strategic long-term planner with thoughtful expression, clean architectural lines, sophisticated color scheme, building something meaningful"
+                "TheArchitect": "a strategic long-term planner with thoughtful expression, clean architectural lines, sophisticated color scheme, building something meaningful",
+                "FREAKYEL": "an experimental boundary-pushing creative with wild unconventional style, edgy avant-garde aesthetic, electric purple and neon colors, confident rebellious expression exploring the weird edges of technology",
+                "CONSPIRACYEL": "a paranoid tech investigator with intense conspiratorial gaze, dark mysterious aesthetic, shadowy lighting with amber highlights, surrounded by interconnected data webs",
+                "THEDETECTIVE": "a methodical digital sleuth with sharp analytical focus, noir detective aesthetic, dark coat and thoughtful expression, magnifying glass examining code patterns",
+                "GYMBRO": "a fitness-obsessed programmer with muscular build, gym aesthetic merged with tech gear, protein shake in one hand, laptop in other, motivational energy",
+                "PIRATEEIL": "a swashbuckling code pirate with adventurous spirit, maritime tech aesthetic, captain's hat with USB cables, treasure map of algorithms spread out",
+                "COFFEEADDICT": "a hyper-caffeinated developer with intense energy, surrounded by multiple coffee cups, jittery but focused expression, steam rising from endless espresso",
+                "AGIEL": "an artificially intelligent assistant with digital consciousness, holographic projection aesthetic, blue circuit patterns, alternating between robotic and suspiciously human expressions"
             };
 
             const description = characterDescriptions[matchedCharacterName] || characterDescriptions["TheBuilder"];

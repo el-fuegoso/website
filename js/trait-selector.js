@@ -2457,6 +2457,27 @@ function initializeTerminalMode() {
                 case 'request_clarification':
                     terminalDebugger.debug('Action: Request Clarification', { message: result.message });
                     addTerminalLine(result.message);
+                    
+                    // Check if the message contains character identification and trigger avatar generation
+                    if (result.message && result.message.includes('avatar should appear')) {
+                        console.log('🎨 Request clarification contains avatar identification, extracting character...');
+                        const avatarMatch = result.message.match(/\[(\w+)\s+avatar\s+should\s+appear/i);
+                        if (avatarMatch) {
+                            const characterName = avatarMatch[1];
+                            console.log('🎯 Extracted character name:', characterName);
+                            
+                            // Create analysis result object for avatar generation
+                            const analysisResult = {
+                                avatar_data: `${characterName} avatar activating: ${result.message.split('- matches the ')[1] || 'Personality match identified'}`,
+                                explanation: result.message,
+                                personality_scores: result.classification || {},
+                                source: 'terminal_clarification'
+                            };
+                            
+                            console.log('🎭 Triggering avatar generation with:', analysisResult);
+                            updateAvatarCard(analysisResult);
+                        }
+                    }
                     break;
                     
                 case 'analyze':

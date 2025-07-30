@@ -14,8 +14,8 @@ class AvatarGenerator {
     }
 
     init() {
-        // Server-side API key management - no client-side storage needed
-        console.log('Avatar generator initialized with server-side API integration');
+        // Frontend avatar generation using Vercel API endpoint with Google Imagen
+        console.log('Avatar generator initialized with Google Imagen API via Vercel endpoint');
     }
 
     /**
@@ -67,12 +67,12 @@ class AvatarGenerator {
             let avatarData;
             
             try {
-                console.log('🚀 Attempting server-side avatar generation via API...');
-                // Try to use server-side Google Imagen API first
-                avatarData = await this.callServerSideImagenAPI(description, matchedCharacterName, options);
-                console.log('✅ Server-side avatar generation successful!');
+                console.log('🚀 Attempting Google Imagen API generation via Vercel endpoint...');
+                // Use Vercel API endpoint for Google Imagen API
+                avatarData = await this.callGoogleImagenAPI(description, matchedCharacterName, options);
+                console.log('✅ Google Imagen API generation successful!');
             } catch (error) {
-                console.warn('❌ Server-side avatar generation failed, using placeholder:', error.message);
+                console.warn('❌ Google Imagen API generation failed, using placeholder:', error.message);
                 console.log('🎭 Creating placeholder avatar...');
                 // Fall back to placeholder
                 avatarData = this.createPlaceholderAvatar(matchedCharacterName, description);
@@ -96,15 +96,12 @@ class AvatarGenerator {
         }
     }
 
-    async callServerSideImagenAPI(description, characterName, options = {}) {
-        console.log(`🌐 Calling Flask backend for avatar generation: ${characterName}`);
+    async callGoogleImagenAPI(description, characterName, options = {}) {
+        console.log(`🎨 Calling Google Imagen API via Vercel endpoint: ${characterName}`);
         
-        // Get the HF Space URL from environment or use localhost for development
-        const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
+        console.log(`📡 Making request to: /api/generate-avatar`);
         
-        console.log(`📡 Making request to: ${HF_BACKEND_URL}/api/generate_avatar`);
-        
-        // Prepare request body with personality data if available from terminal analysis
+        // Prepare request body for Vercel API endpoint
         const requestBody = {
             characterName: characterName,
             description: description,
@@ -118,7 +115,7 @@ class AvatarGenerator {
             }
         };
         
-        console.log(`📊 Request data:`, {
+        console.log(`📊 Google API request data:`, {
             characterName,
             hasPersonalityScores: !!options.personalityScores && Object.keys(options.personalityScores).length > 0,
             source: options.source,
@@ -126,7 +123,7 @@ class AvatarGenerator {
             hasAnalysisData: !!options.analysisData
         });
         
-        const response = await fetch(`${HF_BACKEND_URL}/api/generate_avatar`, {
+        const response = await fetch('/api/generate-avatar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,22 +131,22 @@ class AvatarGenerator {
             body: JSON.stringify(requestBody)
         });
 
-        console.log(`📡 API response status: ${response.status}`);
+        console.log(`📡 Google API response status: ${response.status}`);
 
         if (!response.ok) {
             let errorMessage;
             try {
                 const errorData = await response.json();
-                console.error('❌ API error response:', errorData);
+                console.error('❌ Google API error response:', errorData);
                 errorMessage = errorData.error || `HTTP ${response.status}`;
             } catch (e) {
                 errorMessage = `HTTP ${response.status} - ${response.statusText}`;
             }
-            throw new Error(`Server avatar generation error: ${errorMessage}`);
+            throw new Error(`Google Imagen API error: ${errorMessage}`);
         }
 
         const data = await response.json();
-        console.log(`📊 API response data:`, { 
+        console.log(`📊 Google API response data:`, { 
             status: data.status, 
             hasAvatar: !!data.avatar,
             avatarSource: data.avatar?.source,
@@ -157,10 +154,10 @@ class AvatarGenerator {
         });
         
         if (data.status !== 'success') {
-            throw new Error(data.error || 'Avatar generation failed');
+            throw new Error(data.error || 'Google avatar generation failed');
         }
 
-        console.log(`✅ Avatar data received for ${characterName}`);
+        console.log(`✅ Google Imagen avatar generated for ${characterName}`);
         return data.avatar;
     }
 

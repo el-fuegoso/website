@@ -44,6 +44,23 @@ export default async function handler(req, res) {
 
         console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API via Gemini`);
         console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);
+        console.log(`🔑 API Key present: ${!!googleApiKey} (length: ${googleApiKey?.length || 0})`);
+
+        const requestBody = {
+            contents: [{
+                parts: [{
+                    text: prompt
+                }]
+            }],
+            generationConfig: {
+                responseModalities: ["IMAGE"],
+                aspectRatio: "1:1",
+                safetyFilterLevel: "BLOCK_SOME"
+            }
+        };
+
+        console.log(`📤 Request body:`, JSON.stringify(requestBody, null, 2));
+        console.log(`📡 Making request to: https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateContent`);
 
         // Call Google Imagen API via Gemini API endpoint
         const imageGenResponse = await fetch(
@@ -54,31 +71,45 @@ export default async function handler(req, res) {
                     'Content-Type': 'application/json',
                     'x-goog-api-key': googleApiKey,
                 },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["IMAGE"],
-                        aspectRatio: "1:1",
-                        safetyFilterLevel: "BLOCK_SOME"
-                    }
-                })
+                body: JSON.stringify(requestBody)
             }
         );
 
         const responseText = await imageGenResponse.text();
         
         console.log(`📡 Imagen API response status: ${imageGenResponse.status}`);
+        console.log(`📥 Full response body:`, responseText);
+        
+        // Log response headers for additional debugging
+        console.log(`📋 Response headers:`);
+        for (const [key, value] of imageGenResponse.headers.entries()) {
+            console.log(`  ${key}: ${value}`);
+        }
         
         if (!imageGenResponse.ok) {
-            console.error('❌ Google Imagen API error:', imageGenResponse.status, responseText);
+            console.error('❌ Google Imagen API error details:');
+            console.error('  Status:', imageGenResponse.status, imageGenResponse.statusText);
+            console.error('  Response body:', responseText);
+            
+            // Try to parse error response for more details
+            let errorDetails = null;
+            try {
+                errorDetails = JSON.parse(responseText);
+                console.error('  Parsed error:', JSON.stringify(errorDetails, null, 2));
+            } catch (e) {
+                console.error('  Could not parse error response as JSON');
+            }
             
             let userFriendlyError = 'Image generation service temporarily unavailable';
+            let specificError = errorDetails?.error?.message || responseText;
+            
             if (imageGenResponse.status === 403) {
                 userFriendlyError = 'API access denied - check project configuration';
+                console.error('  🚨 403 Forbidden - Possible causes:');
+                console.error('    - Imagen API not enabled for this API key');
+                console.error('    - API key lacks image generation permissions');
+                console.error('    - Billing not enabled for Imagen usage');
+                console.error('    - Project restrictions blocking access');
             } else if (imageGenResponse.status === 400) {
                 userFriendlyError = 'Invalid image generation request';
             } else if (imageGenResponse.status >= 500) {
@@ -90,6 +121,7 @@ export default async function handler(req, res) {
                 status: 'error',
                 error: userFriendlyError,
                 details: `API Status: ${imageGenResponse.status}`,
+                specificError: specificError,
                 fallback: true // Signal client to use placeholder
             });
         }

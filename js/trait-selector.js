@@ -242,20 +242,8 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             
             const data = await response.json();
             
-            // Check if we should generate an avatar - trigger immediately for substantial text
-            const shouldAnalyze = !this.hasGeneratedAvatar && (
-                userInput.length > 100 || // Substantial text provided
-                userInput.toLowerCase().includes('analyze') || // User explicitly asks for analysis
-                this.conversationHistory.length >= 6 // Fallback: after extended conversation
-            );
-            
-            if (shouldAnalyze) {
-                await this.generateTerminalAvatar(data, userInput);
-                this.hasGeneratedAvatar = true;
-                return `${data.response || data.explanation || this.getFallbackResponse(userInput)}
-
-[COMPLETE] Big Five extracted. Generating your El persona...`;
-            }
+            // Let the main terminal processing handle avatar generation
+            // Remove old flow that shows results in terminal instead of character card
             
             return data.response || data.explanation || this.getFallbackResponse(userInput);
         } catch (error) {
@@ -2146,25 +2134,80 @@ function removeTypingIndicator() {
 }
 
 function updateAvatarCard(analysisResult) {
-    // Update avatar card with analysis results
-    if (analysisResult.avatar_data) {
+    console.log('🎭 Updating avatar card with analysis result:', analysisResult);
+    
+    // Update avatar card with analysis results from Flask backend
+    if (analysisResult && (analysisResult.avatar_data || analysisResult.explanation)) {
         const avatarCard = document.getElementById('avatarCard');
         const personaName = document.getElementById('personaName');
         const personaTitle = document.getElementById('personaTitle');
         const personaDescription = document.getElementById('personaDescription');
         
-        if (personaName && analysisResult.avatar_data.title) {
-            personaName.textContent = analysisResult.avatar_data.title;
+        // Extract character info from avatar_data or explanation
+        let characterName = 'AI Character';
+        let characterTitle = 'Personality Match';
+        let characterDescription = analysisResult.explanation || 'Analysis complete';
+        
+        if (analysisResult.avatar_data) {
+            // Handle different avatar_data formats
+            if (typeof analysisResult.avatar_data === 'string') {
+                // Parse "FREAKYEL avatar activating: Creative, unconventional thinker..."
+                const match = analysisResult.avatar_data.match(/(\w+)\s+avatar\s+activating:\s*(.+)/i);
+                if (match) {
+                    characterName = match[1];
+                    characterDescription = match[2];
+                }
+            } else if (analysisResult.avatar_data.title) {
+                characterName = analysisResult.avatar_data.title;
+                characterTitle = analysisResult.avatar_data.archetype?.description || characterTitle;
+            }
         }
         
-        if (personaTitle && analysisResult.avatar_data.archetype) {
-            personaTitle.textContent = analysisResult.avatar_data.archetype.description;
+        // Update the card elements
+        if (personaName) {
+            personaName.textContent = characterName;
         }
         
-        if (personaDescription && analysisResult.explanation) {
-            personaDescription.textContent = analysisResult.explanation;
+        if (personaTitle) {
+            personaTitle.textContent = characterTitle;
         }
         
+        if (personaDescription) {
+            personaDescription.textContent = characterDescription;
+        }
+        
+        // Generate avatar for the character
+        if (window.avatarGenerator && characterName) {
+            console.log('🎨 Generating avatar for character:', characterName);
+            const avatarOptions = {
+                personalityScores: analysisResult.personality_scores || {},
+                analysisData: analysisResult,
+                source: 'terminal_analysis'
+            };
+            
+            window.avatarGenerator.generateAvatar(characterName, avatarOptions).then(avatarData => {
+                if (avatarData && avatarCard) {
+                    // Update avatar display in the card
+                    const avatarImage = window.avatarGenerator.renderAvatarImage(avatarData);
+                    const existingAvatar = avatarCard.querySelector('.avatar-display');
+                    if (existingAvatar) {
+                        existingAvatar.innerHTML = avatarImage;
+                    } else {
+                        // Create avatar display if it doesn't exist
+                        const avatarDisplay = document.createElement('div');
+                        avatarDisplay.className = 'avatar-display';
+                        avatarDisplay.innerHTML = avatarImage;
+                        avatarCard.appendChild(avatarDisplay);
+                    }
+                }
+            }).catch(error => {
+                console.error('Avatar generation failed:', error);
+            });
+        }
+        
+        console.log('✅ Avatar card updated successfully');
+    } else {
+        console.warn('⚠️ No avatar data found in analysis result');
     }
     
     // Update radar charts if personality scores exist

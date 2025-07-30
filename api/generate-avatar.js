@@ -39,8 +39,9 @@ export default async function handler(req, res) {
             });
         }
 
-        // Build the prompt for Google Imagen
-        const prompt = `Professional headshot portrait of ${description}, high quality, digital art style, clean background, 512x512 resolution`;
+        // Build the prompt for Google Imagen with full body anime style
+        const baseStyleDescription = "A full body, bold, distinctive, and dynamic anime-inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard.";
+        const prompt = `${baseStyleDescription} Depicting ${description} with a transparent background.`;
 
         console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API via Gemini`);
         console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);

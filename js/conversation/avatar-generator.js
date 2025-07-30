@@ -43,22 +43,23 @@ class AvatarGenerator {
 
         try {
             const characterDescriptions = {
-                "TheBuilder": "a digital MacGyver with engineering precision, confident posture, wearing practical tech gear, cyberpunk aesthetic with warm colors",
-                "TheNurturer": "a warm empathetic leader with kind eyes, approachable demeanor, earth tones and soft lighting, gentle but strong presence",
-                "TheTrailblazer": "a dynamic innovator with intense focus, futuristic style, electric blue and silver colors, confident expression radiating leadership energy",
-                "TheAnalyst": "a methodical data expert with sharp analytical gaze, clean modern style, navy and white color scheme, surrounded by subtle data visualizations",
-                "TheConnector": "a charismatic team builder with engaging smile, vibrant collaborative energy, warm color palette, natural networking pose",
-                "TheVanguard": "a bold risk-taking pioneer with determined expression, edgy modern style, red and black color scheme, confident stance facing forward",
-                "TheHarmonizer": "a balanced wise advisor with calm peaceful expression, neutral elegant tones, serene background, embodying stability and wisdom",
-                "TheCatalyst": "a high-energy motivator with dynamic pose, bright energetic colors, action-oriented stance, inspiring leadership presence",
-                "TheArchitect": "a strategic long-term planner with thoughtful expression, clean architectural lines, sophisticated color scheme, building something meaningful",
-                "FREAKYEL": "an experimental boundary-pushing creative with wild unconventional style, edgy avant-garde aesthetic, electric purple and neon colors, confident rebellious expression exploring the weird edges of technology",
-                "CONSPIRACYEL": "a paranoid tech investigator with intense conspiratorial gaze, dark mysterious aesthetic, shadowy lighting with amber highlights, surrounded by interconnected data webs",
-                "THEDETECTIVE": "a methodical digital sleuth with sharp analytical focus, noir detective aesthetic, dark coat and thoughtful expression, magnifying glass examining code patterns",
-                "GYMBRO": "a fitness-obsessed programmer with muscular build, gym aesthetic merged with tech gear, protein shake in one hand, laptop in other, motivational energy",
-                "PIRATEEIL": "a swashbuckling code pirate with adventurous spirit, maritime tech aesthetic, captain's hat with USB cables, treasure map of algorithms spread out",
-                "COFFEEADDICT": "a hyper-caffeinated developer with intense energy, surrounded by multiple coffee cups, jittery but focused expression, steam rising from endless espresso",
-                "AGIEL": "an artificially intelligent assistant with digital consciousness, holographic projection aesthetic, blue circuit patterns, alternating between robotic and suspiciously human expressions"
+                "TheBuilder": "a digital MacGyver building things with engineering precision, surrounded by code and power tools, actively constructing a complex, glowing structure, in a vibrant, slightly chaotic style",
+                "TheDetective": "a digital Sherlock Holmes, intensely investigating lines of code, surrounded by holographic error logs and intricate bug tracking elements, in a mysterious, analytical style",
+                "GrumpyOldManEl": "a cantankerous code critic, with a vintage computer, grumbling while expertly debugging, expressing skepticism about modern frameworks, in a nostalgic, slightly grumpy style with a knowing smirk",
+                "PirateEl": "a swashbuckling software sailor, dramatically navigating a digital sea on a ship made of code snippets, with version control logs unfurling like sails, in an adventurous, stylized manner",
+                "GymBroEl": "a buff code buddy, applying gym logic to programming, flexing muscles while refactoring code, surrounded by elements of weightlifting and optimized algorithms, in a strong, energetic style",
+                "FreakyEl": "a boundary-pushing, intensely experimental beta tester, exploring the most bizarre and extreme edges of technology, wearing a stylish leather jacket with chains and spikes, with unconventional and unsettling testing approaches, in a truly bizarre, surreal, and unsettling BDSM-inspired style, pushing limits",
+                "CoffeeAddictEl": "a caffeinated coding companion, fueled by dangerous amounts of coffee, eyes wide with intense focus, coding at hyper-speed, with coffee steam swirling around them, in a vibrant, high-focus style",
+                "ConspiracyEl": "a paranoid problem investigator, surrounded by red string boards and suspicious connections in code, whispering theories about hidden connections and systemic issues, in a mysterious, analytical style with a watchful gaze",
+                "AGIEl": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style",
+                // Keep compatibility with existing character names
+                "THEDETECTIVE": "a digital Sherlock Holmes, intensely investigating lines of code, surrounded by holographic error logs and intricate bug tracking elements, in a mysterious, analytical style",
+                "GYMBRO": "a buff code buddy, applying gym logic to programming, flexing muscles while refactoring code, surrounded by elements of weightlifting and optimized algorithms, in a strong, energetic style",
+                "PIRATEEIL": "a swashbuckling software sailor, dramatically navigating a digital sea on a ship made of code snippets, with version control logs unfurling like sails, in an adventurous, stylized manner",
+                "COFFEEADDICT": "a caffeinated coding companion, fueled by dangerous amounts of coffee, eyes wide with intense focus, coding at hyper-speed, with coffee steam swirling around them, in a vibrant, high-focus style",
+                "CONSPIRACYEL": "a paranoid problem investigator, surrounded by red string boards and suspicious connections in code, whispering theories about hidden connections and systemic issues, in a mysterious, analytical style with a watchful gaze",
+                "FREAKYEL": "a boundary-pushing, intensely experimental beta tester, exploring the most bizarre and extreme edges of technology, wearing a stylish leather jacket with chains and spikes, with unconventional and unsettling testing approaches, in a truly bizarre, surreal, and unsettling BDSM-inspired style, pushing limits",
+                "AGIEL": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style"
             };
 
             const description = characterDescriptions[matchedCharacterName] || characterDescriptions["TheBuilder"];

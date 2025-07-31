@@ -1198,7 +1198,15 @@ class ElliotGenerator {
         waterAsciiContainer.className = 'avatar-display-container';
 
         // Render the avatar component
+        console.log('🎯 DEBUG: showAvatarResults called with elliotData:', elliotData);
+        console.log('🎯 DEBUG: elliotData.avatarData:', elliotData.avatarData);
+        console.log('🎯 DEBUG: window.avatarGenerator:', window.avatarGenerator);
+        console.log('🎯 DEBUG: Condition check - elliotData.avatarData exists:', !!elliotData.avatarData);
+        console.log('🎯 DEBUG: Condition check - window.avatarGenerator exists:', !!window.avatarGenerator);
+        console.log('🎯 DEBUG: Overall condition result:', !!(elliotData.avatarData && window.avatarGenerator));
+        
         if (elliotData.avatarData && window.avatarGenerator) {
+            console.log('🎯 DEBUG: Entering avatar rendering block');
             window.avatarGenerator.renderAvatarComponent(
                 waterAsciiContainer, 
                 elliotData.avatarData, 
@@ -1217,6 +1225,15 @@ class ElliotGenerator {
             this.enableChatButton(elliotData);
             
         } else {
+            console.log('❌ DEBUG: Avatar rendering condition failed!');
+            console.log('❌ DEBUG: Missing avatarData:', !elliotData.avatarData);
+            console.log('❌ DEBUG: Missing avatarGenerator:', !window.avatarGenerator);
+            if (!elliotData.avatarData) {
+                console.log('❌ DEBUG: elliotData.avatarData is:', elliotData.avatarData);
+            }
+            if (!window.avatarGenerator) {
+                console.log('❌ DEBUG: window.avatarGenerator is:', window.avatarGenerator);
+            }
         }
     }
 
@@ -2752,7 +2769,20 @@ function initializeTerminalMode() {
                                 
                                 if (matchedCharacter && window.avatarGenerator) {
                                     // Generate avatar for the matched character
-                                    const avatarData = await window.avatarGenerator.generateAvatar(matchedCharacter.name);
+                                    console.log('🎯 DEBUG: About to call generateAvatar for:', matchedCharacter.name);
+                                    console.log('🎯 DEBUG: window.avatarGenerator exists:', !!window.avatarGenerator);
+                                    
+                                    let avatarData;
+                                    try {
+                                        avatarData = await window.avatarGenerator.generateAvatar(matchedCharacter.name);
+                                        console.log('🎯 DEBUG: generateAvatar returned:', avatarData);
+                                        console.log('🎯 DEBUG: avatarData type:', typeof avatarData);
+                                        console.log('🎯 DEBUG: avatarData truthy:', !!avatarData);
+                                    } catch (error) {
+                                        console.error('❌ DEBUG: generateAvatar failed with error:', error);
+                                        console.error('❌ DEBUG: Error stack:', error.stack);
+                                        avatarData = null;
+                                    }
                                     
                                     // Create elliotData using the matched character
                                     const elliotData = {
@@ -2764,6 +2794,9 @@ function initializeTerminalMode() {
                                         avatarData: avatarData,
                                         similarityScore: matchedCharacter.similarity
                                     };
+                                    
+                                    console.log('🎯 DEBUG: Created elliotData:', elliotData);
+                                    console.log('🎯 DEBUG: elliotData.avatarData exists:', !!elliotData.avatarData);
                                     
                                     // Trigger full avatar generation (image + card + radar charts)
                                     window.elliotGenerator.showAvatarResults(elliotData);

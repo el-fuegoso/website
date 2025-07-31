@@ -2762,6 +2762,14 @@ function initializeTerminalMode() {
                             
                             console.log('🎯 STEP 7: Triggering full avatar generation...');
                             
+                            // DEBUG: Check conditional requirements before avatar generation
+                            console.log('🔍 Pre-conditional debug:');
+                            console.log('🔍 window.elliotGenerator exists:', !!window.elliotGenerator);
+                            console.log('🔍 window.elliotGenerator value:', window.elliotGenerator);
+                            console.log('🔍 analysisResult.ocean_scores exists:', !!analysisResult.ocean_scores);
+                            console.log('🔍 analysisResult.ocean_scores value:', analysisResult.ocean_scores);
+                            console.log('🔍 Overall conditional result:', !!(window.elliotGenerator && analysisResult.ocean_scores));
+                            
                             // Find best character match based on OCEAN scores
                             if (window.elliotGenerator && analysisResult.ocean_scores) {
                                 // Match user to existing character based on OCEAN similarity
@@ -2807,6 +2815,15 @@ function initializeTerminalMode() {
                                 } else {
                                     addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">❌ Unable to find character match. Please try again.</span>`);
                                 }
+                            } else {
+                                console.log('❌ CONDITIONAL FAILED: Avatar generation skipped');
+                                if (!window.elliotGenerator) {
+                                    console.log('❌ Missing: window.elliotGenerator is', typeof window.elliotGenerator);
+                                }
+                                if (!analysisResult.ocean_scores) {
+                                    console.log('❌ Missing: analysisResult.ocean_scores is', analysisResult.ocean_scores);
+                                }
+                                addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">❌ Avatar generation failed - missing required components</span>`);
                             }
                             
                             console.log('🎯 STEP 8: Character card and radar charts updated');

@@ -53,17 +53,16 @@ class Terminal {
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; font-weight: bold;">PERSONA GENERATOR | Custom Neural Architecture</span>`);
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">════════════════════════════════════════════════════════════</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">I built a specialized LLM head that extracts Big Five personality</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">traits from any text input. Doesn't matter what you feed it.</span>`);
+            this.addToOutput(`<span style="color: #61dafb; font-family: 'Roboto Mono', monospace; font-weight: bold;">Chat naturally - I'll analyze your responses to create your personalized avatar</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Resume? Job description? Essay you wrote? Random thoughts?</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">The model reads between the lines and pulls your psychological</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">profile. Then generates your personalized "El" avatar.</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">I need about 100 words from our conversation to analyze your personality</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">traits and generate your unique "El" character.</span>`);
             this.addToOutput('');
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">No surveys. No questionnaires. Just raw text analysis.</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Just be yourself - tell me about your work, interests, or thoughts.</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">No surveys needed, just natural conversation.</span>`);
             this.addToOutput('');
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">────────────────────────────────────────────────────────────</span>`);
-            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Ready for input...</span>`);
+            this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Ready to chat...</span>`);
             this.addPrompt();
         }, elliotLines.length * 20 + 300);
     }
@@ -75,7 +74,7 @@ class Terminal {
         this.isProcessing = true;
         
         // Replace the input line with the completed command
-        this.input.parentNode.innerHTML = `<span style="color: #61dafb; font-family: 'Roboto Mono', monospace;">elliot@terminal ~ % </span><span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">${userInput}</span>`;
+        this.input.parentNode.innerHTML = `<span style="color: #61dafb; font-family: 'Roboto Mono', monospace;">user@terminal ~ % </span><span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">${userInput}</span>`;
         
         this.showLoading();
 
@@ -2012,7 +2011,7 @@ Conversation context: ${data.classification?.type || 'general discussion'}`;
 
             // Check if we should trigger personality analysis
             const conversationLength = (data.conversationHistory || []).length;
-            const shouldAnalyze = conversationLength >= 8 || this.getTotalWordCount(data.conversationHistory) > 200;
+            const shouldAnalyze = conversationLength >= 8 || this.getTotalWordCount(data.conversationHistory) > 100;
 
             return {
                 action: shouldAnalyze ? 'analyze' : 'chat',
@@ -2090,11 +2089,9 @@ function runTerminalAnimation() {
         { text: '', delay: 300 },
         { text: '**PERSONA GENERATOR v2.0**', delay: 100 },
         { text: '', delay: 200 },
-        { text: 'I built a specialized LLM head that extracts Big Five personality traits from any text input. Doesn\'t matter what you feed it.', delay: 50 },
+        { text: 'Chat naturally - I\'ll analyze your responses to create your personalized avatar', delay: 50 },
         { text: '', delay: 200 },
-        { text: 'Resume? Job description? Essay you wrote? Random thoughts? The model reads between the lines and pulls your psychological profile. Then generates your personalized "El" avatar.', delay: 50 },
-        { text: '', delay: 200 },
-        { text: 'No surveys. No questionnaires. Just raw text analysis.', delay: 50 },
+        { text: 'I need about 100 words from our conversation to analyze your personality traits and generate your unique "El" character. Just be yourself - tell me about your work, interests, or thoughts. No surveys needed, just natural conversation.', delay: 50 },
         { text: '', delay: 300 },
         { text: 'Ready for input...', delay: 100 }
     ];
@@ -2272,9 +2269,9 @@ function addTerminalLine(text, isUser = false) {
     
     const line = document.createElement('div');
     if (isUser) {
-        line.innerHTML = `<span style="color: #00ff41;">elliot@terminal ~ %</span> ${text}`;
+        line.innerHTML = `<span style="color: #61dafb;">user@terminal ~ %</span> <span style="color: #ffffff;">${text}</span>`;
     } else {
-        line.textContent = text;
+        line.innerHTML = text; // Allow HTML formatting for bot responses
     }
     output.appendChild(line);
     
@@ -2583,12 +2580,25 @@ function initializeTerminalMode() {
                 case 'chat':
                     // Handle Claude conversation responses
                     terminalDebugger.debug('Action: Chat', { message: result.message });
-                    addTerminalLine(result.message);
+                    addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">${result.message}</span>`);
+                    
+                    // Show word count progress
+                    const currentWordCount = globalTerminalIntelligence.getTotalWordCount(
+                        globalTerminalIntelligence.conversationHistory
+                    );
+                    const progressColor = currentWordCount >= 100 ? '#61dafb' : '#888';
+                    const progressText = currentWordCount >= 100 
+                        ? '✓ Ready for analysis!' 
+                        : `Word count: ${currentWordCount}/100`;
+                    
+                    setTimeout(() => {
+                        addTerminalLine(`<span style="color: ${progressColor}; font-size: 0.9em; font-style: italic;">${progressText}</span>`);
+                    }, 500);
                     
                     // Show analysis trigger hint if getting close
                     if (result.shouldAnalyze) {
                         setTimeout(() => {
-                            addTerminalLine('💡 I think I have enough information to analyze your personality. Continuing conversation to gather final insights...');
+                            addTerminalLine('💡 I have enough information now. Let me analyze your personality...');
                         }, 1000);
                     }
                     break;

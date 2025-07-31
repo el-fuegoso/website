@@ -55,7 +55,10 @@ class AvatarGenerator {
                 "COFFEEADDICT": "a caffeinated coding companion, fueled by dangerous amounts of coffee, eyes wide with intense focus, coding at hyper-speed, with coffee steam swirling around them, in a vibrant, high-focus style",
                 "CONSPIRACYEL": "a paranoid problem investigator, surrounded by red string boards and suspicious connections in code, whispering theories about hidden connections and systemic issues, in a mysterious, analytical style with a watchful gaze",
                 "FREAKYEL": "a boundary-pushing, intensely experimental beta tester, exploring the most bizarre and extreme edges of technology, wearing a stylish leather jacket with chains and spikes, with unconventional and unsettling testing approaches, in a truly bizarre, surreal, and unsettling BDSM-inspired style, pushing limits",
-                "AGIEL": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style"
+                "AGIEL": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style",
+                // Missing all-caps variants that were causing fallback to TheBuilder
+                "GRUMPYOLDMANEL": "a cantankerous old curmudgeon, hunched over his vintage computer with thick glasses, grumbling about how everything was better in the old days, shaking his fist at newfangled technology while stubbornly clinging to his ancient setup, in a nostalgic, irritably grumpy style with a perpetual scowl",
+                "PIRATEEL": "a swashbuckling pirate captain, dramatically commanding a grand sailing ship on stormy seas, with billowing sails and treasure chests, wielding a cutlass with confident authority, in an adventurous, nautical style"
             };
 
             const description = characterDescriptions[matchedCharacterName] || characterDescriptions["TheBuilder"];

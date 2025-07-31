@@ -44,7 +44,7 @@ class Terminal {
         elliotLines.forEach((line, index) => {
             setTimeout(() => {
                 this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace; letter-spacing: 0; white-space: pre; line-height: 1;">${line}</span>`);
-            }, index * 150);
+            }, index * 20);
         });
         
         // Add divider and instructions after ASCII art
@@ -65,7 +65,7 @@ class Terminal {
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">────────────────────────────────────────────────────────────</span>`);
             this.addToOutput(`<span style="color: #ffffff; font-family: 'Roboto Mono', monospace;">Ready for input...</span>`);
             this.addPrompt();
-        }, elliotLines.length * 150 + 300);
+        }, elliotLines.length * 20 + 300);
     }
 
     async processInput() {
@@ -2013,25 +2013,17 @@ function runTerminalAnimation() {
     const loadingSequence = [
         { text: 'Initializing...', delay: 1000 },
         { text: '', delay: 200 },
-        { 
-            text: `███████ ██      ██      ██  ██████  ████████
-██      ██      ██      ██ ██    ██    ██   
-█████   ██      ██      ██ ██    ██    ██   
-██      ██      ██      ██ ██    ██    ██   
-███████ ███████ ███████ ██  ██████     ██   `, 
-            delay: 1200
-        },
+        { text: '███████ ██      ██      ██  ██████  ████████', delay: 20 },
+        { text: '██      ██      ██      ██ ██    ██    ██   ', delay: 20 },
+        { text: '█████   ██      ██      ██ ██    ██    ██   ', delay: 20 },
+        { text: '██      ██      ██      ██ ██    ██    ██   ', delay: 20 },
+        { text: '███████ ███████ ███████ ██  ██████     ██   ', delay: 20 },
         { text: '', delay: 300 },
         { text: '**PERSONA GENERATOR v2.0**', delay: 100 },
         { text: '', delay: 200 },
-        { text: 'I built a specialized LLM head that extracts Big Five', delay: 50 },
-        { text: 'personality traits from any text input. Doesn\'t matter', delay: 50 },
-        { text: 'what you feed it.', delay: 50 },
+        { text: 'I built a specialized LLM head that extracts Big Five personality traits from any text input. Doesn\'t matter what you feed it.', delay: 50 },
         { text: '', delay: 200 },
-        { text: 'Resume? Job description? Essay you wrote? Random thoughts?', delay: 50 },
-        { text: 'The model reads between the lines and pulls your', delay: 50 },
-        { text: 'psychological profile. Then generates your personalized', delay: 50 },
-        { text: '"El" avatar.', delay: 50 },
+        { text: 'Resume? Job description? Essay you wrote? Random thoughts? The model reads between the lines and pulls your psychological profile. Then generates your personalized "El" avatar.', delay: 50 },
         { text: '', delay: 200 },
         { text: 'No surveys. No questionnaires. Just raw text analysis.', delay: 50 },
         { text: '', delay: 300 },
@@ -2063,6 +2055,12 @@ function runTerminalAnimation() {
         for (let i = 0; i < loadingSequence.length; i++) {
             const item = loadingSequence[i];
             const line = document.createElement('div');
+            
+            // Apply proper space preservation to ASCII art lines (indices 2-6)
+            if (i >= 2 && i <= 6 && item.text.includes('█')) {
+                line.style.whiteSpace = 'pre';
+                line.style.fontFamily = 'monospace';
+            }
             
             if (item.typewriter) {
                 line.style.whiteSpace = 'pre';

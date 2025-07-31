@@ -1234,33 +1234,55 @@ class ElliotGenerator {
     }
 
     enableChatButton(elliotData) {
+        console.log('🔧 DEBUG: enableChatButton called with elliotData:', elliotData);
         
         // Find the static chat button
         const chatBtn = document.getElementById('chatNowBtn');
+        console.log('🔍 DEBUG: Chat button found in enableChatButton:', !!chatBtn);
+        console.log('🔍 DEBUG: Chat button element details:', chatBtn);
         
         if (!chatBtn) {
-            console.error('❌ CRITICAL: Chat button not found in HTML - ID chatNowBtn missing!');
+            console.error('❌ DEBUG: Chat button not found in HTML - ID chatNowBtn missing!');
             // Let's check what elements DO exist
             const allButtons = document.querySelectorAll('button');
             const avatarCard = document.querySelector('.avatar-card');
+            console.log('🔍 DEBUG: All buttons found:', allButtons.length, allButtons);
+            console.log('🔍 DEBUG: Avatar card found:', !!avatarCard);
+            console.log('🔍 DEBUG: Document ready state:', document.readyState);
             return;
         }
         
         // Check parent container
         const parentContainer = chatBtn.parentElement;
+        console.log('🔍 DEBUG: Button parent container:', parentContainer);
+        
+        // Log button state before changes
+        console.log('🔍 DEBUG: Button state before enabling:');
+        console.log('  - disabled:', chatBtn.disabled);
+        console.log('  - opacity:', chatBtn.style.opacity);
+        console.log('  - display:', chatBtn.style.display);
+        console.log('  - existing onclick:', !!chatBtn.onclick);
         
         // Enable the button and make it fully visible
         chatBtn.disabled = false;
         chatBtn.style.opacity = '1';
         
+        console.log('🔍 DEBUG: Button state after enabling:');
+        console.log('  - disabled:', chatBtn.disabled);
+        console.log('  - opacity:', chatBtn.style.opacity);
         
         // Add click handler
         chatBtn.onclick = () => {
+            console.log('🎯 DEBUG: enableChatButton click handler triggered');
+            console.log('🔍 DEBUG: elliotData in click handler:', elliotData);
             
             try {
+                console.log('🚀 DEBUG: Calling openChatWithCharacter');
                 this.openChatWithCharacter(elliotData);
+                console.log('✅ DEBUG: openChatWithCharacter call completed');
             } catch (error) {
-                console.error('❌ CRITICAL: Error in button click handler:', error);
+                console.error('❌ DEBUG: Error in enableChatButton click handler:', error);
+                console.error('❌ DEBUG: Error stack:', error.stack);
                 alert('Error opening chat: ' + error.message);
             }
         };
@@ -2209,8 +2231,15 @@ function updateAvatarCard(analysisResult) {
         }
         
         // Update the card elements
+        console.log('🔧 DEBUG: Updating persona name element');
+        console.log('🔍 DEBUG: personaName element exists:', !!personaName);
+        console.log('🔍 DEBUG: characterName to set:', characterName);
+        
         if (personaName) {
             personaName.textContent = characterName;
+            console.log('✅ DEBUG: personaName updated to:', personaName.textContent);
+        } else {
+            console.error('❌ DEBUG: personaName element not found when trying to update');
         }
         
         if (personaTitle) {
@@ -2646,14 +2675,23 @@ function initializeTerminalMode() {
 
 // Initialize function
 function initializeTraitSelector() {
+    console.log('🔧 DEBUG: initializeTraitSelector() called');
+    console.log('🔍 DEBUG: window.AvatarGenerator type:', typeof window.AvatarGenerator);
+    console.log('🔍 DEBUG: window.avatarGenerator exists:', !!window.avatarGenerator);
+    
     if (typeof window.AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
+        console.log('🔧 DEBUG: Creating new AvatarGenerator instance...');
         try {
             window.avatarGenerator = new window.AvatarGenerator();
+            console.log('✅ DEBUG: AvatarGenerator initialized successfully');
+            console.log('🔍 DEBUG: AvatarGenerator methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.avatarGenerator)));
         } catch (error) {
-            console.error('❌ Failed to initialize avatar generator:', error);
+            console.error('❌ DEBUG: Failed to initialize avatar generator:', error);
+            console.error('❌ DEBUG: AvatarGenerator error stack:', error.stack);
         }
     } else if (typeof window.AvatarGenerator === 'undefined') {
-        console.error('❌ AvatarGenerator class not loaded - check script imports');
+        console.error('❌ DEBUG: AvatarGenerator class not loaded - check script imports');
+        console.log('🔍 DEBUG: Available window objects with Avatar:', Object.keys(window).filter(key => key.includes('Avatar')));
     } else {
         console.log('ℹ️ Avatar generator already initialized');
     }

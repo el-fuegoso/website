@@ -165,77 +165,193 @@ class ThemeManager {
 }
 
 function ensureChatInitialized() {
+    console.log('🔧 DEBUG: ensureChatInitialized() called');
+    
     try {
         // Check if chat system components are available
+        console.log('🔍 DEBUG: Checking chat system classes availability:');
+        console.log('  - window.ChatUI:', typeof window.ChatUI);
+        console.log('  - window.ConversationManager:', typeof window.ConversationManager);
+        console.log('  - window.chatUI instance exists:', !!window.chatUI);
+        console.log('  - window.conversationManager instance exists:', !!window.conversationManager);
+        
         if (typeof window.ChatUI === 'undefined' || typeof window.ConversationManager === 'undefined') {
-            console.error('❌ Chat system classes not loaded!');
-            console.error('💡 Make sure all chat dependencies are included in HTML');
+            console.error('❌ DEBUG: Chat system classes not loaded!');
+            console.error('💡 DEBUG: Missing classes - ChatUI:', typeof window.ChatUI, 'ConversationManager:', typeof window.ConversationManager);
+            console.error('💡 DEBUG: Make sure all chat dependencies are included in HTML');
+            console.log('🔍 DEBUG: Available window objects with Chat/Conversation:', Object.keys(window).filter(key => key.includes('Chat') || key.includes('Conversation')));
             return null;
         }
         
         // Initialize chat UI if not already done
         if (!window.chatUI) {
+            console.log('🔧 DEBUG: Creating new ChatUI instance...');
             try {
                 window.chatUI = new window.ChatUI();
-                console.log('✅ ChatUI initialized in ensureChatInitialized');
+                console.log('✅ DEBUG: ChatUI initialized successfully in ensureChatInitialized');
+                console.log('🔍 DEBUG: ChatUI instance methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.chatUI)));
             } catch (error) {
-                console.error('❌ Failed to create ChatUI:', error);
+                console.error('❌ DEBUG: Failed to create ChatUI instance:', error);
+                console.error('❌ DEBUG: ChatUI constructor error stack:', error.stack);
                 return null;
             }
+        } else {
+            console.log('✅ DEBUG: Existing ChatUI instance found');
         }
         
         // Initialize conversation manager if not already done
         if (!window.conversationManager) {
-            window.conversationManager = new window.ConversationManager();
+            console.log('🔧 DEBUG: Creating new ConversationManager instance...');
+            try {
+                window.conversationManager = new window.ConversationManager();
+                console.log('✅ DEBUG: ConversationManager initialized successfully');
+            } catch (error) {
+                console.error('❌ DEBUG: Failed to create ConversationManager:', error);
+                console.error('❌ DEBUG: ConversationManager error stack:', error.stack);
+                return null;
+            }
+        } else {
+            console.log('✅ DEBUG: Existing ConversationManager instance found');
         }
         
-        return {
+        const result = {
             chatUI: window.chatUI,
             conversationManager: window.conversationManager
         };
         
+        console.log('✅ DEBUG: ensureChatInitialized completed successfully:', {
+            hasChatUI: !!result.chatUI,
+            hasConversationManager: !!result.conversationManager
+        });
+        
+        return result;
+        
     } catch (error) {
-        console.error('❌ Failed to initialize chat system:', error);
+        console.error('❌ DEBUG: Unexpected error in ensureChatInitialized:', error);
+        console.error('❌ DEBUG: Error stack:', error.stack);
         return null;
     }
 }
 
 function setupChatButton() {
+    console.log('🔧 DEBUG: setupChatButton() called');
+    
     const chatBtn = document.getElementById('chatNowBtn');
+    console.log('🔍 DEBUG: Chat button element:', chatBtn);
+    console.log('🔍 DEBUG: Button exists:', !!chatBtn);
+    
     if (!chatBtn) {
+        console.error('❌ DEBUG: Chat button not found - checking DOM state');
+        console.log('🔍 DEBUG: All buttons in DOM:', document.querySelectorAll('button'));
+        console.log('🔍 DEBUG: Elements with chatNowBtn ID:', document.querySelectorAll('#chatNowBtn'));
         return;
     }
     
+    // Log button current state
+    console.log('🔍 DEBUG: Button disabled:', chatBtn.disabled);
+    console.log('🔍 DEBUG: Button style.display:', chatBtn.style.display);
+    console.log('🔍 DEBUG: Button style.opacity:', chatBtn.style.opacity);
+    console.log('🔍 DEBUG: Button onclick before setup:', chatBtn.onclick);
+    
     chatBtn.onclick = () => {
-        console.log('🎯 Main chat button clicked');
+        console.log('🎯 DEBUG: Main chat button clicked - starting diagnostic flow');
+        
+        // Log current window state
+        console.log('🔍 DEBUG: window.avatarGenerator exists:', !!window.avatarGenerator);
+        console.log('🔍 DEBUG: avatarGenerator methods:', window.avatarGenerator ? Object.getOwnPropertyNames(Object.getPrototypeOf(window.avatarGenerator)) : 'N/A');
         
         // Initialize chat system if needed
+        console.log('🔧 DEBUG: Calling ensureChatInitialized()');
         const chatComponents = ensureChatInitialized();
+        console.log('🔍 DEBUG: ensureChatInitialized result:', chatComponents);
+        
         if (!chatComponents) {
-            console.error('❌ Chat system not available');
+            console.error('❌ DEBUG: Chat system not available - initialization failed');
             alert('Chat system is initializing. Please try again in a moment.');
             return;
         }
         
         // Start chat with current persona or default character
-        const currentPersona = document.getElementById('personaName')?.textContent || 'ConspiracyEl';
+        const personaElement = document.getElementById('personaName');
+        console.log('🔍 DEBUG: personaName element:', personaElement);
+        const currentPersona = personaElement?.textContent || 'ConspiracyEl';
+        console.log('🔍 DEBUG: Current persona for chat:', currentPersona);
         
         if (window.avatarGenerator && typeof window.avatarGenerator.startChatWithCharacter === 'function') {
             try {
+                console.log('🚀 DEBUG: Calling startChatWithCharacter with:', currentPersona);
                 window.avatarGenerator.startChatWithCharacter(currentPersona);
+                console.log('✅ DEBUG: startChatWithCharacter call completed');
             } catch (error) {
-                console.error('❌ Error starting character chat:', error);
+                console.error('❌ DEBUG: Error starting character chat:', error);
+                console.error('❌ DEBUG: Error stack:', error.stack);
                 alert('Failed to start chat. Please try again.');
             }
         } else {
-            console.error('❌ Avatar generator or startChatWithCharacter method not available');
+            console.error('❌ DEBUG: Avatar generator conditions failed:');
+            console.error('  - avatarGenerator exists:', !!window.avatarGenerator);
+            console.error('  - startChatWithCharacter method exists:', window.avatarGenerator ? typeof window.avatarGenerator.startChatWithCharacter : 'N/A');
+            console.error('  - startChatWithCharacter is function:', window.avatarGenerator ? typeof window.avatarGenerator.startChatWithCharacter === 'function' : 'N/A');
             alert('Chat system is not properly initialized. Please refresh the page.');
         }
     };
+    
+    console.log('✅ DEBUG: Chat button onclick handler attached');
+    console.log('🔍 DEBUG: Button onclick after setup:', chatBtn.onclick);
 }
+
+// Debug function to check chat system state - can be called from console
+window.debugChatSystem = function() {
+    console.log('🔍 === CHAT SYSTEM DEBUG REPORT ===');
+    
+    // Check button existence and state
+    const chatBtn = document.getElementById('chatNowBtn');
+    console.log('🔘 Chat Button Status:');
+    console.log('  - exists:', !!chatBtn);
+    if (chatBtn) {
+        console.log('  - disabled:', chatBtn.disabled);
+        console.log('  - style.display:', chatBtn.style.display);
+        console.log('  - style.opacity:', chatBtn.style.opacity);
+        console.log('  - style.visibility:', chatBtn.style.visibility);
+        console.log('  - has onclick:', !!chatBtn.onclick);
+        console.log('  - text content:', chatBtn.textContent?.trim());
+    }
+    
+    // Check classes availability
+    console.log('🏗️ Class Availability:');
+    console.log('  - window.ChatUI:', typeof window.ChatUI);
+    console.log('  - window.ConversationManager:', typeof window.ConversationManager);
+    console.log('  - window.AvatarGenerator:', typeof window.AvatarGenerator);
+    
+    // Check instances
+    console.log('🎭 Instance Availability:');
+    console.log('  - window.chatUI:', !!window.chatUI);
+    console.log('  - window.conversationManager:', !!window.conversationManager);
+    console.log('  - window.avatarGenerator:', !!window.avatarGenerator);
+    
+    // Check character context
+    const personaElement = document.getElementById('personaName');
+    console.log('👤 Character Context:');
+    console.log('  - personaName element exists:', !!personaElement);
+    console.log('  - current persona:', personaElement?.textContent || 'Not set');
+    
+    // Test ensureChatInitialized
+    console.log('🔧 Testing ensureChatInitialized...');
+    const chatComponents = ensureChatInitialized();
+    console.log('  - result:', !!chatComponents);
+    
+    console.log('🔍 === END DEBUG REPORT ===');
+    return {
+        buttonExists: !!chatBtn,
+        chatSystemReady: !!chatComponents,
+        avatarGeneratorReady: !!window.avatarGenerator
+    };
+};
 
 // Initialize managers when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔧 DEBUG: DOMContentLoaded event fired');
+    
     // Initialize performance monitoring
     window.performanceManager = new window.MobilePerformanceManager();
     
@@ -248,5 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup chat button
     setupChatButton();
     
-    console.log('✅ Main application managers initialized');
+    console.log('✅ DEBUG: Main application managers initialized');
+    console.log('💡 DEBUG: Use window.debugChatSystem() in console for full chat system diagnosis');
 });

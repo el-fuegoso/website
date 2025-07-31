@@ -352,18 +352,51 @@ window.debugChatSystem = function() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🔧 DEBUG: DOMContentLoaded event fired');
     
-    // Initialize performance monitoring
-    window.performanceManager = new window.MobilePerformanceManager();
+    // Initialize performance monitoring (optional)
+    try {
+        if (typeof window.MobilePerformanceManager === 'function') {
+            window.performanceManager = new window.MobilePerformanceManager();
+            console.log('✅ DEBUG: Performance manager initialized');
+        } else {
+            console.log('ℹ️ DEBUG: MobilePerformanceManager not available - skipping');
+        }
+    } catch (error) {
+        console.warn('⚠️ DEBUG: Failed to initialize performance manager:', error.message);
+    }
     
-    // Initialize accessibility features
-    window.a11yManager = new MobileAccessibilityManager();
+    // Initialize accessibility features (optional)
+    try {
+        if (typeof MobileAccessibilityManager === 'function') {
+            window.a11yManager = new MobileAccessibilityManager();
+            console.log('✅ DEBUG: Accessibility manager initialized');
+        } else {
+            console.log('ℹ️ DEBUG: MobileAccessibilityManager not available - skipping');
+        }
+    } catch (error) {
+        console.warn('⚠️ DEBUG: Failed to initialize accessibility manager:', error.message);
+    }
     
-    // Initialize theme management
-    window.themeManager = new ThemeManager();
+    // Initialize theme management (optional)
+    try {
+        if (typeof ThemeManager === 'function') {
+            window.themeManager = new ThemeManager();
+            console.log('✅ DEBUG: Theme manager initialized');
+        } else {
+            console.log('ℹ️ DEBUG: ThemeManager not available - skipping');
+        }
+    } catch (error) {
+        console.warn('⚠️ DEBUG: Failed to initialize theme manager:', error.message);
+    }
     
-    // Setup chat button
-    setupChatButton();
+    // Setup chat button (CRITICAL - always run this)
+    try {
+        setupChatButton();
+        console.log('✅ DEBUG: Chat button setup completed');
+    } catch (error) {
+        console.error('❌ DEBUG: CRITICAL - Failed to setup chat button:', error);
+        console.error('❌ DEBUG: Chat button error stack:', error.stack);
+    }
     
-    console.log('✅ DEBUG: Main application managers initialized');
+    console.log('✅ DEBUG: DOMContentLoaded initialization completed');
     console.log('💡 DEBUG: Use window.debugChatSystem() in console for full chat system diagnosis');
 });

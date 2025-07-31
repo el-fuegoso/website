@@ -1,7 +1,6 @@
 // Main Website JavaScript - Performance monitoring and artifact management
 
 // Debug: Verify script is loading
-console.log('⚡ main.js script loaded');
 
 // CONFIG object is defined in the inline script block in index.html
 

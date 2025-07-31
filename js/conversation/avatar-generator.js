@@ -4,7 +4,6 @@
  */
 
 // Debug: Verify script is loading
-console.log('🔨 avatar-generator.js script loaded');
 class AvatarGenerator {
     constructor() {
         this.isGenerating = false;
@@ -25,7 +24,6 @@ class AvatarGenerator {
      * @returns {Promise<Object>} Avatar data with image URL
      */
     async generateAvatar(matchedCharacterName = "TheBuilder", options = {}) {
-        console.log(`🎨 Starting avatar generation for: ${matchedCharacterName}`);
         
         if (this.isGenerating) {
             console.log('⚠️ Avatar generation already in progress, skipping');
@@ -34,12 +32,10 @@ class AvatarGenerator {
 
         // Check cache first
         if (this.generatedAvatars.has(matchedCharacterName)) {
-            console.log(`✅ Found cached avatar for: ${matchedCharacterName}`);
             return this.generatedAvatars.get(matchedCharacterName);
         }
 
         this.isGenerating = true;
-        console.log(`🔄 Starting fresh avatar generation for: ${matchedCharacterName}`);
 
         try {
             const characterDescriptions = {
@@ -63,28 +59,22 @@ class AvatarGenerator {
             };
 
             const description = characterDescriptions[matchedCharacterName] || characterDescriptions["TheBuilder"];
-            console.log(`📝 Using description: ${description.substring(0, 50)}...`);
             
             let avatarData;
             
             try {
-                console.log('🚀 Attempting Google Imagen API generation via Vercel endpoint...');
                 // Use Vercel API endpoint for Google Imagen API
                 avatarData = await this.callGoogleImagenAPI(description, matchedCharacterName, options);
-                console.log('✅ Google Imagen API generation successful!');
             } catch (error) {
                 console.warn('❌ Google Imagen API generation failed, using placeholder:', error.message);
                 console.log('🎭 Creating placeholder avatar...');
                 // Fall back to placeholder
                 avatarData = this.createPlaceholderAvatar(matchedCharacterName, description);
-                console.log('✅ Placeholder avatar created');
             }
 
             // Cache the result
-            console.log(`💾 Caching avatar for ${matchedCharacterName}`);
             this.generatedAvatars.set(matchedCharacterName, avatarData);
 
-            console.log(`🎉 Avatar generation completed for ${matchedCharacterName}`);
             return avatarData;
 
         } catch (error) {
@@ -93,14 +83,11 @@ class AvatarGenerator {
             return this.createErrorAvatar(matchedCharacterName);
         } finally {
             this.isGenerating = false;
-            console.log(`🔓 Avatar generation lock released for ${matchedCharacterName}`);
         }
     }
 
     async callGoogleImagenAPI(description, characterName, options = {}) {
-        console.log(`🎨 Calling Google Imagen API via Vercel endpoint: ${characterName}`);
         
-        console.log(`📡 Making request to: /api/generate-avatar`);
         
         // Prepare request body for Vercel API endpoint
         const requestBody = {
@@ -116,13 +103,6 @@ class AvatarGenerator {
             }
         };
         
-        console.log(`📊 Google API request data:`, {
-            characterName,
-            hasPersonalityScores: !!options.personalityScores && Object.keys(options.personalityScores).length > 0,
-            source: options.source,
-            hasUserText: !!options.userText,
-            hasAnalysisData: !!options.analysisData
-        });
         
         const response = await fetch('/api/generate-avatar', {
             method: 'POST',
@@ -132,7 +112,6 @@ class AvatarGenerator {
             body: JSON.stringify(requestBody)
         });
 
-        console.log(`📡 Google API response status: ${response.status}`);
 
         if (!response.ok) {
             let errorMessage;
@@ -147,18 +126,11 @@ class AvatarGenerator {
         }
 
         const data = await response.json();
-        console.log(`📊 Google API response data:`, { 
-            status: data.status, 
-            hasAvatar: !!data.avatar,
-            avatarSource: data.avatar?.source,
-            hasImageUrl: !!data.avatar?.imageUrl
-        });
         
         if (data.status !== 'success') {
             throw new Error(data.error || 'Google avatar generation failed');
         }
 
-        console.log(`✅ Google Imagen avatar generated for ${characterName}`);
         return data.avatar;
     }
 

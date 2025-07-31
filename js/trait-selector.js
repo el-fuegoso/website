@@ -726,14 +726,12 @@ class ElliotGenerator {
     }
 
     async generateElliot() {
-        console.log('🔧 generateElliot() called - starting trait-based generation');
         if (this.isGenerating) {
             console.log('⚠️ Generation already in progress, skipping');
             return;
         }
 
         this.isGenerating = true;
-        console.log('✅ Starting Elliot generation process');
         console.log('🔍 Checking if avatarGenerator is available:', !!window.avatarGenerator);
         this.showGeneratingState();
 
@@ -2052,7 +2050,6 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
     const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
     const fullUrl = `${HF_BACKEND_URL}/api/analyze`;
     
-    console.log('🚀 FLASK API CALL START');
     console.log('📡 URL:', fullUrl);
     console.log('📝 Request payload:', { text: text.substring(0, 100) + '...', mode, context });
     
@@ -2092,7 +2089,6 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         }
 
         const jsonResponse = await response.json();
-        console.log('✅ Flask API SUCCESS - Response:', jsonResponse);
         return jsonResponse;
         
     } catch (error) {
@@ -2172,14 +2168,12 @@ function updateAvatarCard(analysisResult) {
                 if (match) {
                     characterName = match[1];
                     characterDescription = match[2];
-                    console.log('✅ Extracted character:', { characterName, characterDescription });
                 } else {
                     console.log('⚠️ String format did not match expected pattern');
                 }
             } else if (analysisResult.avatar_data.title) {
                 characterName = analysisResult.avatar_data.title;
                 characterTitle = analysisResult.avatar_data.archetype?.description || characterTitle;
-                console.log('✅ Used object format:', { characterName, characterTitle });
             }
         } else {
             console.log('⚠️ No avatar_data found in analysis result');
@@ -2227,7 +2221,6 @@ function updateAvatarCard(analysisResult) {
             });
         }
         
-        console.log('✅ Avatar card updated successfully');
     } else {
         console.warn('⚠️ No avatar data found in analysis result');
     }
@@ -2412,7 +2405,6 @@ function initializeTerminalMode() {
                 terminalDebugger.debug('Calling processInput on TerminalIntelligence');
                 const result = await globalTerminalIntelligence.processInput(userInput);
                 
-                console.log('✅ STEP 2: TerminalIntelligence response received');
                 console.log('📊 Result action:', result.action);
                 console.log('📄 Result message:', result.message?.substring(0, 200) + '...');
                 console.log('🔍 Full result object:', result);
@@ -2485,7 +2477,6 @@ function initializeTerminalMode() {
                             { classification: result.classification }
                         );
                         
-                        console.log('✅ STEP 5: Flask API call completed successfully');
                         
                         removeTypingIndicator();
                         terminalDebugger.success('API Call Complete', {
@@ -2623,15 +2614,12 @@ function initializeTerminalMode() {
 }
 
 // Add basic console test to verify script is loading
-console.log('🚀 trait-selector.js script loaded and executing');
 
 // Initialize function
 function initializeTraitSelector() {
-    console.log('🔧 Initializing avatar generator system...');
     if (typeof window.AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
         try {
             window.avatarGenerator = new window.AvatarGenerator();
-            console.log('✅ Avatar generator initialized successfully');
         } catch (error) {
             console.error('❌ Failed to initialize avatar generator:', error);
         }
@@ -2644,21 +2632,17 @@ function initializeTraitSelector() {
     // Only initialize if trait selector elements exist
     if (document.querySelector('.trait-selector-container')) {
         window.elliotGenerator = new ElliotGenerator();
-        console.log('✅ ElliotGenerator initialized');
     }
     
     // Initialize terminal mode functionality
     initializeTerminalMode();
-    console.log('✅ Trait selector initialization complete');
 }
 
 // Initialize trait selector - DOM is already ready since script loads at bottom of HTML
 // But add both immediate execution and DOMContentLoaded fallback for safety
 if (document.readyState === 'loading') {
-    console.log('📅 DOM still loading, waiting for DOMContentLoaded...');
     document.addEventListener('DOMContentLoaded', initializeTraitSelector);
 } else {
-    console.log('📅 DOM already ready, initializing immediately...');
     initializeTraitSelector();
 }
 

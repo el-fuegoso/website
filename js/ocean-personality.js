@@ -4,7 +4,6 @@
  */
 
 // Debug: Verify script is loading
-console.log('🌊 ocean-personality.js script loaded');
 
 class OceanPersonalitySystem {
     constructor() {
@@ -590,14 +589,12 @@ class OceanPersonalitySystem {
     }
 
     async generateCharacter() {
-        console.log('🎯 GENERATE button clicked - starting character generation');
         if (this.isGenerating) {
             console.log('⚠️ Generation already in progress, skipping');
             return;
         }
         
         this.isGenerating = true;
-        console.log('🔄 Character generation started');
         const generateBtn = document.querySelector('.generate-btn');
         
         // Stop shuffling
@@ -705,11 +702,9 @@ class OceanPersonalitySystem {
         }
 
         // Generate avatar for the matched character
-        console.log('🎨 Starting avatar generation for matched character:', match.character.name);
         if (window.avatarGenerator) {
             try {
                 const avatarData = await window.avatarGenerator.generateAvatar(match.character.name);
-                console.log('✅ Avatar generated successfully:', avatarData);
                 
                 // Replace the portrait text with the actual avatar
                 if (imageContainer && avatarData) {

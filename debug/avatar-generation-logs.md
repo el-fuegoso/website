@@ -26,6 +26,49 @@ These logs were instrumental in:
 - Verifying prompt generation
 - Troubleshooting API call failures
 
+## Client-Side Console Logs (To Be Removed)
+
+From the console output you provided, here are the client-side debugging logs that need cleaning:
+
+### avatar-generator.js
+```javascript
+console.log('🔨 avatar-generator.js script loaded');
+console.log('Avatar generator initialized with Google Imagen API via Vercel endpoint');
+console.log('🎨 Starting avatar generation for: GRUMPYOLDMANEL');
+console.log('🔄 Starting fresh avatar generation for: GRUMPYOLDMANEL');
+console.log('📝 Using description: ...');
+console.log('🚀 Attempting Google Imagen API generation via Vercel endpoint...');
+console.log('🎨 Calling Google Imagen API via Vercel endpoint: GRUMPYOLDMANEL');
+console.log('📡 Making request to: /api/generate-avatar');
+console.log('📊 Google API request data: ...');
+console.log('📡 Google API response status: 200');
+console.log('📊 Google API response data: ...');
+console.log('✅ Google Imagen avatar generated for GRUMPYOLDMANEL'); 
+console.log('✅ Google Imagen API generation successful!');
+console.log('💾 Caching avatar for GRUMPYOLDMANEL');
+console.log('🎉 Avatar generation completed for GRUMPYOLDMANEL');
+console.log('🔓 Avatar generation lock released for GRUMPYOLDMANEL');
+```
+
+### ocean-personality.js
+```javascript
+console.log('🌊 ocean-personality.js script loaded');
+console.log('🎯 GENERATE button clicked - starting character generation');
+console.log('🔄 Character generation started');
+console.log('🎨 Starting avatar generation for matched character: GRUMPYOLDMANEL');
+console.log('✅ Avatar generated successfully: ...');
+```
+
+### trait-selector.js
+```javascript
+console.log('🚀 trait-selector.js script loaded and executing');
+console.log('📅 DOM still loading, waiting for DOMContentLoaded...');
+console.log('🔧 Initializing avatar generator system...');
+console.log('✅ Avatar generator initialized successfully');
+console.log('✅ Trait selector initialization complete');
+```
+
 ## Status
-✅ **Debugging Complete** - Avatar generation working successfully
-🗂️ **Logs Archived** - Removed from production console for cleaner output
+✅ **Server-Side Debugging Complete** - API generate-avatar.js cleaned
+🔄 **Client-Side Cleanup In Progress** - Removing console logs from JS files
+🗂️ **Logs Archived** - Preserved for future reference if needed

@@ -2038,6 +2038,53 @@ Conversation context: ${data.classification?.type || 'general discussion'}`;
             return total;
         }, 0);
     }
+
+    findBestCharacterMatchFromOCEAN(oceanScores) {
+        // Convert HF API OCEAN scores (1-5 scale) to character comparison format
+        const userScores = {
+            O: oceanScores.Openness || 0,
+            C: oceanScores.Conscientiousness || 0,
+            E: oceanScores.Extraversion || 0,
+            A: oceanScores.Agreeableness || 0,
+            N: oceanScores.Neuroticism || 0
+        };
+
+        console.log('🔍 User OCEAN scores for matching:', userScores);
+
+        // Get character database from elliotGenerator
+        const characters = window.elliotGenerator ? window.elliotGenerator.getCharacterData() : {};
+        let bestMatch = null;
+        let bestSimilarity = -1;
+
+        for (const [charName, charData] of Object.entries(characters)) {
+            // Calculate Euclidean distance between user and character OCEAN scores
+            const distance = Math.sqrt(
+                Math.pow(userScores.O - charData.O, 2) +
+                Math.pow(userScores.C - charData.C, 2) +
+                Math.pow(userScores.E - charData.E, 2) +
+                Math.pow(userScores.A - charData.A, 2) +
+                Math.pow(userScores.N - charData.N, 2)
+            );
+
+            // Convert distance to similarity (0-1 scale, where 1 is perfect match)
+            const maxDistance = Math.sqrt(5 * Math.pow(4, 2)); // Max possible distance
+            const similarity = 1 - (distance / maxDistance);
+
+            console.log(`📊 ${charName}: distance=${distance.toFixed(2)}, similarity=${similarity.toFixed(3)}`);
+
+            if (similarity > bestSimilarity) {
+                bestSimilarity = similarity;
+                bestMatch = {
+                    name: charName,
+                    data: charData,
+                    similarity: similarity
+                };
+            }
+        }
+
+        console.log('🎯 Best character match:', bestMatch);
+        return bestMatch;
+    }
     
     handleClarification(choice) {
         if (!this.awaitingClarification || !this.pendingAnalysis) {
@@ -2698,31 +2745,35 @@ function initializeTerminalMode() {
                             
                             console.log('🎯 STEP 7: Triggering full avatar generation...');
                             
-                            // Use the avatar generator to create a full avatar with image
-                            if (window.avatarGenerator && analysisResult.ocean_scores) {
-                                // Generate avatar using the same system as "Build Your Character"
-                                const avatarData = window.avatarGenerator.generateAvatar({
-                                    oceanScores: analysisResult.ocean_scores,
-                                    characterName: analysisResult.avatar_data?.character_name || 'Generated',
-                                    source: 'terminal_analysis'
-                                });
+                            // Find best character match based on OCEAN scores
+                            if (window.elliotGenerator && analysisResult.ocean_scores) {
+                                // Match user to existing character based on OCEAN similarity
+                                const matchedCharacter = this.findBestCharacterMatchFromOCEAN(analysisResult.ocean_scores);
                                 
-                                // Create elliotData for the showAvatarResults function
-                                const elliotData = {
-                                    analysisData: analysisResult,
-                                    ocean_scores: analysisResult.ocean_scores,
-                                    characterName: analysisResult.avatar_data?.character_name || avatarData.characterName,
-                                    title: analysisResult.avatar_data?.title || 'AI Character',
-                                    description: analysisResult.avatar_data?.description || 'Generated from conversation analysis',
-                                    avatarData: avatarData // This now has proper structure with imageUrl, etc.
-                                };
-                                
-                                // Trigger full avatar generation (image + card + radar charts)
-                                if (window.elliotGenerator) {
+                                if (matchedCharacter && window.avatarGenerator) {
+                                    // Generate avatar for the matched character
+                                    const avatarData = await window.avatarGenerator.generateAvatar(matchedCharacter.name);
+                                    
+                                    // Create elliotData using the matched character
+                                    const elliotData = {
+                                        analysisData: analysisResult,
+                                        ocean_scores: analysisResult.ocean_scores,
+                                        characterName: matchedCharacter.name,
+                                        title: matchedCharacter.data.title,
+                                        description: matchedCharacter.data.description,
+                                        avatarData: avatarData,
+                                        similarityScore: matchedCharacter.similarity
+                                    };
+                                    
+                                    // Trigger full avatar generation (image + card + radar charts)
                                     window.elliotGenerator.showAvatarResults(elliotData);
+                                    
+                                    const matchPercentage = Math.round(matchedCharacter.similarity * 100);
+                                    addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎯 Best match: "${matchedCharacter.name}" (${matchPercentage}% similarity)</span>`);
+                                    addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎨 Your avatar is ready!</span>`);
+                                } else {
+                                    addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">❌ Unable to find character match. Please try again.</span>`);
                                 }
-                                
-                                addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎨 Your personalized "${elliotData.characterName}" avatar is ready!</span>`);
                             }
                             
                             console.log('🎯 STEP 8: Character card and radar charts updated');

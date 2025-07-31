@@ -39,9 +39,9 @@ export default async function handler(req, res) {
             });
         }
 
-        // Build the prompt for Google Imagen with full body anime style
-        const baseStyleDescription = "A full body, bold, distinctive, and dynamic anime-inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard.";
-        const prompt = `${baseStyleDescription} Depicting ${description} with a transparent background.`;
+        // Build the prompt for Google Imagen with comic book style
+        const baseStyleDescription = "A bold, distinctive, and dynamic, comic book inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard.";
+        const prompt = `${baseStyleDescription} Depicting ${description} with a background that matches the style of the character.`;
 
         console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API via Gemini`);
         console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);

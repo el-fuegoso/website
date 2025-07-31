@@ -2122,10 +2122,13 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         
         const endTime = performance.now();
         console.log(`⏱️ HF API call took: ${Math.round(endTime - startTime)}ms`);
-        console.log('✅ HF API Response:', result);
+        console.log('✅ HF API Response raw:', result);
+        console.log('📊 HF API Response data:', result.data);
+        console.log('🔍 HF API Response data[0]:', result.data[0]);
+        console.log('🔍 HF API Response data[0] type:', typeof result.data[0]);
         
-        // Parse the JSON result from HF API
-        const oceanScores = JSON.parse(result.data[0]);
+        // Handle the response - it's already an object, not a JSON string
+        const oceanScores = result.data[0];
         console.log('🧠 OCEAN Scores:', oceanScores);
         
         // Transform HF response to match expected format

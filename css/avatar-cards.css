@@ -104,7 +104,7 @@
 }
 
 .image-container {
-    width: 60%;
+    width: 100%;
     height: 250px;
     overflow: hidden;
     background: #333;
@@ -133,11 +133,17 @@
     justify-content: center;
 }
 
+/* Radar Charts Section - New Position Above Sliders */
+.radar-charts-section {
+    padding: 12px 8px;
+}
+
 .header-radars {
-    width: 40%;
     display: flex;
-    flex-direction: column;
-    gap: 1px;
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
 }
 
 .header-radar-section {
@@ -146,22 +152,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8px;
-    border-bottom: 1px solid rgba(51, 51, 51, 0.2);
-    background: #f9f9f9;
-}
-
-.header-radar-section:last-child {
-    border-bottom: none;
+    padding: 12px;
 }
 
 .header-chart-title {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    margin: 0 0 4px 0;
-    color: var(--text-medium);
+    margin: 0 0 8px 0;
+    color: var(--text-dark);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-align: center;
 }
 
 .header-radar-chart {
@@ -260,42 +261,7 @@
     text-align: center;
 }
 
-.toggle-switch {
-    width: 14px;
-    height: 14px;
-    background: white;
-    border: 2px solid rgba(51, 51, 51, 0.3);
-    border-radius: 0;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.toggle-switch::after {
-    content: '✓';
-    font-size: 9px;
-    font-weight: bold;
-    color: white;
-    opacity: 0;
-    transition: all 0.2s ease;
-}
-
-.toggle-switch.active {
-    background: var(--amber);
-    border-color: var(--gold);
-}
-
-.toggle-switch.active::after {
-    opacity: 1;
-}
-
-.toggle-switch:hover {
-    border-color: var(--amber);
-    transform: scale(1.05);
-}
+/* Toggle switch styles removed - replaced with OCEAN sliders */
 
 .trait-grid {
     display: grid;

@@ -8,14 +8,13 @@
 class OceanPersonalitySystem {
     constructor() {
         this.userScores = {
-            openness: 0,
-            conscientiousness: 0,
-            extraversion: 0,
-            agreeableness: 0,
-            neuroticism: 0
+            openness: 0.5,
+            conscientiousness: 0.5,
+            extraversion: 0.5,
+            agreeableness: 0.5,
+            neuroticism: 0.5
         };
         
-        this.selectedTraits = new Set();
         this.isGenerating = false;
         this.helixAnimation = null;
         
@@ -211,37 +210,7 @@ class OceanPersonalitySystem {
         }
     }
 
-    // Trait to OCEAN mapping weights
-    getTraitWeights() {
-        return {
-            // Toggles (checkboxes)
-            'high-energy': { extraversion: 0.8, openness: 0.4 },
-            'intense-focus': { conscientiousness: 0.7, neuroticism: -0.3 },
-            'innovation': { openness: 0.9, conscientiousness: 0.3 },
-            'cooperative': { agreeableness: 0.8, extraversion: 0.4 },
-            'calm-pressure': { neuroticism: -0.8, conscientiousness: 0.5 },
-
-            // Grid traits (emojis)
-            'sword': { conscientiousness: 0.6, openness: 0.4 },
-            'link': { agreeableness: 0.7, extraversion: 0.5 },
-            'warning': { neuroticism: 0.6, conscientiousness: 0.4 },
-            'wrench': { conscientiousness: 0.8, openness: 0.6 },
-            'shield': { conscientiousness: 0.7, agreeableness: 0.3 },
-            'brush': { openness: 0.9, extraversion: 0.4 },
-            'magnify': { openness: 0.6, conscientiousness: 0.5 },
-            'fire': { extraversion: 0.8, openness: 0.7 },
-            'eyes': { neuroticism: 0.5, openness: 0.6 },
-            'cycle': { openness: 0.7, conscientiousness: 0.4 },
-            'pencil': { conscientiousness: 0.6, openness: 0.5 },
-            'crown': { extraversion: 0.8, conscientiousness: 0.6 },
-            'smile': { extraversion: 0.7, agreeableness: 0.8 },
-            'heart': { agreeableness: 0.9, extraversion: 0.5 },
-            'diamond': { openness: 0.6, conscientiousness: 0.7 },
-            'lightning': { extraversion: 0.8, openness: 0.6 },
-            'plant': { agreeableness: 0.6, openness: 0.5 },
-            'hammer': { conscientiousness: 0.8, extraversion: 0.4 }
-        };
-    }
+    // Trait weight mapping removed - using direct OCEAN slider values
 
     // Character database with OCEAN profiles
     getCharacterDatabase() {
@@ -349,21 +318,13 @@ class OceanPersonalitySystem {
     }
 
     setupTraitSelectors() {
-        // Setup toggle switches (checkboxes)
-        const toggles = document.querySelectorAll('.toggle-switch');
-        toggles.forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
+        // Setup OCEAN sliders
+        const sliders = document.querySelectorAll('.trait-slider');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
                 const traitName = e.target.getAttribute('data-trait');
-                this.toggleTrait(traitName, e.target);
-            });
-        });
-
-        // Setup trait grid buttons
-        const traitOptions = document.querySelectorAll('.trait-option');
-        traitOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
-                const traitName = e.target.getAttribute('data-trait');
-                this.toggleTrait(traitName, e.target);
+                const value = parseFloat(e.target.value);
+                this.updateTraitValue(traitName, value, e.target);
             });
         });
     }
@@ -380,184 +341,29 @@ class OceanPersonalitySystem {
         if (generateBtn) generateBtn.addEventListener('click', () => this.generateCharacter());
     }
 
-    toggleTrait(traitName, element) {
+    updateTraitValue(traitName, value, element) {
         if (!traitName) return;
 
-        if (this.selectedTraits.has(traitName)) {
-            this.selectedTraits.delete(traitName);
-            element.classList.remove('active', 'selected');
-        } else {
-            this.selectedTraits.add(traitName);
-            element.classList.add('active', 'selected');
+        // Update the user score directly
+        this.userScores[traitName] = value;
+        
+        // Update the display value
+        const valueDisplay = element.parentElement.querySelector('.trait-value');
+        if (valueDisplay) {
+            valueDisplay.textContent = value.toFixed(1);
         }
 
-        this.calculateOceanScores();
         this.updateDisplay();
     }
 
-    calculateOceanScores() {
-        // Reset scores
-        this.userScores = {
-            openness: 0,
-            conscientiousness: 0,
-            extraversion: 0,
-            agreeableness: 0,
-            neuroticism: 0
-        };
-
-        const weights = this.getTraitWeights();
-
-        // Calculate weighted scores
-        this.selectedTraits.forEach(trait => {
-            const traitWeights = weights[trait];
-            if (traitWeights) {
-                Object.keys(traitWeights).forEach(dimension => {
-                    this.userScores[dimension] += traitWeights[dimension];
-                });
-            }
-        });
-
-        // Normalize scores to 0-1 range
-        Object.keys(this.userScores).forEach(dimension => {
-            this.userScores[dimension] = Math.max(0, Math.min(1, this.userScores[dimension]));
-        });
-    }
-
     updateDisplay() {
-        // Update trait counter
-        const counter = document.getElementById('traitCounter');
-        const displayCounter = document.getElementById('displayTraitCounter');
-        
-        if (counter) counter.textContent = `${this.selectedTraits.size}/18`;
-        if (displayCounter) displayCounter.textContent = `${this.selectedTraits.size}/18`;
-        
-        // Update soundbars to be responsive to trait selection
-        this.updateSoundbars();
-        
         // Update radar charts
         this.updateRadarCharts();
     }
 
-    updateSoundbars() {
-        const soundbars = document.querySelectorAll('.soundbar');
-        
-        soundbars.forEach((bar) => {
-            const trait = bar.dataset.trait;
-            const harmony = bar.dataset.harmony;
-            if (!trait) return;
-            
-            // Check if this trait is selected
-            const isSelected = this.selectedTraits.has(trait);
-            
-            // Calculate height based on selection and relationships
-            let height = 8; // Base height - always start from bottom
-            const relatedTraits = this.getTraitResonance(trait);
-            const resonanceCount = relatedTraits.filter(t => this.selectedTraits.has(t)).length;
-            
-            if (isSelected) {
-                height = 45; // Primary trait height - no randomness
-                bar.classList.add('active');
-                this.applyTraitColor(bar, harmony, 'primary');
-                
-                // Trigger resonance effects
-                this.triggerResonance(trait);
-            } else if (resonanceCount > 0) {
-                height = 20 + (resonanceCount * 5); // Resonance height - clean calculation
-                bar.classList.add('resonance');
-                bar.classList.remove('active');
-                this.applyTraitColor(bar, harmony, 'resonance');
-            } else {
-                height = 8; // Base height - consistent
-                bar.classList.remove('active', 'resonance');
-                this.applyTraitColor(bar, harmony, 'neutral');
-            }
-            
-            // Apply height with smooth transition
-            bar.style.height = `${Math.min(height, 65)}px`;
-            bar.style.transition = 'all 0.3s ease';
-            
-            // Add click handler for interactive soundbars
-            if (!bar.hasClickHandler) {
-                bar.addEventListener('click', () => this.toggleTraitFromSoundbar(trait));
-                bar.style.cursor = 'pointer';
-                bar.hasClickHandler = true;
-            }
-        });
-    }
+    // Soundbar methods removed - simplified interface with OCEAN sliders only
 
-    getTraitResonance(trait) {
-        // Define trait relationship matrix for resonance effects
-        const resonanceMatrix = {
-            // Creative cluster
-            'brush': ['fire', 'lightning', 'diamond', 'cycle'],
-            'fire': ['brush', 'lightning', 'crown', 'hammer'],
-            'lightning': ['fire', 'brush', 'crown', 'wrench'],
-            
-            // Technical cluster  
-            'wrench': ['sword', 'hammer', 'pencil', 'lightning'],
-            'sword': ['wrench', 'magnify', 'eyes', 'shield'],
-            'hammer': ['wrench', 'fire', 'crown', 'plant'],
-            'pencil': ['wrench', 'sword', 'magnify', 'diamond'],
-            
-            // Social cluster
-            'heart': ['smile', 'link', 'plant', 'shield'],
-            'smile': ['heart', 'link', 'crown', 'fire'],
-            'link': ['heart', 'smile', 'cycle', 'plant'],
-            
-            // Leadership cluster
-            'crown': ['fire', 'lightning', 'smile', 'hammer'],
-            'shield': ['sword', 'heart', 'eyes', 'warning'],
-            
-            // Analytical cluster
-            'magnify': ['sword', 'eyes', 'pencil', 'cycle'],
-            'eyes': ['magnify', 'sword', 'warning', 'shield'],
-            'warning': ['eyes', 'shield', 'sword', 'cycle'],
-            
-            // Growth cluster
-            'plant': ['heart', 'link', 'hammer', 'cycle'],
-            'cycle': ['plant', 'brush', 'magnify', 'warning'],
-            'diamond': ['brush', 'pencil', 'crown', 'lightning']
-        };
-        
-        return resonanceMatrix[trait] || [];
-    }
-
-    applyTraitColor(bar, harmony, state) {
-        // Simple brand orange color system with subtle variations
-        const colors = {
-            primary: '#B8860B',    // Brand amber/gold
-            resonance: 'rgba(184, 134, 11, 0.6)',  // Lighter orange for resonance
-            neutral: '#ddd'        // Default neutral gray
-        };
-        
-        bar.style.backgroundColor = colors[state];
-    }
-
-    triggerResonance(clickedTrait) {
-        const relatedTraits = this.getTraitResonance(clickedTrait);
-        
-        relatedTraits.forEach((relatedTrait, index) => {
-            const relatedBar = document.querySelector(`.soundbar[data-trait="${relatedTrait}"]`);
-            if (relatedBar && !this.selectedTraits.has(relatedTrait)) {
-                // Simple, subtle pulse - no staggering
-                setTimeout(() => {
-                    relatedBar.classList.add('pulse');
-                    setTimeout(() => relatedBar.classList.remove('pulse'), 400);
-                }, index * 50); // Shorter delay
-            }
-        });
-    }
-
-    getRelatedTraits(dimension) {
-        const traitMappings = {
-            openness: ['innovation', 'brush', 'fire', 'lightning', 'cycle'],
-            conscientiousness: ['intense-focus', 'wrench', 'sword', 'hammer', 'pencil'],
-            extraversion: ['high-energy', 'crown', 'smile', 'fire', 'lightning'],
-            agreeableness: ['cooperative', 'heart', 'link', 'plant', 'smile'],
-            neuroticism: ['warning', 'eyes', 'shield']
-        };
-        return traitMappings[dimension] || [];
-    }
+    // Complex trait resonance methods removed - using direct OCEAN values now
 
     findBestCharacterMatch() {
         const characters = this.getCharacterDatabase();
@@ -631,34 +437,7 @@ class OceanPersonalitySystem {
         }
     }
 
-    toggleTraitFromSoundbar(trait) {
-        // Find the corresponding trait option in the emoji grid
-        const traitOption = document.querySelector(`.trait-option[data-trait="${trait}"]`);
-        if (traitOption) {
-            // Toggle the trait selection
-            const isSelected = this.selectedTraits.has(trait);
-            if (isSelected) {
-                this.selectedTraits.delete(trait);
-                traitOption.classList.remove('selected');
-            } else {
-                this.selectedTraits.add(trait);
-                traitOption.classList.add('selected');
-            }
-            
-            // Update personality scores and UI
-            this.calculatePersonalityScores();
-            this.updateTraitCounter();
-            this.updateSoundbars();
-            this.updateRadarCharts();
-            
-            // Add visual feedback for the clicked soundbar
-            const clickedBar = document.querySelector(`.soundbar[data-trait="${trait}"]`);
-            if (clickedBar) {
-                clickedBar.classList.add('pulse');
-                setTimeout(() => clickedBar.classList.remove('pulse'), 600);
-            }
-        }
-    }
+    // Soundbar interaction methods removed
 
     startWaterfallAnimation() {
         // Removed ASCII waterfall animation
@@ -818,42 +597,59 @@ class OceanPersonalitySystem {
     }
 
     randomizeTraits() {
-        this.resetTraits();
+        // Set random values for all OCEAN traits
+        const traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
         
-        const allTraits = Object.keys(this.getTraitWeights());
-        const numToSelect = Math.floor(Math.random() * 8) + 3; // 3-10 traits
+        traits.forEach(trait => {
+            const randomValue = Math.round(Math.random() * 10) / 10; // 0.0 to 1.0 in 0.1 increments
+            this.userScores[trait] = randomValue;
+            
+            // Update slider and display
+            const slider = document.querySelector(`.trait-slider[data-trait="${trait}"]`);
+            const valueDisplay = document.querySelector(`.trait-row:has(.trait-slider[data-trait="${trait}"]) .trait-value`);
+            
+            if (slider) slider.value = randomValue;
+            if (valueDisplay) valueDisplay.textContent = randomValue.toFixed(1);
+        });
         
-        for (let i = 0; i < numToSelect; i++) {
-            const randomTrait = allTraits[Math.floor(Math.random() * allTraits.length)];
-            if (!this.selectedTraits.has(randomTrait)) {
-                const element = document.querySelector(`[data-trait="${randomTrait}"]`);
-                if (element) {
-                    this.toggleTrait(randomTrait, element);
-                }
-            }
-        }
+        this.updateDisplay();
     }
 
     resetTraits() {
-        this.selectedTraits.clear();
+        // Reset all OCEAN traits to 0.5 (neutral)
+        const traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
         
-        // Remove all active classes
-        document.querySelectorAll('.toggle-switch, .trait-option').forEach(el => {
-            el.classList.remove('active', 'selected');
+        traits.forEach(trait => {
+            this.userScores[trait] = 0.5;
+            
+            // Update slider and display
+            const slider = document.querySelector(`.trait-slider[data-trait="${trait}"]`);
+            const valueDisplay = document.querySelector(`.trait-row:has(.trait-slider[data-trait="${trait}"]) .trait-value`);
+            
+            if (slider) slider.value = 0.5;
+            if (valueDisplay) valueDisplay.textContent = '0.5';
         });
         
-        this.calculateOceanScores();
         this.updateDisplay();
     }
 
     saveProfile() {
         const profile = {
-            selectedTraits: Array.from(this.selectedTraits),
             oceanScores: this.userScores,
             timestamp: new Date().toISOString()
         };
         
         localStorage.setItem('oceanProfile', JSON.stringify(profile));
+        
+        // Visual feedback
+        const saveBtn = document.querySelector('.save-btn');
+        if (saveBtn) {
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'SAVED!';
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+            }, 1500);
+        }
     }
 }
 

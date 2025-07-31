@@ -874,194 +874,151 @@
     flex-shrink: 0;
 }
 
-.soundbar-container {
+/* OCEAN Personality Sliders */
+.trait-slider-section {
+    margin-bottom: 20px;
+}
+
+.trait-sliders {
     display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1px;
-    height: 60px;
-    margin-bottom: 8px;
-    padding: 0 4px;
-    width: 100%;
+    flex-direction: column;
 }
 
-.soundbar {
-    flex: 1;
-    background: #ddd;
-    border-radius: 1px;
-    transition: all 0.3s ease;
-    height: 8px;
-    position: relative;
-    cursor: pointer;
-}
-
-.soundbar.active {
-    background: var(--amber);
-}
-
-.soundbar.resonance {
-    background: rgba(255, 165, 0, 0.6);
-}
-
-.soundbar.pulse {
-    animation: soundbar-pulse 0.4s ease-out;
-}
-
-.soundbar.generating {
-    animation: soundwave-intense 0.8s ease-in-out infinite;
-}
-
-.soundbar:hover {
-    background: var(--gold);
-    cursor: pointer;
-}
-
-.soundbar.active:hover {
-    background: var(--gold);
-}
-
-/* Enhanced tooltips for sound bars */
-.soundbar:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 10px;
-    white-space: nowrap;
-    z-index: 1000;
-    margin-bottom: 4px;
-    pointer-events: none;
-}
-
-/* Trait-specific bar heights for visual variety */
-.soundbar[data-trait="energy"] { --default-height: 25px; }
-.soundbar[data-trait="intensity"] { --default-height: 28px; }
-.soundbar[data-trait="innovation"] { --default-height: 32px; }
-.soundbar[data-trait="cooperative"] { --default-height: 24px; }
-.soundbar[data-trait="calm"] { --default-height: 20px; }
-.soundbar[data-trait="technical"] { --default-height: 22px; }
-.soundbar[data-trait="creativity"] { --default-height: 30px; }
-.soundbar[data-trait="leadership"] { --default-height: 26px; }
-.soundbar[data-trait="collaborative"] { --default-height: 24px; }
-.soundbar[data-trait="adventure"] { --default-height: 33px; }
-.soundbar[data-trait="empathetic"] { --default-height: 27px; }
-.soundbar[data-trait="discipline"] { --default-height: 27px; }
-.soundbar[data-trait="harmonious"] { --default-height: 25px; }
-.soundbar[data-trait="hustle"] { --default-height: 36px; }
-.soundbar[data-trait="speed"] { --default-height: 38px; }
-.soundbar[data-trait="experimental"] { --default-height: 23px; }
-.soundbar[data-trait="paranoia"] { --default-height: 21px; }
-.soundbar[data-trait="anxious"] { --default-height: 19px; }
-.soundbar[data-trait="supportive"] { --default-height: 26px; }
-
-@keyframes soundbar-pulse {
-    0% { 
-        background: #ddd;
-    }
-    50% { 
-        background: var(--amber);
-    }
-    100% { 
-        background: #ddd;
-    }
-}
-
-@keyframes soundwave-intense {
-    0%, 100% { 
-        height: 12px;
-        opacity: 0.8;
-        background: var(--gold);
-    }
-    50% { 
-        height: 45px;
-        opacity: 1;
-        background: var(--amber);
-    }
-}
-
-.soundbar-info {
+.trait-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 11px;
+    gap: 12px;
+    padding: 0 4px;
 }
 
-.trait-count {
-    color: var(--amber);
+.trait-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    font-size: 14px;
     font-weight: 600;
+    color: var(--text-dark);
 }
 
-.possibilities-label {
-    color: var(--gold);
+.trait-emoji {
+    font-size: 16px;
 }
 
-.trait-options {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 4px;
-    margin-bottom: 12px;
-    flex-shrink: 0;
-}
-
-.trait-option {
-    background: rgba(240, 238, 230, 0.9);
-    color: var(--green);
-    border-radius: 6px;
-    padding: 8px 4px;
-    text-align: center;
-    font-size: 12px;
-    font-weight: 500;
+.trait-slider {
+    flex: 1;
+    height: 2px;
+    background: #ddd;
+    outline: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 2px solid rgba(240, 238, 230, 0.3);
-    position: relative;
-    backdrop-filter: blur(2px);
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    accent-color: var(--green);
 }
 
-.trait-option:hover {
-    background: rgba(240, 238, 230, 1);
-    transform: scale(1.05);
-    border-color: var(--amber);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.trait-slider::-webkit-slider-track {
+    height: 2px;
+    background: #ddd;
+    border: none;
+    border-radius: 0;
 }
 
-.trait-option:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
-    padding: 4px 8px;
+.trait-slider::-webkit-slider-runnable-track {
+    height: 2px;
+    background: #ddd;
+    border: none;
+    border-radius: 0;
+}
+
+.trait-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--green);
+    border: 1px solid white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.trait-slider::-moz-range-track {
+    height: 2px;
+    background: #ddd;
+    border: none;
+}
+
+.trait-slider::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--green);
+    border: 1px solid white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.trait-slider:hover {
+    background: rgba(0, 66, 37, 0.1);
+}
+
+.trait-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.1);
+    background: #005f2e;
+}
+
+.trait-slider:hover::-moz-range-thumb {
+    transform: scale(1.1);
+    background: #005f2e;
+}
+
+.trait-slider:focus {
+    background: rgba(0, 66, 37, 0.15);
+}
+
+.trait-slider:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(0, 66, 37, 0.2);
+}
+
+.trait-slider:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 3px rgba(0, 66, 37, 0.2);
+}
+
+.trait-value {
+    min-width: 32px;
+    text-align: center;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-medium);
+    background: rgba(240, 238, 230, 0.8);
+    padding: 4px 6px;
     border-radius: 4px;
-    font-size: 10px;
-    white-space: nowrap;
-    z-index: 1000;
-    margin-bottom: 4px;
-}
-
-.trait-option.selected {
-    background: var(--amber);
-    color: white;
-    font-weight: 700;
-    border-color: var(--gold);
-    box-shadow: 0 2px 12px rgba(204, 122, 0, 0.3);
+    border: 1px solid rgba(204, 122, 0, 0.2);
 }
 
 /* Action Buttons Section */
 .action-buttons-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     margin: 16px 4px 12px 4px;
     flex-shrink: 0;
+}
+
+.top-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+}
+
+.action-btn.full-width {
+    width: 100%;
+    margin-top: 4px;
+    flex: 1;
 }
 
 .action-btn {

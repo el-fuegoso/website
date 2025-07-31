@@ -803,22 +803,10 @@ class ElliotGenerator {
                     }
                 });
             } else {
-                // Ultra fallback - just use TheBuilder
-                if (window.avatarGenerator) {
-                    const avatarData = await window.avatarGenerator.generateAvatar('TheBuilder');
-                    const builderData = this.getCharacterData()['TheBuilder'];
-                    this.displayElliotWithAvatar({
-                        name: 'TheBuilder',
-                        title: builderData.title,
-                        description: builderData.description,
-                        characterName: 'TheBuilder',
-                        avatarData: avatarData,
-                        analysisData: { matched_character: { similarity_score: 0.5 } }
-                    });
-                } else {
-                    const elliotData = await this.generateDemoElliot();
-                    this.displayElliot(elliotData);
-                }
+                // No fallback to TheBuilder - show proper error handling
+                console.error('❌ No personality analysis data available');
+                this.showError('Unable to analyze personality from current trait selection. Please select more traits or try the terminal interface.');
+                return;
             }
             
         } catch (error) {

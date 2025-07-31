@@ -61,7 +61,12 @@ class AvatarGenerator {
                 "PIRATEEL": "a swashbuckling pirate captain, dramatically commanding a grand sailing ship on stormy seas, with billowing sails and treasure chests, wielding a cutlass with confident authority, in an adventurous, nautical style"
             };
 
-            const description = characterDescriptions[matchedCharacterName] || characterDescriptions["TheBuilder"];
+            const description = characterDescriptions[matchedCharacterName];
+            
+            if (!description) {
+                console.error(`❌ No character description found for: ${matchedCharacterName}`);
+                throw new Error(`Character '${matchedCharacterName}' not found in character database`);
+            }
             
             let avatarData;
             
@@ -367,6 +372,24 @@ class AvatarGenerator {
     }
 
     getCharacterDataForChat(characterName) {
+        // Map all-caps shuffling names to proper character names
+        const nameMapping = {
+            'COFFEEADDICT': 'CoffeeAddictEl',
+            'CONSPIRACYEL': 'ConspiracyEl', 
+            'GYMBRO': 'GymBroEl',
+            'PIRATEEIL': 'PirateEl',
+            'PIRATEEL': 'PirateEl', // Handle both variants
+            'THEBUILDER': 'TheBuilder',
+            'THEDETECTIVE': 'TheDetective',
+            'GRUMPYOLDMANEL': 'GrumpyOldManEl',
+            'FREAKYEL': 'FreakyEl',
+            'AGIEL': 'AGIEl'
+        };
+        
+        // Map the character name to proper format
+        const mappedName = nameMapping[characterName] || characterName;
+        console.log(`🔄 DEBUG: Character name mapping: "${characterName}" → "${mappedName}"`);
+        
         // Character descriptions for chat context
         const characterData = {
             "TheBuilder": {
@@ -425,7 +448,22 @@ class AvatarGenerator {
             }
         };
 
-        return characterData[characterName] || characterData["TheBuilder"];
+        const character = characterData[mappedName];
+        
+        if (!character) {
+            console.error(`❌ No character data found for mapped name: ${mappedName} (original: ${characterName})`);
+            console.log('📋 Available characters:', Object.keys(characterData));
+            // Return a generic fallback instead of TheBuilder
+            return {
+                title: "Unknown Character",
+                description: `I'm ${characterName}, but my character data seems to be missing`,
+                personality: "mysterious, undefined",
+                expertise: "being enigmatic"
+            };
+        }
+        
+        console.log(`✅ DEBUG: Found character data for "${mappedName}":`, character.title);
+        return character;
     }
 
     // Server-side avatar generation - no client-side API key management needed

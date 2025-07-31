@@ -49,7 +49,7 @@ export default async function handler(req, res) {
             }],
             parameters: {
                 sampleCount: 1,
-                aspectRatio: "1:1",
+                aspectRatio: "4:3",
                 personGeneration: "allow_adult"
             }
         };

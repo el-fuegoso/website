@@ -114,6 +114,23 @@
     color: white;
     font-size: 14px;
     font-weight: 600;
+    position: relative;
+}
+
+/* Ensure images inside the container are properly sized */
+.image-container .generated-avatar {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.image-container .avatar-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-radars {

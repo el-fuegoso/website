@@ -43,10 +43,6 @@ export default async function handler(req, res) {
         const baseStyleDescription = "A bold, distinctive, and dynamic, comic book inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard. No text, letters, or words should appear anywhere in the image.";
         const prompt = `${baseStyleDescription} Depicting ${description} with a background that matches the style of the character.`;
 
-        console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API via Gemini`);
-        console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);
-        console.log(`🔑 API Key present: ${!!googleApiKey} (length: ${googleApiKey?.length || 0})`);
-
         const requestBody = {
             instances: [{
                 prompt: prompt
@@ -57,9 +53,6 @@ export default async function handler(req, res) {
                 personGeneration: "allow_adult"
             }
         };
-
-        console.log(`📤 Request body:`, JSON.stringify(requestBody, null, 2));
-        console.log(`📡 Making request to: https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-preview-06-06:predict`);
 
         // Call Google Imagen API via Gemini API endpoint
         const imageGenResponse = await fetch(
@@ -76,8 +69,7 @@ export default async function handler(req, res) {
 
         const responseText = await imageGenResponse.text();
         
-        console.log(`📡 Imagen API response status: ${imageGenResponse.status}`);
-        console.log(`📥 Full response body:`, responseText);
+        // Response received from Imagen API
         
         // Log response headers for additional debugging
         console.log(`📋 Response headers:`);

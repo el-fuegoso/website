@@ -104,8 +104,8 @@
 }
 
 .image-container {
-    width: 293px; /* Fixed width for 4:3 landscape aspect ratio */
-    height: 220px; /* Fixed height for 4:3 landscape (293/220 = 1.33) */
+    width: 350px; /* Fixed width for 16:9 cinematic aspect ratio */
+    height: 197px; /* Fixed height for 16:9 landscape (350/197 = 1.78) */
     max-width: 100%; /* Ensure it doesn't exceed card width on mobile */
     overflow: hidden;
     background: #333;

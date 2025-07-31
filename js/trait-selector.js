@@ -1076,9 +1076,21 @@ class ElliotGenerator {
         const generationPath = document.getElementById('generationPath');
         if (generationPath) generationPath.classList.add('active');
         
-        // Activate water ascii generating animation
-        const waterAscii = document.getElementById('avatarCard');
-        if (waterAscii) waterAscii.classList.add('generating');
+        // Hide avatar card content during generation, show only helix
+        const avatarCard = document.getElementById('avatarCard');
+        if (avatarCard) {
+            avatarCard.classList.add('generating');
+            // Hide specific card elements but keep image-container visible for helix
+            const cardHeader = avatarCard.querySelector('.avatar-card-header');
+            const headerRadars = avatarCard.querySelector('.header-radars');
+            const blueAccents = avatarCard.querySelectorAll('.blue-accent');
+            const hoverEffects = avatarCard.querySelectorAll('.hover-effect');
+            
+            if (cardHeader) cardHeader.style.display = 'none';
+            if (headerRadars) headerRadars.style.display = 'none';
+            blueAccents.forEach(accent => accent.style.display = 'none');
+            hoverEffects.forEach(effect => effect.style.display = 'none');
+        }
 
         // Update generate button
         const btn = document.getElementById('generateBtn');
@@ -1167,7 +1179,7 @@ class ElliotGenerator {
         if (generationPath) generationPath.style.display = 'none';
         if (avatarLabel) avatarLabel.style.display = 'none';
 
-        // Clear the water ASCII content and replace with avatar
+        // Clear content and replace with avatar display
         waterAsciiContainer.innerHTML = '';
         waterAsciiContainer.className = 'avatar-display-container';
 
@@ -1512,9 +1524,70 @@ class ElliotGenerator {
         if (generationPath) generationPath.style.display = 'block';
         if (avatarLabel) avatarLabel.style.display = 'block';
 
-        // Restore original water ASCII structure
-        waterAsciiContainer.className = 'water-ascii';
-        waterAsciiContainer.innerHTML = '<pre id="asciiContent"></pre>';
+        // Restore complete original structure
+        waterAsciiContainer.className = 'avatar-card';
+        waterAsciiContainer.innerHTML = `
+            <div class="blue-accent"></div>
+            <div class="hover-effect"></div>
+            <div class="blue-accent"></div>
+            <div class="hover-effect"></div>
+            
+            <!-- Avatar Card Header -->
+            <div class="avatar-card-header">
+                <div class="toggle-header">
+                    <span class="toggle-title">Digital Persona</span>
+                    <span class="trait-counter" id="displayTraitCounter">0/18</span>
+                </div>
+            </div>
+            
+            <div class="card-header">
+                <div class="image-container">
+                    <div>CONSPIRACYEL PORTRAIT</div>
+                </div>
+                
+                <div class="header-radars">
+                    <div class="header-radar-section">
+                        <h4 class="header-chart-title">YOUR PROFILE</h4>
+                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
+                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
+                                <line x1="60" y1="60" x2="60" y2="10" />
+                                <line x1="60" y1="60" x2="95" y2="35" />
+                                <line x1="60" y1="60" x2="85" y2="75" />
+                                <line x1="60" y1="60" x2="35" y2="75" />
+                                <line x1="60" y1="60" x2="25" y2="35" />
+                            </g>
+                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
+                                <text x="60" y="8">O</text>
+                                <text x="98" y="38">C</text>
+                                <text x="88" y="78">E</text>
+                                <text x="32" y="78">A</text>
+                                <text x="22" y="38">N</text>
+                            </g>
+                        </svg>
+                    </div>
+                    
+                    <div class="header-radar-section">
+                        <h4 class="header-chart-title">CHARACTER</h4>
+                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
+                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
+                                <line x1="60" y1="60" x2="60" y2="10" />
+                                <line x1="60" y1="60" x2="95" y2="35" />
+                                <line x1="60" y1="60" x2="85" y2="75" />
+                                <line x1="60" y1="60" x2="35" y2="75" />
+                                <line x1="60" y1="60" x2="25" y2="35" />
+                            </g>
+                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
+                                <text x="60" y="8">O</text>
+                                <text x="98" y="38">C</text>
+                                <text x="88" y="78">E</text>
+                                <text x="32" y="78">A</text>
+                                <text x="22" y="38">N</text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        `;
 
         // Restart the water animation
         if (this.waterAscii) {

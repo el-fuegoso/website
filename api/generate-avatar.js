@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         }
 
         // Build the prompt for Google Imagen with comic book style
-        const baseStyleDescription = "A bold, distinctive, and dynamic, comic book inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard.";
+        const baseStyleDescription = "A bold, distinctive, and dynamic, comic book inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard. No text, letters, or words should appear anywhere in the image.";
         const prompt = `${baseStyleDescription} Depicting ${description} with a background that matches the style of the character.`;
 
         console.log(`🎨 Generating avatar for ${characterName} with Google Imagen API via Gemini`);

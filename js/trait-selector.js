@@ -1956,37 +1956,84 @@ class TerminalIntelligence {
     }
     
     async callClaudeAPI(data) {
-        // Use HF backend for terminal API calls
-        const result = await callPersonalityAPI(data.message, 'conversation', {
-            character_name: 'TerminalAssistant',
-            terminal_context: {
-                classification: data.classification,
-                context: data.context,
-                conversation_history: data.conversationHistory
-            }
-        });
-        
-        if (result.status === 'success') {
-            // Determine action based on classification
-            let action = 'analyze';
-            if (data.classification.type === 'insufficient') {
-                action = 'request_more_info';
-            } else if (data.classification.type === 'ambiguous' && data.classification.confidence < 0.3) {
-                action = 'request_clarification';
-                this.pendingAnalysis = { text: data.message, classification: data.classification };
-                this.awaitingClarification = true;
-            }
+        try {
+            // Use existing Claude client for terminal conversations
+            const claudeClient = window.claudeClient || new ClaudeClient();
             
+            // Build terminal-specific system prompt
+            const terminalSystemPrompt = `You are a Terminal Assistant for personality analysis. You're helping users explore their personality through conversation.
+
+Your role:
+- Engage users in natural conversation
+- Ask thoughtful questions about their work, interests, and experiences  
+- Be curious and encouraging
+- Keep responses concise (1-2 sentences) for terminal format
+- Don't mention personality analysis explicitly - just have a natural conversation
+
+Conversation context: ${data.classification?.type || 'general discussion'}`;
+
+            // Prepare conversation messages
+            const messages = [];
+            
+            // Add recent conversation history (last 6 messages to stay within context limits)
+            const recentHistory = (data.conversationHistory || []).slice(-6);
+            recentHistory.forEach(msg => {
+                messages.push({
+                    role: msg.type === 'user' ? 'user' : 'assistant',
+                    content: msg.content
+                });
+            });
+            
+            // Add current message
+            messages.push({
+                role: 'user',
+                content: data.message
+            });
+
+            // Call Claude API
+            const response = await fetch('/api/claude', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: messages,
+                    system: terminalSystemPrompt,
+                    max_tokens: 150 // Keep responses concise for terminal
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Claude API HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            const claudeMessage = result.content?.[0]?.text || result.message || 'I understand. Tell me more.';
+
+            // Check if we should trigger personality analysis
+            const conversationLength = (data.conversationHistory || []).length;
+            const shouldAnalyze = conversationLength >= 8 || this.getTotalWordCount(data.conversationHistory) > 200;
+
             return {
-                action: action,
-                message: result.response?.message || result.response || 'Analysis complete',
+                action: shouldAnalyze ? 'analyze' : 'chat',
+                message: claudeMessage,
                 classification: data.classification,
                 context: data.context,
-                text: data.message
+                text: data.message,
+                shouldAnalyze: shouldAnalyze
             };
-        } else {
-            throw new Error(result.error || 'Claude API call failed');
+
+        } catch (error) {
+            console.error('Claude API Error:', error);
+            throw new Error(`Claude API call failed: ${error.message}`);
         }
+    }
+
+    getTotalWordCount(conversationHistory) {
+        if (!conversationHistory) return 0;
+        return conversationHistory.reduce((total, msg) => {
+            return total + (msg.content?.split(' ').length || 0);
+        }, 0);
     }
     
     handleClarification(choice) {
@@ -2533,6 +2580,19 @@ function initializeTerminalMode() {
                 });
                 
                 switch (result.action) {
+                case 'chat':
+                    // Handle Claude conversation responses
+                    terminalDebugger.debug('Action: Chat', { message: result.message });
+                    addTerminalLine(result.message);
+                    
+                    // Show analysis trigger hint if getting close
+                    if (result.shouldAnalyze) {
+                        setTimeout(() => {
+                            addTerminalLine('💡 I think I have enough information to analyze your personality. Continuing conversation to gather final insights...');
+                        }, 1000);
+                    }
+                    break;
+                    
                 case 'request_more_info':
                     terminalDebugger.debug('Action: Request More Info', { message: result.message });
                     addTerminalLine(result.message);
@@ -2565,63 +2625,83 @@ function initializeTerminalMode() {
                     break;
                     
                 case 'analyze':
-                    console.log('🎯 STEP 3: Action is ANALYZE - calling Flask backend');
-                    console.log('📝 Text to analyze:', result.text?.substring(0, 100) + '...');
-                    console.log('⚙️ Analysis mode:', result.context?.mode);
-                    console.log('🏷️ Classification:', result.classification);
+                    console.log('🎯 STEP 3: Action is ANALYZE - aggregating conversation for HF API');
+                    
+                    // Aggregate entire conversation history for personality analysis
+                    const conversationText = globalTerminalIntelligence.conversationHistory
+                        .map(msg => `${msg.type === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+                        .join('\n\n');
+                    
+                    console.log('📝 Conversation text to analyze:', conversationText.substring(0, 200) + '...');
+                    console.log('📊 Total conversation length:', conversationText.length);
                     
                     terminalDebugger.debug('Action: Analyze', {
-                        text: result.text,
-                        mode: result.context.mode,
-                        classification: result.classification
+                        conversationLength: conversationText.length,
+                        messageCount: globalTerminalIntelligence.conversationHistory.length
                     });
                     
                     // Show analysis message
-                    addTerminalLine(result.context.instruction);
+                    addTerminalLine('🧠 Analyzing your conversation for personality insights...');
                     showTypingIndicator();
                     
                     try {
-                        console.log('🎯 STEP 4: Starting Flask API call...');
-                        terminalDebugger.debug('Calling Personality API', {
-                            text: result.text.substring(0, 100) + '...',
-                            mode: result.context.mode
+                        console.log('🎯 STEP 4: Starting HF API call for personality analysis...');
+                        terminalDebugger.debug('Calling HF Personality API', {
+                            textLength: conversationText.length
                         });
                         
-                        // Call Python backend
+                        // Call HF API for personality analysis
                         const analysisResult = await callPersonalityAPI(
-                            result.text, 
-                            result.context.mode, 
-                            { classification: result.classification }
+                            conversationText, 
+                            'conversation', 
+                            { 
+                                source: 'terminal_conversation',
+                                messageCount: globalTerminalIntelligence.conversationHistory.length
+                            }
                         );
                         
                         
                         removeTypingIndicator();
-                        terminalDebugger.success('API Call Complete', {
-                            status: analysisResult.status,
-                            hasData: !!analysisResult.data
+                        terminalDebugger.success('HF API Call Complete', {
+                            hasOceanScores: !!analysisResult.ocean_scores,
+                            hasAvatarData: !!analysisResult.avatar_data
                         });
                         
-                        // Process successful analysis
-                        if (analysisResult.status === 'success') {
-                            console.log('🎯 STEP 6: Processing successful Flask response');
-                            console.log('🎉 Flask analysis successful! Result:', analysisResult);
-                            addTerminalLine('✅ Analysis complete! Your personalized avatar has been generated.');
+                        // Process successful HF analysis
+                        if (analysisResult.success) {
+                            console.log('🎯 STEP 6: Processing successful HF API response');
+                            console.log('🎉 HF analysis successful! Result:', analysisResult);
+                            addTerminalLine('✅ Personality analysis complete! Your personalized avatar has been generated.');
                             
-                            console.log('🎯 STEP 7: Updating character card...');
+                            console.log('🎯 STEP 7: Updating character card and radar charts...');
                             // Update avatar card with results
                             updateAvatarCard(analysisResult);
                             
-                            console.log('🎯 STEP 8: Character card update completed');
-                            terminalDebugger.success('Avatar Card Updated', {
+                            // Update radar charts with OCEAN scores
+                            if (window.elliotGenerator && analysisResult.ocean_scores) {
+                                const elliotData = {
+                                    analysisData: analysisResult,
+                                    ocean_scores: analysisResult.ocean_scores,
+                                    characterName: analysisResult.avatar_data?.character_name || 'Generated'
+                                };
+                                window.elliotGenerator.updateRadarCharts(elliotData);
+                            }
+                            
+                            console.log('🎯 STEP 8: Character card and radar charts updated');
+                            terminalDebugger.success('Avatar & Charts Updated', {
+                                hasOceanScores: !!analysisResult.ocean_scores,
                                 hasAvatarData: !!analysisResult.avatar_data,
-                                hasExplanation: !!analysisResult.explanation,
-                                hasPersonalityScores: !!analysisResult.personality_scores
+                                hasExplanation: !!analysisResult.explanation
                             });
                             
                             // Add response to conversation history
-                            globalTerminalIntelligence.addAssistantResponse('Analysis completed successfully');
+                            globalTerminalIntelligence.conversationHistory.push({
+                                type: 'assistant',
+                                content: 'Analysis completed successfully - your personality profile and avatar are ready!',
+                                timestamp: Date.now()
+                            });
                         } else {
-                            addTerminalLine('Analysis failed: ' + (analysisResult.error || 'Unknown error'));
+                            addTerminalLine('❌ Analysis failed: ' + (analysisResult.error || 'Unknown error'));
                         }
                         
                     } catch (error) {

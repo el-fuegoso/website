@@ -1078,7 +1078,16 @@ class ElliotGenerator {
         const avatarCard = document.getElementById('avatarCard');
         if (avatarCard) {
             avatarCard.classList.add('generating');
-            // Hide specific card elements but keep image-container visible for helix
+            
+            // Store original image container content for restoration
+            const imageContainer = avatarCard.querySelector('.image-container');
+            if (imageContainer && !imageContainer.dataset.originalContent) {
+                imageContainer.dataset.originalContent = imageContainer.innerHTML;
+                // Clear placeholder text to show only helix animation
+                imageContainer.innerHTML = '';
+            }
+            
+            // Hide other card elements
             const cardHeader = avatarCard.querySelector('.avatar-card-header');
             const headerRadars = avatarCard.querySelector('.header-radars');
             const blueAccents = avatarCard.querySelectorAll('.blue-accent');
@@ -1109,9 +1118,29 @@ class ElliotGenerator {
         const generationPath = document.getElementById('generationPath');
         if (generationPath) generationPath.classList.remove('active');
         
-        // Remove water ascii generating state
-        const waterAscii = document.getElementById('avatarCard');
-        if (waterAscii) waterAscii.classList.remove('generating');
+        // Remove water ascii generating state and restore image container
+        const avatarCard = document.getElementById('avatarCard');
+        if (avatarCard) {
+            avatarCard.classList.remove('generating');
+            
+            // Restore image container content if it was stored
+            const imageContainer = avatarCard.querySelector('.image-container');
+            if (imageContainer && imageContainer.dataset.originalContent) {
+                imageContainer.innerHTML = imageContainer.dataset.originalContent;
+                delete imageContainer.dataset.originalContent;
+            }
+            
+            // Show hidden elements
+            const cardHeader = avatarCard.querySelector('.avatar-card-header');
+            const headerRadars = avatarCard.querySelector('.header-radars');
+            const blueAccents = avatarCard.querySelectorAll('.blue-accent');
+            const hoverEffects = avatarCard.querySelectorAll('.hover-effect');
+            
+            if (cardHeader) cardHeader.style.display = 'block';
+            if (headerRadars) headerRadars.style.display = 'flex';
+            blueAccents.forEach(accent => accent.style.display = 'block');
+            hoverEffects.forEach(effect => effect.style.display = 'block');
+        }
         
         // Reset generate button
         const btn = document.getElementById('generateBtn');

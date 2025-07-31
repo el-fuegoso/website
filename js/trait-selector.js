@@ -2031,7 +2031,11 @@ Conversation context: ${data.classification?.type || 'general discussion'}`;
     getTotalWordCount(conversationHistory) {
         if (!conversationHistory) return 0;
         return conversationHistory.reduce((total, msg) => {
-            return total + (msg.content?.split(' ').length || 0);
+            // Only count user messages, not assistant responses
+            if (msg.type === 'user') {
+                return total + (msg.content?.split(' ').length || 0);
+            }
+            return total;
         }, 0);
     }
     
@@ -2681,20 +2685,44 @@ function initializeTerminalMode() {
                         if (analysisResult.success) {
                             console.log('🎯 STEP 6: Processing successful HF API response');
                             console.log('🎉 HF analysis successful! Result:', analysisResult);
-                            addTerminalLine('✅ Personality analysis complete! Your personalized avatar has been generated.');
                             
-                            console.log('🎯 STEP 7: Updating character card and radar charts...');
-                            // Update avatar card with results
-                            updateAvatarCard(analysisResult);
+                            // Display OCEAN scores in terminal
+                            if (analysisResult.ocean_scores) {
+                                const scoresText = Object.entries(analysisResult.ocean_scores)
+                                    .map(([trait, score]) => `${trait}: ${score.toFixed(1)}`)
+                                    .join(', ');
+                                addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">Your personality scores: ${scoresText}</span>`);
+                            }
                             
-                            // Update radar charts with OCEAN scores
-                            if (window.elliotGenerator && analysisResult.ocean_scores) {
+                            addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">✅ Analysis complete! Generating your personalized avatar...</span>`);
+                            
+                            console.log('🎯 STEP 7: Triggering full avatar generation...');
+                            
+                            // Use the avatar generator to create a full avatar with image
+                            if (window.avatarGenerator && analysisResult.ocean_scores) {
+                                // Generate avatar using the same system as "Build Your Character"
+                                const avatarData = window.avatarGenerator.generateAvatar({
+                                    oceanScores: analysisResult.ocean_scores,
+                                    characterName: analysisResult.avatar_data?.character_name || 'Generated',
+                                    source: 'terminal_analysis'
+                                });
+                                
+                                // Create elliotData for the showAvatarResults function
                                 const elliotData = {
                                     analysisData: analysisResult,
                                     ocean_scores: analysisResult.ocean_scores,
-                                    characterName: analysisResult.avatar_data?.character_name || 'Generated'
+                                    characterName: analysisResult.avatar_data?.character_name || avatarData.characterName,
+                                    title: analysisResult.avatar_data?.title || 'AI Character',
+                                    description: analysisResult.avatar_data?.description || 'Generated from conversation analysis',
+                                    avatarData: avatarData // This now has proper structure with imageUrl, etc.
                                 };
-                                window.elliotGenerator.updateRadarCharts(elliotData);
+                                
+                                // Trigger full avatar generation (image + card + radar charts)
+                                if (window.elliotGenerator) {
+                                    window.elliotGenerator.showAvatarResults(elliotData);
+                                }
+                                
+                                addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎨 Your personalized "${elliotData.characterName}" avatar is ready!</span>`);
                             }
                             
                             console.log('🎯 STEP 8: Character card and radar charts updated');

@@ -1414,28 +1414,50 @@ class ElliotGenerator {
     }
 
     updateRadarCharts(elliotData) {
-        // Get user's Big Five scores
-        const selectedTraitsObj = {};
-        Array.from(this.selectedTraits).forEach(trait => {
-            selectedTraitsObj[trait] = true;
-        });
-        const userBigFive = this.mapUITraitsToBigFive(selectedTraitsObj);
+        // Check if we have OCEAN scores from HF API
+        const oceanScores = elliotData.analysisData?.ocean_scores || elliotData.ocean_scores;
         
-        // Get character's Big Five scores (convert from 1-5 to 0-1 scale)
-        const characterData = elliotData.analysisData?.matched_character?.data || this.getCharacterData()[elliotData.characterName];
-        const characterBigFive = characterData ? {
-            "Openness": (characterData.O - 1) / 4,
-            "Conscientiousness": (characterData.C - 1) / 4,
-            "Extraversion": (characterData.E - 1) / 4,
-            "Agreeableness": (characterData.A - 1) / 4,
-            "Neuroticism": (characterData.N - 1) / 4
-        } : null;
+        if (oceanScores) {
+            // Convert HF API OCEAN scores (1-5 scale) to radar chart format (0-1 scale)
+            const userBigFive = {
+                "Openness": (oceanScores.Openness - 1) / 4,
+                "Conscientiousness": (oceanScores.Conscientiousness - 1) / 4,
+                "Extraversion": (oceanScores.Extraversion - 1) / 4,
+                "Agreeableness": (oceanScores.Agreeableness - 1) / 4,
+                "Neuroticism": (oceanScores.Neuroticism - 1) / 4
+            };
+            
+            // Use the same scores for character chart (since they're generated from user analysis)
+            const characterBigFive = { ...userBigFive };
+            
+            // Update both radar charts
+            this.drawRadarChart('userRadarChart', userBigFive, '#004225');
+            this.drawRadarChart('characterRadarChart', characterBigFive, '#CC7A00');
+            
+            console.log('📊 Updated radar charts with OCEAN scores:', oceanScores);
+        } else {
+            // Fallback to old trait mapping system if no OCEAN scores
+            const selectedTraitsObj = {};
+            Array.from(this.selectedTraits).forEach(trait => {
+                selectedTraitsObj[trait] = true;
+            });
+            const userBigFive = this.mapUITraitsToBigFive(selectedTraitsObj);
+            
+            // Get character's Big Five scores (convert from 1-5 to 0-1 scale)
+            const characterData = elliotData.analysisData?.matched_character?.data || this.getCharacterData()[elliotData.characterName];
+            const characterBigFive = characterData ? {
+                "Openness": (characterData.O - 1) / 4,
+                "Conscientiousness": (characterData.C - 1) / 4,
+                "Extraversion": (characterData.E - 1) / 4,
+                "Agreeableness": (characterData.A - 1) / 4,
+                "Neuroticism": (characterData.N - 1) / 4
+            } : null;
 
-        if (!characterBigFive) return;
-
-        // Update both radar charts
-        this.drawRadarChart('userRadarChart', userBigFive, '#004225');
-        this.drawRadarChart('characterRadarChart', characterBigFive, '#CC7A00');
+            if (characterBigFive) {
+                this.drawRadarChart('userRadarChart', userBigFive, '#004225');
+                this.drawRadarChart('characterRadarChart', characterBigFive, '#CC7A00');
+            }
+        }
         
         // Activate the charts container
         const radarContainer = document.getElementById('radarChartsContainer');
@@ -2082,67 +2104,115 @@ function runTerminalAnimation() {
     runLoadingSequence();
 }
 
-// Python Backend Integration
+// Hugging Face API Integration - Direct Client Calls
 async function callPersonalityAPI(text, mode = 'general', context = {}) {
-    const HF_BACKEND_URL = window.HF_BACKEND_URL || 'http://localhost:5002';
-    const fullUrl = `${HF_BACKEND_URL}/api/analyze`;
-    
-    console.log('📡 URL:', fullUrl);
+    console.log('🤗 Calling Hugging Face API directly');
     console.log('📝 Request payload:', { text: text.substring(0, 100) + '...', mode, context });
-    
-    const requestBody = {
-        text: text,
-        mode: mode,
-        context: context
-    };
     
     try {
         const startTime = performance.now();
         
-        const response = await fetch(fullUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
+        // Connect to the HF Space
+        const client = await window.GradioClient.connect("jrjrhan/personality_classification_OCEAN_en");
+        
+        // Call the prediction endpoint
+        const result = await client.predict("/predict", {
+            inputs: text
         });
         
         const endTime = performance.now();
-        console.log(`⏱️ API call took: ${Math.round(endTime - startTime)}ms`);
-        console.log(`📊 Response status: ${response.status}`);
-        console.log(`📊 Response headers:`, Object.fromEntries(response.headers.entries()));
-
-        if (!response.ok) {
-            // Get the error response body for debugging
-            let errorBody = '';
-            try {
-                errorBody = await response.text();
-                console.error('❌ Error response body:', errorBody);
-            } catch (e) {
-                console.error('❌ Could not read error response body');
-            }
-            
-            throw new Error(`Flask API HTTP ${response.status}: ${response.statusText}${errorBody ? ' - ' + errorBody : ''}`);
-        }
-
-        const jsonResponse = await response.json();
-        return jsonResponse;
+        console.log(`⏱️ HF API call took: ${Math.round(endTime - startTime)}ms`);
+        console.log('✅ HF API Response:', result);
+        
+        // Parse the JSON result from HF API
+        const oceanScores = JSON.parse(result.data[0]);
+        console.log('🧠 OCEAN Scores:', oceanScores);
+        
+        // Transform HF response to match expected format
+        const transformedResult = {
+            ocean_scores: oceanScores,
+            avatar_data: generateAvatarFromScores(oceanScores),
+            explanation: generateExplanationFromScores(oceanScores),
+            mode: mode,
+            context: context,
+            success: true
+        };
+        
+        console.log('🔄 Transformed result:', transformedResult);
+        return transformedResult;
         
     } catch (error) {
-        console.error('🔥 FLASK API CALL FAILED:');
-        console.error('🔗 URL:', fullUrl);
-        console.error('📤 Request:', requestBody);
-        console.error('💥 Error:', error);
-        
-        // Enhanced error message based on error type
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error(`Network error - Cannot reach Flask backend at ${fullUrl}. Check if Hugging Face Space is running.`);
-        } else if (error.message.includes('HTTP')) {
-            throw error; // Already has good HTTP error info
-        } else {
-            throw new Error(`Flask API error: ${error.message}`);
+        console.error('💥 HF API call failed:', error);
+        throw new Error(`Hugging Face API error: ${error.message}`);
+    }
+}
+
+// Generate avatar data from OCEAN scores
+function generateAvatarFromScores(oceanScores) {
+    // Find the dominant trait
+    let dominantTrait = null;
+    let maxScore = 0;
+    
+    for (const [trait, score] of Object.entries(oceanScores)) {
+        if (score > maxScore) {
+            maxScore = score;
+            dominantTrait = trait;
         }
     }
+    
+    // Character mapping based on dominant OCEAN trait
+    const characterMap = {
+        'Openness': {
+            character: 'TheVisionary',
+            title: 'Creative Innovator',
+            description: 'Driven by curiosity and imagination, always exploring new possibilities.'
+        },
+        'Conscientiousness': {
+            character: 'TheBuilder',
+            title: 'Systematic Achiever', 
+            description: 'Organized and goal-oriented, turning ideas into reality through discipline.'
+        },
+        'Extraversion': {
+            character: 'TheConnector',
+            title: 'Social Catalyst',
+            description: 'Energized by interaction, building bridges between people and ideas.'
+        },
+        'Agreeableness': {
+            character: 'TheHelper',
+            title: 'Collaborative Spirit',
+            description: 'Focused on harmony and cooperation, bringing out the best in others.'
+        },
+        'Neuroticism': {
+            character: 'TheAnalyst',
+            title: 'Thoughtful Observer',
+            description: 'Highly aware and sensitive, providing deep insights and careful analysis.'
+        }
+    };
+    
+    const selectedCharacter = characterMap[dominantTrait] || characterMap['Openness'];
+    
+    return {
+        character_name: selectedCharacter.character,
+        title: selectedCharacter.title,
+        description: selectedCharacter.description,
+        ocean_scores: oceanScores,
+        dominant_trait: dominantTrait
+    };
+}
+
+// Generate explanation from OCEAN scores
+function generateExplanationFromScores(oceanScores) {
+    const traits = [];
+    
+    for (const [trait, score] of Object.entries(oceanScores)) {
+        let level = 'moderate';
+        if (score >= 4.0) level = 'high';
+        else if (score <= 2.5) level = 'low';
+        
+        traits.push(`${trait}: ${level} (${score.toFixed(1)})`);
+    }
+    
+    return `Personality analysis complete. Key traits: ${traits.join(', ')}. This profile suggests a unique blend of characteristics that shape your approach to problem-solving and interaction.`;
 }
 
 // Terminal Display Functions

@@ -4,6 +4,8 @@
  */
 
 // Debug: Verify script is loading
+import { getAvatarPrompt } from '../avatar-prompts.js';
+
 class AvatarGenerator {
     constructor() {
         this.isGenerating = false;
@@ -38,34 +40,11 @@ class AvatarGenerator {
         this.isGenerating = true;
 
         try {
-            const characterDescriptions = {
-                "TheBuilder": "a digital MacGyver building things with engineering precision, surrounded by code and power tools, actively constructing a complex, glowing structure, in a vibrant, slightly chaotic style",
-                "TheDetective": "a digital Sherlock Holmes, intensely investigating lines of code, surrounded by holographic error logs and intricate bug tracking elements, in a mysterious, analytical style",
-                "GrumpyOldManEl": "a weathered tech veteran with battle-scarred hands and steely gray eyes, dramatically silhouetted against walls of vintage monitors and retro computing hardware, defiantly wielding ancient keyboards like legendary weapons, surrounded by crackling CRT screens and tangled cables in a cyberpunk fortress of obsolete glory, in a gritty, noir comic book style with dramatic shadows and electric lighting",
-                "PirateEl": "a swashbuckling pirate captain, dramatically commanding a grand sailing ship on stormy seas, with billowing sails and treasure chests, wielding a cutlass with confident authority, in an adventurous, nautical style",
-                "GymBroEl": "a heroically muscular titan with glowing energy radiating from every fiber, dramatically lifting impossibly massive weights in a high-tech training facility, muscles rippling with superhuman power as electricity crackles around iron barbells, surrounded by holographic workout data and pulsing neon lights, posed in a dynamic action shot with dramatic upward lighting, in a bold, superhero comic book style with vibrant colors and epic proportions",
-                "FreakyEl": "a boundary-pushing, intensely experimental beta tester, exploring the most bizarre and extreme edges of technology, wearing a stylish leather jacket with chains and spikes, with unconventional and unsettling testing approaches, in a truly bizarre, surreal, and unsettling BDSM-inspired style, pushing limits",
-                "CoffeeAddictEl": "a hyperkinetic coding savant with lightning-fast fingers dancing across multiple glowing keyboards, surrounded by a whirlwind of floating coffee cups and swirling steam tornados, eyes blazing with caffeinated intensity as digital code streams flow like liquid energy around their workspace, crackling with electric coffee-powered aura in a high-tech command center, captured mid-motion in a dynamic, kinetic comic book style with speed lines and energy effects",
-                "ConspiracyEl": "a paranoid problem investigator, surrounded by red string boards and suspicious connections in code, whispering theories about hidden connections and systemic issues, in a mysterious, analytical style with a watchful gaze",
-                "AGIEl": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style",
-                // Keep compatibility with existing character names
-                "THEBUILDER": "a digital MacGyver building things with engineering precision, surrounded by code and power tools, actively constructing a complex, glowing structure, in a vibrant, slightly chaotic style",
-                "THEDETECTIVE": "a digital Sherlock Holmes, intensely investigating lines of code, surrounded by holographic error logs and intricate bug tracking elements, in a mysterious, analytical style",
-                "GYMBRO": "a heroically muscular titan with glowing energy radiating from every fiber, dramatically lifting impossibly massive weights in a high-tech training facility, muscles rippling with superhuman power as electricity crackles around iron barbells, surrounded by holographic workout data and pulsing neon lights, posed in a dynamic action shot with dramatic upward lighting, in a bold, superhero comic book style with vibrant colors and epic proportions",
-                "PIRATEEIL": "a swashbuckling pirate captain, dramatically commanding a grand sailing ship on stormy seas, with billowing sails and treasure chests, wielding a cutlass with confident authority, in an adventurous, nautical style",
-                "COFFEEADDICT": "a hyperkinetic coding savant with lightning-fast fingers dancing across multiple glowing keyboards, surrounded by a whirlwind of floating coffee cups and swirling steam tornados, eyes blazing with caffeinated intensity as digital code streams flow like liquid energy around their workspace, crackling with electric coffee-powered aura in a high-tech command center, captured mid-motion in a dynamic, kinetic comic book style with speed lines and energy effects",
-                "CONSPIRACYEL": "a paranoid problem investigator, surrounded by red string boards and suspicious connections in code, whispering theories about hidden connections and systemic issues, in a mysterious, analytical style with a watchful gaze",
-                "FREAKYEL": "a boundary-pushing, intensely experimental beta tester, exploring the most bizarre and extreme edges of technology, wearing a stylish leather jacket with chains and spikes, with unconventional and unsettling testing approaches, in a truly bizarre, surreal, and unsettling BDSM-inspired style, pushing limits",
-                "AGIEL": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style",
-                // Missing all-caps variants that were causing fallback to TheBuilder
-                "GRUMPYOLDMANEL": "a weathered tech veteran with battle-scarred hands and steely gray eyes, dramatically silhouetted against walls of vintage monitors and retro computing hardware, defiantly wielding ancient keyboards like legendary weapons, surrounded by crackling CRT screens and tangled cables in a cyberpunk fortress of obsolete glory, in a gritty, noir comic book style with dramatic shadows and electric lighting",
-                "PIRATEEL": "a swashbuckling pirate captain, dramatically commanding a grand sailing ship on stormy seas, with billowing sails and treasure chests, wielding a cutlass with confident authority, in an adventurous, nautical style"
-            };
-
-            const description = characterDescriptions[matchedCharacterName];
+            // Get the complete prompt for the character using the imported function
+            const prompt = getAvatarPrompt(matchedCharacterName);
             
-            if (!description) {
-                console.error(`❌ No character description found for: ${matchedCharacterName}`);
+            if (!prompt) {
+                console.error(`❌ No character prompt found for: ${matchedCharacterName}`);
                 throw new Error(`Character '${matchedCharacterName}' not found in character database`);
             }
             
@@ -73,12 +52,12 @@ class AvatarGenerator {
             
             try {
                 // Use Vercel API endpoint for Google Imagen API
-                avatarData = await this.callGoogleImagenAPI(description, matchedCharacterName, options);
+                avatarData = await this.callGoogleImagenAPI(matchedCharacterName, options);
             } catch (error) {
                 console.warn('❌ Google Imagen API generation failed, using placeholder:', error.message);
                 console.log('🎭 Creating placeholder avatar...');
                 // Fall back to placeholder
-                avatarData = this.createPlaceholderAvatar(matchedCharacterName, description);
+                avatarData = this.createPlaceholderAvatar(matchedCharacterName);
             }
 
             // Cache the result
@@ -95,17 +74,15 @@ class AvatarGenerator {
         }
     }
 
-    async callGoogleImagenAPI(description, characterName, options = {}) {
+    async callGoogleImagenAPI(characterName, options = {}) {
         
         
         // Prepare request body for Vercel API endpoint
         const requestBody = {
             characterName: characterName,
-            description: description,
             personality_scores: options.personalityScores || {},
             user_context: { 
-                characterName, 
-                description,
+                characterName,
                 source: options.source || 'ui_traits',
                 userText: options.userText || null,
                 analysisData: options.analysisData || null
@@ -143,7 +120,7 @@ class AvatarGenerator {
         return data.avatar;
     }
 
-    createPlaceholderAvatar(characterName, description) {
+    createPlaceholderAvatar(characterName) {
         // Create a colorful placeholder based on character name
         const colors = {
             "TheBuilder": "#FF6B35",
@@ -165,7 +142,6 @@ class AvatarGenerator {
             imageUrl: null,
             placeholderColor: avatarColor,
             placeholderInitial: initial,
-            description,
             timestamp: new Date().toISOString(),
             source: 'placeholder'
         };

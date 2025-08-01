@@ -1,3 +1,5 @@
+import { getAvatarPrompt } from '../js/avatar-prompts.js';
+
 export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,18 +32,17 @@ export default async function handler(req, res) {
             });
         }
 
-        const { characterName, description } = req.body;
+        const { characterName } = req.body;
 
-        if (!characterName || !description) {
+        if (!characterName) {
             return res.status(400).json({
                 status: 'error',
-                error: 'Character name and description are required'
+                error: 'Character name is required'
             });
         }
 
-        // Build the prompt for Google Imagen with comic book style
-        const baseStyleDescription = "A bold, distinctive, and dynamic, comic book inspired, digital, vibrant avatar with exaggerated features, energetic composition, clean lines and glowing elements. The character should subtly incorporate green eyes and a short beard. No text, letters, or words should appear anywhere in the image.";
-        const prompt = `${baseStyleDescription} Depicting ${description} with a background that matches the style of the character.`;
+        // Get the complete prompt for the character
+        const prompt = getAvatarPrompt(characterName);
 
         const requestBody = {
             instances: [{
@@ -162,7 +163,6 @@ export default async function handler(req, res) {
             avatar: {
                 characterName,
                 imageUrl,
-                description,
                 timestamp: new Date().toISOString(),
                 source: 'google_imagen'
             }

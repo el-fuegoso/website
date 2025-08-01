@@ -471,14 +471,7 @@ class OceanPersonalitySystem {
             await this.scrambleText(detailsElement, details);
         }
         
-        // Update dynamic character traits
-        const traitsElement = document.querySelector('#personaTraits');
-        if (traitsElement && match.character.traits) {
-            const traitsList = match.character.traits.join(', ');
-            const traitsText = `${traitsList}.<br>An expert in pattern recognition, system thinking, uncovering hidden issues.`;
-            traitsElement.innerHTML = traitsText;
-            traitsElement.style.display = 'block'; // Show the traits when character is generated
-        }
+        // Dynamic character traits removed for cleaner UI with larger images
 
         // Generate avatar for the matched character
         if (window.avatarGenerator) {

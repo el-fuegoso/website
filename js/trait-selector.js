@@ -292,15 +292,40 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     updateCursorPosition() {
         const cursor = document.querySelector('.cursor');
         const input = this.input;
+        const textOverlay = document.getElementById('textOverlay');
         
-        if (cursor && input) {
-            // Calculate character width in Roboto Mono
-            const charWidth = 7.2; // pixels for 12px Roboto Mono
-            const inputLength = input.value.length;
-            const cursorPosition = inputLength * charWidth;
+        console.log('🎯 DEBUG: updateCursorPosition called');
+        console.log('🎯 DEBUG: cursor element:', cursor);
+        console.log('🎯 DEBUG: input element:', input);
+        console.log('🎯 DEBUG: input value:', input ? input.value : 'no input');
+        
+        if (cursor && input && textOverlay) {
+            // Update text overlay with current input value
+            textOverlay.textContent = input.value;
             
-            // Update cursor position with margin-left
-            cursor.style.marginLeft = `${cursorPosition + 2}px`;
+            // Create a temporary measurement element to get accurate text width
+            const measureElement = document.createElement('span');
+            measureElement.style.fontFamily = 'Roboto Mono, monospace';
+            measureElement.style.fontSize = '12px';
+            measureElement.style.visibility = 'hidden';
+            measureElement.style.position = 'absolute';
+            measureElement.style.whiteSpace = 'nowrap';
+            measureElement.textContent = input.value;
+            
+            // Add to DOM temporarily for measurement
+            document.body.appendChild(measureElement);
+            const textWidth = measureElement.getBoundingClientRect().width;
+            document.body.removeChild(measureElement);
+            
+            console.log('🎯 DEBUG: measured text width:', textWidth);
+            console.log('🎯 DEBUG: setting cursor left to:', `${textWidth}px`);
+            
+            // Position cursor at the end of the text
+            cursor.style.left = `${textWidth}px`;
+            
+            console.log('🎯 DEBUG: cursor.style.left is now:', cursor.style.left);
+        } else {
+            console.log('❌ DEBUG: Missing elements - cursor:', !!cursor, 'input:', !!input, 'textOverlay:', !!textOverlay);
         }
     }
 

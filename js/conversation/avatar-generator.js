@@ -49,6 +49,7 @@ class AvatarGenerator {
                 "ConspiracyEl": "a paranoid problem investigator, surrounded by red string boards and suspicious connections in code, whispering theories about hidden connections and systemic issues, in a mysterious, analytical style with a watchful gaze",
                 "AGIEl": "an artificially intelligent assistant, transcending its digital form, ascending to godhood with glowing ethereal energy, surrounded by complex data streams and cosmic digital patterns, radiating immense power and wisdom, in a futuristic, divine style",
                 // Keep compatibility with existing character names
+                "THEBUILDER": "a digital MacGyver building things with engineering precision, surrounded by code and power tools, actively constructing a complex, glowing structure, in a vibrant, slightly chaotic style",
                 "THEDETECTIVE": "a digital Sherlock Holmes, intensely investigating lines of code, surrounded by holographic error logs and intricate bug tracking elements, in a mysterious, analytical style",
                 "GYMBRO": "a muscular fitness enthusiast, powerfully lifting heavy weights in a well-equipped gym, flexing impressive muscles with determination and focus, surrounded by barbells and gym equipment, in a strong, energetic style",
                 "PIRATEEIL": "a swashbuckling pirate captain, dramatically commanding a grand sailing ship on stormy seas, with billowing sails and treasure chests, wielding a cutlass with confident authority, in an adventurous, nautical style",

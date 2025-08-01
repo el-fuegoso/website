@@ -104,9 +104,9 @@
 }
 
 .image-container {
-    width: 350px; /* Fixed width for 16:9 cinematic aspect ratio */
-    height: 197px; /* Fixed height for 16:9 landscape (350/197 = 1.78) */
-    max-width: 100%; /* Ensure it doesn't exceed card width on mobile */
+    width: calc(100% - 50px); /* Responsive width with 25px padding on each side */
+    aspect-ratio: 16/9; /* Maintain 16:9 cinematic aspect ratio */
+    max-width: calc(100% - 50px); /* Ensure it doesn't exceed card width on mobile */
     overflow: hidden;
     background: #333;
     display: flex;
@@ -540,12 +540,24 @@
     font-weight: 400;
 }
 
+.input-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
 .cursor {
     color: #ffffff;
     animation: blink 1s infinite;
-    margin-left: 2px;
+    position: absolute;
+    left: 0px;
+    top: 0;
     display: inline-block;
     font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 10;
 }
 
 @keyframes blink {
@@ -560,9 +572,22 @@
     outline: none;
     font-family: 'Roboto Mono', monospace;
     font-size: 12px;
-    margin-left: -8px;
-    flex: 1;
+    width: 100%;
     caret-color: transparent;
+    position: relative;
+    z-index: 1;
+}
+
+.input-text-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #ffffff;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
 }
 
 /* Scrollbar styling */

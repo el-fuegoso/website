@@ -97,3 +97,6 @@ tmp/
 temp/
 .tmp/
 test-terminal.html
+
+# Archived backend (submodule causing issues)
+backend-archive-2025-07-31/

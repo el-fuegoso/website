@@ -273,34 +273,15 @@
                             
                             <div class="terminal-body">
                                 <div id="terminal-output">
-                                    <div>Initializing...</div>
-                                    <div></div>
-                                    <pre style="color: #ffffff; font-family: 'Roboto Mono', monospace; margin: 0; line-height: 1; letter-spacing: 0; white-space: pre;">███████ ██      ██      ██  ██████  ████████
-██      ██      ██      ██ ██    ██    ██   
-█████   ██      ██      ██ ██    ██    ██   
-██      ██      ██      ██ ██    ██    ██   
-███████ ███████ ███████ ██  ██████     ██   </pre>
-                                    <div></div>
-                                    <div><strong>PERSONA GENERATOR v2.0</strong></div>
-                                    <div></div>
-                                    <div>I built a specialized LLM head that extracts Big Five</div>
-                                    <div>personality traits from any text input. Doesn't matter</div>
-                                    <div>what you feed it.</div>
-                                    <div></div>
-                                    <div>Resume? Job description? Essay you wrote? Random thoughts?</div>
-                                    <div>The model reads between the lines and pulls your</div>
-                                    <div>psychological profile. Then generates your personalized</div>
-                                    <div>"El" avatar.</div>
-                                    <div></div>
-                                    <div>No surveys. No questionnaires. Just raw text analysis.</div>
-                                    <div></div>
-                                    <div>Ready for input...</div>
+                                    <!-- Dynamic content will be inserted here -->
                                 </div>
                                 
                                 <div class="prompt-line" id="prompt-line">
                                     <span class="prompt">user@terminal ~ %</span>
-                                    <span class="cursor">█</span>
-                                    <input type="text" class="input-line" id="terminalInput" placeholder="" autocomplete="off">
+                                    <div class="input-wrapper">
+                                        <input type="text" class="terminal-input" id="terminalInput" placeholder="" autocomplete="off">
+                                        <span class="terminal-cursor" id="terminalCursor"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -325,7 +306,7 @@
                     
                     <div class="card-header">
                         <div class="image-container">
-                            <div>CONSPIRACYEL PORTRAIT</div>
+                            <!-- Binary flow animation will be inserted here -->
                         </div>
                         
                         <!-- Radar charts moved above sliders -->

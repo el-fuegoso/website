@@ -72,128 +72,174 @@ class OceanPersonalitySystem {
         const imageContainer = document.querySelector('.image-container');
         if (!imageContainer) return;
 
-        // Create canvas for helix animation
-        const canvas = document.createElement('canvas');
-        canvas.width = 300;
-        canvas.height = 250;
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
+        // Create ASCII container for binary flow animation
+        const asciiContainer = document.createElement('div');
+        asciiContainer.style.cssText = `
+            width: 100%;
+            height: 100%;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 8px;
+            line-height: 1;
+            color: #00ff88;
+            background: #1a1a1a;
+            padding: 8px;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: pre;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
         
         imageContainer.innerHTML = '';
-        imageContainer.appendChild(canvas);
-        
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+        imageContainer.appendChild(asciiContainer);
 
         // Animation variables
+        let width = 35; // Adjusted for persona card size
+        let height = 20;
+        let grid = [];
         let time = 0;
-        const particles = [];
-        let helixPoints = [];
-        const numParticles = 30; // Fewer particles for performance
-        const TWO_PI = Math.PI * 2;
+        let animationFrameId;
+        let showingLoading = true;
+        let loadingFlashTime = 0;
 
-        // Helper functions
-        const random = (min, max) => {
-            if (max === undefined) {
-                max = min;
-                min = 0;
-            }
-            return Math.random() * (max - min) + min;
-        };
+        // LOADING ASCII art
+        const loadingText = [
+            "██      ██████   █████  ██████  ",
+            "██     ██    ██ ██   ██ ██   ██ ",
+            "██     ██    ██ ███████ ██   ██ ",
+            "██     ██    ██ ██   ██ ██   ██ ",
+            "██████  ██████  ██   ██ ██████  ",
+            "                                ",
+            "██ ███    ██  ██████            ",
+            "██ ████   ██ ██                 ",
+            "██ ██ ██  ██ ██   ███           ",
+            "██ ██  ██ ██ ██    ██           ",
+            "██ ██   ████  ██████            "
+        ];
 
-        const map = (value, start1, stop1, start2, stop2) => {
-            return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
-        };
-
-        const dist = (x1, y1, z1, x2, y2, z2) => {
-            const dx = x2 - x1;
-            const dy = y2 - y1;
-            const dz = z2 - z1;
-            return Math.sqrt(dx * dx + dy * dy + dz * dz);
-        };
-
-        // HelixParticle class
-        class HelixParticle {
-            constructor(initialPhase) {
-                this.phase = initialPhase || random(TWO_PI);
-                this.radius = random(45, 55); // Scaled for smaller canvas
-                this.yOffset = random(-150, 150);
-                this.ySpeed = random(0.3, 0.6) * (random() > 0.5 ? 1 : -1);
-                this.rotationSpeed = random(0.005, 0.0075);
-                this.size = random(2, 4);
-                this.opacity = random(120, 180);
-                this.strength = random(0.8, 1);
-            }
-
-            update() {
-                this.phase += this.rotationSpeed * this.strength;
-                this.yOffset += this.ySpeed;
-
-                if (this.yOffset > 175) this.yOffset = -175;
-                if (this.yOffset < -175) this.yOffset = 175;
-
-                const x = width / 2 + Math.cos(this.phase) * this.radius;
-                const y = height / 2 + this.yOffset;
-                const z = Math.sin(this.phase) * this.radius;
-
-                return { x, y, z, strength: this.strength, size: this.size, opacity: this.opacity };
+        function initGrid() {
+            grid = [];
+            for (let y = 0; y < height; y++) {
+                let row = [];
+                for (let x = 0; x < width; x++) {
+                    row.push(' ');
+                }
+                grid.push(row);
             }
         }
 
-        // Create helix particles
-        for (let i = 0; i < numParticles; i++) {
-            const initialPhase = (i / numParticles) * TWO_PI * 3;
-            particles.push(new HelixParticle(initialPhase));
+        function renderLoading() {
+            const flash = Math.sin(loadingFlashTime * 0.2) > 0;
+            if (flash) {
+                let centered = [];
+                const startY = Math.floor((height - loadingText.length) / 2);
+                
+                for (let i = 0; i < height; i++) {
+                    if (i >= startY && i < startY + loadingText.length) {
+                        const textLine = loadingText[i - startY];
+                        const startX = Math.floor((width - Math.min(textLine.length, width)) / 2);
+                        let line = ' '.repeat(width);
+                        const visibleText = textLine.substring(0, width);
+                        line = line.substring(0, startX) + visibleText + line.substring(startX + visibleText.length);
+                        centered.push(line);
+                    } else {
+                        centered.push(' '.repeat(width));
+                    }
+                }
+                asciiContainer.innerHTML = centered.join('\n');
+            } else {
+                asciiContainer.innerHTML = ' '.repeat(width * height).replace(new RegExp(`.{${width}}`, 'g'), '$&\n');
+            }
         }
 
-        // Animation loop
-        const animate = () => {
-            if (!this.helixAnimation) return;
+        function renderBinaryFlow() {
+            let html = '';
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    html += grid[y][x];
+                }
+                html += '\n';
+            }
+            asciiContainer.innerHTML = html;
+        }
 
-            // Clear background
-            ctx.fillStyle = '#ddd';
-            ctx.fillRect(0, 0, width, height);
-
-            time += 0.02;
-
-            // Update helix points
-            helixPoints = particles.map(particle => particle.update());
-            helixPoints.sort((a, b) => a.z - b.z);
-
-            // Draw connections
-            ctx.lineWidth = 1;
-            for (let i = 0; i < helixPoints.length; i++) {
-                const hp1 = helixPoints[i];
-                for (let j = 0; j < helixPoints.length; j++) {
-                    if (i !== j) {
-                        const hp2 = helixPoints[j];
-                        const d = dist(hp1.x, hp1.y, hp1.z, hp2.x, hp2.y, hp2.z);
-
-                        if (d < 60) {
-                            const opacity = map(d, 0, 60, 40, 10) * 
-                                          map(Math.min(hp1.z, hp2.z), -55, 55, 0.3, 1);
-
-                            ctx.strokeStyle = `rgba(184, 134, 11, ${opacity / 255})`;
-                            ctx.beginPath();
-                            ctx.moveTo(hp1.x, hp1.y);
-                            ctx.lineTo(hp2.x, hp2.y);
-                            ctx.stroke();
+        function updateBinaryFlow() {
+            initGrid();
+            
+            const blockSize = Math.floor(width * 0.5);
+            const blockX = Math.floor(width / 2 - blockSize / 2);
+            const blockY = Math.floor(height / 2 - blockSize / 2);
+            const t = time * 0.008;
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (x >= blockX && x < blockX + blockSize && 
+                        y >= blockY && y < blockY + blockSize) {
+                        const innerDist = Math.min(
+                            x - blockX, 
+                            blockX + blockSize - x,
+                            y - blockY,
+                            blockY + blockSize - y
+                        );
+                        
+                        const erosion = time * 0.01;
+                        if (innerDist > erosion) {
+                            grid[y][x] = '█';
+                        } else {
+                            grid[y][x] = Math.random() > 0.7 ? '█' : '▓';
+                        }
+                    } else {
+                        const dx = x - width / 2;
+                        const dy = y - height / 2;
+                        const angle = Math.atan2(dy, dx);
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        const wave = Math.sin(dist * 0.3 - t + angle * 1.8);
+                        const flow = Math.sin(x * 0.15 + y * 0.08 + t * 0.6);
+                        
+                        if (flow + wave > 0.5) {
+                            grid[y][x] = '▓';
+                        } else if (flow + wave < -0.3) {
+                            grid[y][x] = '░';
                         }
                     }
                 }
             }
+            
+            // Add flowing effects
+            for (let i = 0; i < 3; i++) {
+                const flowX = blockX + Math.floor(Math.random() * blockSize);
+                const flowY = blockY + Math.floor(Math.random() * blockSize);
+                const length = Math.floor(Math.random() * 6) + 3;
+                let fx = Math.floor(flowX);
+                let fy = Math.floor(flowY);
+                
+                for (let j = 0; j < length; j++) {
+                    if (fx >= 0 && fx < width && fy >= 0 && fy < height) {
+                        grid[fy][fx] = '▒';
+                    }
+                    fx += Math.floor(Math.random() * 3) - 1;
+                    fy += Math.floor(Math.random() * 3) - 1;
+                }
+            }
+        }
 
-            // Draw helix points
-            for (let i = 0; i < helixPoints.length; i++) {
-                const hp = helixPoints[i];
-                const sizeMultiplier = map(hp.z, -55, 55, 0.6, 1.3);
-                const adjustedOpacity = map(hp.z, -55, 55, hp.opacity * 0.4, hp.opacity);
+        const animate = () => {
+            if (!this.helixAnimation) return;
 
-                ctx.fillStyle = `rgba(184, 134, 11, ${adjustedOpacity / 255})`;
-                ctx.beginPath();
-                ctx.arc(hp.x, hp.y, (hp.size * sizeMultiplier) / 2, 0, TWO_PI);
-                ctx.fill();
+            if (showingLoading) {
+                loadingFlashTime++;
+                renderLoading();
+                
+                // Show loading for 2 seconds, then switch to binary flow
+                if (loadingFlashTime > 120) {
+                    showingLoading = false;
+                }
+            } else {
+                updateBinaryFlow();
+                renderBinaryFlow();
+                time++;
             }
 
             this.helixAnimation = requestAnimationFrame(animate);
@@ -452,10 +498,8 @@ class OceanPersonalitySystem {
         
         if (!match.character) return;
 
-        // Stop waterfall and show character name
-        if (imageContainer) {
-            imageContainer.innerHTML = `<div style="color: white; font-size: 14px; font-weight: 600; text-align: center;">${match.character.name} PORTRAIT</div>`;
-        }
+        // Stop binary flow animation for character reveal
+        this.stopHelixAnimation();
 
         // Scramble and reveal text
         if (titleElement) {

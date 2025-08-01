@@ -4,7 +4,7 @@
  */
 
 // Debug: Verify script is loading
-import { getAvatarPrompt } from '../avatar-prompts.js';
+// Import will be handled inline to avoid module loading issues
 
 class AvatarGenerator {
     constructor() {
@@ -40,8 +40,11 @@ class AvatarGenerator {
         this.isGenerating = true;
 
         try {
-            // Get the complete prompt for the character using the imported function
-            const prompt = getAvatarPrompt(matchedCharacterName);
+            // Get the complete prompt for the character from global avatar prompts
+            const prompt = window.getAvatarPrompt ? 
+                          window.getAvatarPrompt(matchedCharacterName) :
+                          window.avatarPrompts?.[matchedCharacterName] || 
+                          'Default avatar generation prompt';
             
             if (!prompt) {
                 console.error(`❌ No character prompt found for: ${matchedCharacterName}`);

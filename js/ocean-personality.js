@@ -77,9 +77,9 @@ class OceanPersonalitySystem {
         asciiContainer.style.cssText = `
             width: 100%;
             height: 100%;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 8px;
-            line-height: 1;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 0.85;
             color: #000000;
             background: #ddd;
             padding: 8px;
@@ -95,8 +95,8 @@ class OceanPersonalitySystem {
         imageContainer.appendChild(asciiContainer);
 
         // Animation variables
-        let width = 35; // Adjusted for persona card size
-        let height = 20;
+        let width = 25; // Square format like header artifact
+        let height = 25;
         let grid = [];
         let time = 0;
         let animationFrameId;
@@ -116,19 +116,33 @@ class OceanPersonalitySystem {
             time
         };
 
-        // LOADING ASCII art
+        // LOADING ASCII art - compact version for 25x25 grid
         const loadingText = [
-            "██      ██████   █████  ██████  ",
-            "██     ██    ██ ██   ██ ██   ██ ",
-            "██     ██    ██ ███████ ██   ██ ",
-            "██     ██    ██ ██   ██ ██   ██ ",
-            "██████  ██████  ██   ██ ██████  ",
-            "                                ",
-            "██ ███    ██  ██████            ",
-            "██ ████   ██ ██                 ",
-            "██ ██ ██  ██ ██   ███           ",
-            "██ ██  ██ ██ ██    ██           ",
-            "██ ██   ████  ██████            "
+            "                         ",
+            "                         ",
+            "                         ",
+            "    ▓▓    ▓▓▓▓  ▓▓▓      ",
+            "    ▓     ▓  ▓ ▓   ▓     ",
+            "    ▓     ▓  ▓ ▓▓▓▓▓     ",
+            "    ▓     ▓  ▓ ▓   ▓     ",
+            "    ▓▓▓▓  ▓▓▓▓ ▓   ▓     ",
+            "                         ",
+            "   ▓▓▓▓  ▓ ▓▓  ▓▓ ▓▓▓▓   ",
+            "   ▓   ▓ ▓ ▓▓▓ ▓▓ ▓      ",
+            "   ▓   ▓ ▓ ▓ ▓▓▓▓ ▓▓▓    ",
+            "   ▓   ▓ ▓ ▓  ▓▓▓ ▓  ▓   ",
+            "   ▓▓▓▓  ▓ ▓   ▓▓ ▓▓▓▓   ",
+            "                         ",
+            "          ░░░░░          ",
+            "                         ",
+            "                         ",
+            "                         ",
+            "                         ",
+            "                         ",
+            "                         ",
+            "                         ",
+            "                         ",
+            "                         "
         ];
 
         function initGrid() {

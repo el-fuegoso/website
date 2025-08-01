@@ -44,3 +44,7 @@ export const avatarPrompts = {
 export function getAvatarPrompt(characterName) {
   return avatarPrompts[characterName] || avatarPrompts["TheBuilder"]; // Default fallback
 }
+
+// Make available globally for non-module scripts
+window.avatarPrompts = avatarPrompts;
+window.getAvatarPrompt = getAvatarPrompt;

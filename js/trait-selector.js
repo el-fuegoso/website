@@ -1412,6 +1412,11 @@ class ElliotGenerator {
         const generationPath = document.getElementById('generationPath');
         if (generationPath) generationPath.classList.add('active');
         
+        // Trigger loading animation in ASCII binary flow
+        if (window.oceanSystem) {
+            window.oceanSystem.triggerLoadingAnimation();
+        }
+        
         // Hide avatar card content during generation, show only helix
         const avatarCard = document.getElementById('avatarCard');
         if (avatarCard) {

@@ -80,8 +80,8 @@ class OceanPersonalitySystem {
             font-family: 'Roboto Mono', monospace;
             font-size: 8px;
             line-height: 1;
-            color: #00ff88;
-            background: #1a1a1a;
+            color: #000000;
+            background: #ddd;
             padding: 8px;
             box-sizing: border-box;
             overflow: hidden;
@@ -100,8 +100,21 @@ class OceanPersonalitySystem {
         let grid = [];
         let time = 0;
         let animationFrameId;
-        let showingLoading = true;
+        let showingLoading = false; // Default to binary flow, not loading
         let loadingFlashTime = 0;
+
+        // Store references for external access
+        this.asciiContainer = asciiContainer;
+        this.binaryFlowState = {
+            get showingLoading() { return showingLoading; },
+            set showingLoading(value) { showingLoading = value; },
+            get loadingFlashTime() { return loadingFlashTime; },
+            set loadingFlashTime(value) { loadingFlashTime = value; },
+            width,
+            height,
+            grid,
+            time
+        };
 
         // LOADING ASCII art
         const loadingText = [
@@ -253,6 +266,14 @@ class OceanPersonalitySystem {
         if (this.helixAnimation) {
             cancelAnimationFrame(this.helixAnimation);
             this.helixAnimation = null;
+        }
+    }
+
+    triggerLoadingAnimation() {
+        // Trigger loading animation if binary flow is currently running
+        if (this.binaryFlowState && this.helixAnimation) {
+            this.binaryFlowState.showingLoading = true;
+            this.binaryFlowState.loadingFlashTime = 0;
         }
     }
 

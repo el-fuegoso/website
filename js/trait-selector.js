@@ -2771,18 +2771,34 @@ function initializeTerminalMode() {
                             console.log('🔍 Overall conditional result:', !!(window.elliotGenerator && analysisResult.ocean_scores));
                             
                             // Find best character match based on OCEAN scores
-                            if (window.elliotGenerator && analysisResult.ocean_scores) {
-                                // Match user to existing character based on OCEAN similarity
-                                const matchedCharacter = this.findBestCharacterMatchFromOCEAN(analysisResult.ocean_scores);
+                            if (window.oceanSystem && analysisResult.ocean_scores) {
+                                // Convert HF API format to Ocean system format
+                                const oceanScores = {
+                                    openness: (analysisResult.ocean_scores.Openness || 3) / 5,
+                                    conscientiousness: (analysisResult.ocean_scores.Conscientiousness || 3) / 5,
+                                    extraversion: (analysisResult.ocean_scores.Extraversion || 3) / 5,
+                                    agreeableness: (analysisResult.ocean_scores.Agreeableness || 3) / 5,
+                                    neuroticism: (analysisResult.ocean_scores.Neuroticism || 3) / 5
+                                };
                                 
-                                if (matchedCharacter && window.avatarGenerator) {
+                                console.log('🎯 DEBUG: Converted OCEAN scores:', oceanScores);
+                                
+                                // Use Ocean system's character matching (same as trait selector)
+                                const originalScores = window.oceanSystem.userScores;
+                                window.oceanSystem.userScores = oceanScores;
+                                const match = window.oceanSystem.findBestCharacterMatch();
+                                window.oceanSystem.userScores = originalScores; // Restore original scores
+                                
+                                console.log('🎯 DEBUG: Character match result:', match);
+                                
+                                if (match.character && window.avatarGenerator) {
                                     // Generate avatar for the matched character
-                                    console.log('🎯 DEBUG: About to call generateAvatar for:', matchedCharacter.name);
+                                    console.log('🎯 DEBUG: About to call generateAvatar for:', match.character.name);
                                     console.log('🎯 DEBUG: window.avatarGenerator exists:', !!window.avatarGenerator);
                                     
                                     let avatarData;
                                     try {
-                                        avatarData = await window.avatarGenerator.generateAvatar(matchedCharacter.name);
+                                        avatarData = await window.avatarGenerator.generateAvatar(match.character.name);
                                         console.log('🎯 DEBUG: generateAvatar returned:', avatarData);
                                         console.log('🎯 DEBUG: avatarData type:', typeof avatarData);
                                         console.log('🎯 DEBUG: avatarData truthy:', !!avatarData);
@@ -2792,33 +2808,29 @@ function initializeTerminalMode() {
                                         avatarData = null;
                                     }
                                     
-                                    // Create elliotData using the matched character
-                                    const elliotData = {
-                                        analysisData: analysisResult,
-                                        ocean_scores: analysisResult.ocean_scores,
-                                        characterName: matchedCharacter.name,
-                                        title: matchedCharacter.data.title,
-                                        description: matchedCharacter.data.description,
-                                        avatarData: avatarData,
-                                        similarityScore: matchedCharacter.similarity
-                                    };
-                                    
-                                    console.log('🎯 DEBUG: Created elliotData:', elliotData);
-                                    console.log('🎯 DEBUG: elliotData.avatarData exists:', !!elliotData.avatarData);
-                                    
-                                    // Trigger full avatar generation (image + card + radar charts)
-                                    window.elliotGenerator.showAvatarResults(elliotData);
-                                    
-                                    const matchPercentage = Math.round(matchedCharacter.similarity * 100);
-                                    addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎯 Best match: "${matchedCharacter.name}" (${matchPercentage}% similarity)</span>`);
-                                    addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎨 Your avatar is ready!</span>`);
+                                    // Use Ocean system's display method for consistent UI
+                                    if (avatarData) {
+                                        // Create match object for display
+                                        const displayMatch = {
+                                            character: match.character,
+                                            similarity: match.similarity,
+                                            avatarData: avatarData
+                                        };
+                                        
+                                        console.log('🎯 DEBUG: Calling Ocean system display method');
+                                        await window.oceanSystem.displayCharacterWithScrambling(displayMatch);
+                                        
+                                        const matchPercentage = Math.round(match.similarity * 100);
+                                        addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎯 Best match: "${match.character.name}" (${matchPercentage}% similarity)</span>`);
+                                        addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">🎨 Your avatar is ready!</span>`);
+                                    }
                                 } else {
                                     addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">❌ Unable to find character match. Please try again.</span>`);
                                 }
                             } else {
                                 console.log('❌ CONDITIONAL FAILED: Avatar generation skipped');
-                                if (!window.elliotGenerator) {
-                                    console.log('❌ Missing: window.elliotGenerator is', typeof window.elliotGenerator);
+                                if (!window.oceanSystem) {
+                                    console.log('❌ Missing: window.oceanSystem is', typeof window.oceanSystem);
                                 }
                                 if (!analysisResult.ocean_scores) {
                                     console.log('❌ Missing: analysisResult.ocean_scores is', analysisResult.ocean_scores);

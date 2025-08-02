@@ -1,295 +1,6 @@
 // Trait Selector JavaScript - Interactive avatar generation interface
 
-/**
- * Terminal Cursor System - Production Implementation
- * 
- * Usage:
- * const cursor = new TerminalCursor('terminalInput', 'terminalCursor');
- * 
- * HTML Structure:
- * <div class="prompt-line">
- *     <span class="prompt">user@terminal ~ %</span>
- *     <div class="input-wrapper">
- *         <input type="text" class="terminal-input" id="terminalInput">
- *         <span class="terminal-cursor" id="terminalCursor"></span>
- *     </div>
- * </div>
- */
-class TerminalCursor {
-    constructor(inputId, cursorId, options = {}) {
-        this.input = document.getElementById(inputId);
-        this.cursor = document.getElementById(cursorId);
-        
-        if (!this.input || !this.cursor) {
-            throw new Error('Input or cursor element not found');
-        }
-        
-        // Configuration
-        this.options = {
-            fallbackToDom: true,
-            debugMode: false,
-            fontLoadTimeout: 1000,
-            ...options
-        };
-        
-        // Create canvas for text measurement
-        this.canvas = document.createElement('canvas');
-        this.measureContext = this.canvas.getContext('2d');
-        
-        // Initialize system
-        this.initialize();
-    }
-    
-    initialize() {
-        this.setupFont();
-        this.setupEvents();
-        this.updateCursorPosition();
-        
-        // Test font loading
-        if (this.options.fontLoadTimeout > 0) {
-            setTimeout(() => this.verifyFontLoading(), this.options.fontLoadTimeout);
-        }
-        
-        this.log('Terminal cursor system initialized');
-    }
-    
-    setupFont() {
-        // Get computed style from input element
-        const computedStyle = window.getComputedStyle(this.input);
-        
-        // Set canvas font to match input exactly (debug tool format)
-        this.measureContext.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
-        
-        this.log(`Font configured: ${this.measureContext.font}`);
-        
-        // Verify font loading like debug tool
-        this.verifyFontLoading();
-    }
-    
-    setupEvents() {
-        // Core events for cursor positioning
-        const events = [
-            'input',     // Text changes
-            'keyup',     // Key releases
-            'paste',     // Paste operations
-            'click',     // Mouse clicks
-            'cut',       // Cut operations
-            'focus',     // Focus changes
-            'keydown'    // For navigation keys
-        ];
-        
-        events.forEach(eventType => {
-            this.input.addEventListener(eventType, (event) => {
-                this.log(`Event: ${eventType} - Key: ${event.key || 'N/A'} - Target value length: ${event.target.value.length}`);
-                
-                // Skip Enter key processing - let Terminal class handle it
-                if (eventType === 'keydown' && event.key === 'Enter') {
-                    return;
-                }
-                
-                if (eventType === 'keydown' && this.isNavigationKey(event.key)) {
-                    // Navigation keys need delayed update (debug tool method)
-                    setTimeout(() => this.updateCursorPosition(), 0);
-                } else {
-                    // Immediate update for other events
-                    this.updateCursorPosition();
-                }
-            });
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            this.setupFont(); // Recalculate font in case of zoom changes
-            this.updateCursorPosition();
-        });
-    }
-    
-    isNavigationKey(key) {
-        return ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(key);
-    }
-    
-    updateCursorPosition() {
-        try {
-            // Ensure input has focus for accurate selectionStart (debug tool method)
-            if (document.activeElement !== this.input) {
-                return; // Don't update if input doesn't have focus
-            }
-            
-            const cursorPosition = this.input.selectionStart || 0;
-            const textToCursor = this.input.value.substring(0, cursorPosition);
-            
-            this.log(`Cursor position: ${cursorPosition}, Text to cursor: "${textToCursor}"`);
-            
-            // Canvas measurement
-            const canvasWidth = this.measureTextCanvas(textToCursor);
-            
-            // DOM measurement fallback
-            const domWidth = this.measureTextDOM(textToCursor);
-            
-            // Use canvas measurement primarily, fall back to DOM if needed
-            let textWidth = canvasWidth;
-            if ((textWidth === 0 || this.options.fallbackToDom) && textToCursor.length > 0) {
-                if (domWidth > textWidth) {
-                    textWidth = domWidth;
-                    this.log(`Using DOM measurement: ${domWidth.toFixed(2)}px`);
-                }
-            }
-            
-            // Position cursor
-            this.cursor.style.left = `${textWidth}px`;
-            
-            this.log(`Cursor positioned at ${textWidth.toFixed(2)}px for position ${cursorPosition}`);
-            
-        } catch (error) {
-            this.log(`Error updating cursor position: ${error.message}`, 'error');
-            
-            // Fallback positioning
-            this.cursor.style.left = '0px';
-        }
-    }
-    
-    measureTextCanvas(text) {
-        try {
-            if (!text) return 0;
-            
-            // Update canvas font each time (debug tool approach)
-            const computedStyle = window.getComputedStyle(this.input);
-            this.measureContext.font = `${computedStyle.fontSize} ${computedStyle.fontFamily}`;
-            
-            const metrics = this.measureContext.measureText(text);
-            
-            // Use bounding box for better accuracy if available
-            if (typeof metrics.actualBoundingBoxLeft === 'number' && 
-                typeof metrics.actualBoundingBoxRight === 'number') {
-                return Math.abs(metrics.actualBoundingBoxLeft) + 
-                       Math.abs(metrics.actualBoundingBoxRight);
-            }
-            
-            // Fallback to basic width
-            return metrics.width;
-            
-        } catch (error) {
-            this.log(`Canvas measurement failed: ${error.message}`, 'error');
-            return 0;
-        }
-    }
-    
-    measureTextDOM(text) {
-        try {
-            if (!text) return 0;
-            
-            const measureElement = document.createElement('span');
-            const computedStyle = window.getComputedStyle(this.input);
-            
-            // Copy all relevant font properties (debug tool approach)
-            measureElement.style.fontFamily = computedStyle.fontFamily;
-            measureElement.style.fontSize = computedStyle.fontSize;
-            measureElement.style.fontWeight = computedStyle.fontWeight;
-            measureElement.style.fontStyle = computedStyle.fontStyle;
-            measureElement.style.letterSpacing = computedStyle.letterSpacing;
-            measureElement.style.wordSpacing = computedStyle.wordSpacing;
-            measureElement.style.textTransform = computedStyle.textTransform;
-            
-            // Positioning and visibility (debug tool method)
-            measureElement.style.position = 'absolute';
-            measureElement.style.visibility = 'hidden';
-            measureElement.style.whiteSpace = 'pre';
-            measureElement.style.left = '-9999px';
-            measureElement.style.top = '-9999px';
-            
-            measureElement.textContent = text || ' ';
-            
-            document.body.appendChild(measureElement);
-            const width = measureElement.getBoundingClientRect().width;
-            document.body.removeChild(measureElement);
-            
-            return width;
-            
-        } catch (error) {
-            this.log(`DOM measurement failed: ${error.message}`, 'error');
-            return 0;
-        }
-    }
-    
-    verifyFontLoading() {
-        // Test with a known monospace character (debug tool method)
-        const testMetrics = this.measureContext.measureText('M');
-        const testWidth = testMetrics.width;
-        
-        this.log(`Test character 'M' width: ${testWidth}`);
-        
-        // Expected width for Roboto Mono 12px 'M' is approximately 7.2px
-        const expectedWidth = 7.2;
-        const difference = Math.abs(testWidth - expectedWidth);
-        
-        if (difference > 2) {
-            this.log(`Font may not be loaded correctly. Expected ~${expectedWidth}px, got ${testWidth}px`, 'warning');
-        } else {
-            this.log(`Font appears to be loaded correctly.`);
-        }
-    }
-    
-    // Public API methods
-    refresh() {
-        this.setupFont();
-        this.updateCursorPosition();
-    }
-    
-    destroy() {
-        // Remove event listeners (simplified - in production you'd store references)
-        this.input.replaceWith(this.input.cloneNode(true));
-        this.log('Terminal cursor system destroyed');
-    }
-    
-    // Utility methods
-    log(message, level = 'info') {
-        if (this.options.debugMode) {
-            const timestamp = new Date().toLocaleTimeString();
-            const prefix = `[${timestamp}] TerminalCursor ${level.toUpperCase()}:`;
-            
-            if (level === 'error') {
-                console.error(prefix, message);
-            } else if (level === 'warning') {
-                console.warn(prefix, message);
-            } else {
-                console.log(prefix, message);
-            }
-        }
-    }
-    
-    // Get current cursor position info (for debugging - debug tool method)
-    getInfo() {
-        const cursorPosition = this.input.selectionStart || 0;
-        const textToCursor = this.input.value.substring(0, cursorPosition);
-        const canvasWidth = this.measureTextCanvas(textToCursor);
-        const domWidth = this.measureTextDOM(textToCursor);
-        
-        return {
-            cursorPosition,
-            textToCursor,
-            canvasWidth,
-            domWidth,
-            currentLeft: this.cursor.style.left,
-            inputFocus: document.activeElement === this.input,
-            inputValue: this.input.value
-        };
-    }
-    
-    // Test measurement methods (debug tool functionality)
-    testMeasurement() {
-        this.log('Testing measurement accuracy...');
-        
-        const testStrings = ['M', 'MM', 'MMM', 'Hello', 'Hello World', '█'];
-        
-        testStrings.forEach(str => {
-            const canvasWidth = this.measureTextCanvas(str);
-            const domWidth = this.measureTextDOM(str);
-            const difference = Math.abs(canvasWidth - domWidth);
-            
-            this.log(`"${str}": Canvas=${canvasWidth.toFixed(2)}px, DOM=${domWidth.toFixed(2)}px, Diff=${difference.toFixed(2)}px`);
-        });
-    }
-}
+// Terminal Cursor System removed - using native browser caret with custom styling
 
 // Terminal interface class - Claude Code style with Elliot
 class Terminal {
@@ -302,7 +13,7 @@ class Terminal {
         this.currentQuestion = 0;
         this.userResponses = [];
         this.hasGeneratedAvatar = false;
-        this.terminalCursor = null; // TerminalCursor instance
+        // Using native browser caret with custom styling
         this.init();
         
         // Questions for quest mode
@@ -567,20 +278,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             this.input.value = '';
             this.input.focus();
             
-            // Initialize terminal cursor first
-            try {
-                this.terminalCursor = new TerminalCursor('terminalInput', 'terminalCursor', {
-                    debugMode: true,
-                    fallbackToDom: true
-                });
-                console.log('🎯 Terminal cursor initialized successfully');
-                
-                // Expose cursor for debugging in console
-                window.debugTerminalCursor = this.terminalCursor;
-                console.log('🔧 Debug access: window.debugTerminalCursor.getInfo() or .testMeasurement()');
-            } catch (error) {
-                console.error('❌ Failed to initialize terminal cursor:', error);
-            }
+            // Using native browser caret with custom styling - no initialization needed
             
             // Add Enter key handler after cursor is initialized
             this.input.removeEventListener('keydown', this.handleKeyDown);
@@ -669,15 +367,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     
     // Cleanup method for terminal cursor
     cleanup() {
-        if (this.terminalCursor) {
-            try {
-                this.terminalCursor.destroy();
-                this.terminalCursor = null;
-                console.log('🎯 Terminal cursor cleaned up successfully');
-            } catch (error) {
-                console.error('❌ Error cleaning up terminal cursor:', error);
-            }
-        }
+        // No cursor cleanup needed - using native browser caret
     }
 }
 
@@ -2960,7 +2650,7 @@ function initializeTerminalMode() {
             globalTerminalIntelligence = null;
             
             // Cleanup terminal cursor if it exists
-            if (globalTerminal) {
+            if (typeof globalTerminal !== 'undefined' && globalTerminal) {
                 globalTerminal.cleanup();
             }
             

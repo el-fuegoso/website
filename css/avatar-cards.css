@@ -547,22 +547,19 @@
     align-items: center;
 }
 
-.cursor {
+/* Native caret styling for terminal input */
+.terminal-input {
     color: #ffffff;
-    animation: blink 1s infinite;
-    position: absolute;
-    left: 0px;
-    top: 0;
-    display: inline-block;
+    background: transparent;
+    border: none;
+    outline: none;
     font-family: 'Roboto Mono', monospace;
     font-size: 12px;
-    pointer-events: none;
-    z-index: 10;
-}
-
-@keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+    width: 100%;
+    caret-color: #ffffff;
+    caret-shape: block;
+    position: relative;
+    z-index: 1;
 }
 
 .input-line {

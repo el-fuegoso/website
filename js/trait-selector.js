@@ -281,8 +281,14 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             // Using native browser caret with custom styling - no initialization needed
             
             // Add Enter key handler after cursor is initialized
+            console.log('🔧 DEBUG: Setting up terminal Enter key handler:', {
+                inputElement: !!this.input,
+                inputId: this.input?.id,
+                handleKeyDownMethod: typeof this.handleKeyDown
+            });
             this.input.removeEventListener('keydown', this.handleKeyDown);
             this.input.addEventListener('keydown', this.handleKeyDown.bind(this));
+            console.log('✅ DEBUG: Terminal Enter key handler attached');
         }
         
         // Scroll output to bottom
@@ -292,23 +298,30 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     }
 
     async handleKeyDown(event) {
-        console.log('🔑 Terminal.handleKeyDown called:', event.key);
+        console.log('🔑 DEBUG: Terminal.handleKeyDown called:', {
+            key: event.key,
+            inputValue: this.input.value,
+            hasGlobalTerminalIntelligence: !!globalTerminalIntelligence,
+            globalTerminalIntelligenceType: typeof globalTerminalIntelligence
+        });
         
         if (event.key === 'Enter') {
             event.preventDefault();
             
             const value = this.input.value.trim();
-            console.log('🎯 Terminal Enter key pressed:', value);
+            console.log('🎯 DEBUG: Terminal Enter key pressed:', {
+                rawValue: this.input.value,
+                trimmedValue: value,
+                valueLength: value.length,
+                hasValue: !!value,
+                hasGlobalTerminalIntelligence: !!globalTerminalIntelligence
+            });
             
             if (value && globalTerminalIntelligence) {
+                console.log('✅ DEBUG: Processing terminal input - conditions met');
                 try {
                     // Clear input immediately
                     this.input.value = '';
-                    
-                    // Update cursor position after clearing
-                    if (this.terminalCursor) {
-                        setTimeout(() => this.terminalCursor.updateCursorPosition(), 0);
-                    }
                     
                     // Handle clarification responses
                     if (globalTerminalIntelligence.awaitingClarification) {
@@ -323,9 +336,16 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                         await this.processTerminalInput(value);
                     }
                 } catch (error) {
-                    console.error('Terminal input processing failed:', error);
+                    console.error('❌ DEBUG: Terminal input processing failed:', error);
                     this.addToOutput(`<span style="color: #ff4444;">Error: ${error.message}</span>`);
                 }
+            } else {
+                console.log('❌ DEBUG: Terminal input NOT processed:', {
+                    hasValue: !!value,
+                    value: value,
+                    hasGlobalTerminalIntelligence: !!globalTerminalIntelligence,
+                    globalTerminalIntelligenceStatus: globalTerminalIntelligence ? 'exists' : 'null/undefined'
+                });
             }
         }
     }
@@ -2606,8 +2626,18 @@ function initializeTerminalMode() {
             });
             
             try {
+                console.log('🔧 DEBUG: About to create TerminalIntelligence...');
+                
                 // Initialize terminal intelligence
                 globalTerminalIntelligence = new TerminalIntelligence();
+                
+                console.log('✅ DEBUG: TerminalIntelligence created successfully:', {
+                    instance: !!globalTerminalIntelligence,
+                    type: typeof globalTerminalIntelligence,
+                    hasProcessInput: typeof globalTerminalIntelligence?.processInput === 'function',
+                    constructorName: globalTerminalIntelligence?.constructor?.name
+                });
+                
                 terminalDebugger.success('TerminalIntelligence Created', {
                     instance: !!globalTerminalIntelligence,
                     type: typeof globalTerminalIntelligence
@@ -2635,6 +2665,11 @@ function initializeTerminalMode() {
                 }
                 
             } catch (error) {
+                console.error('❌ DEBUG: Terminal Mode Initialization Failed:', {
+                    error: error.message,
+                    stack: error.stack,
+                    globalTerminalIntelligenceAfterError: !!globalTerminalIntelligence
+                });
                 terminalDebugger.error('Terminal Mode Initialization Failed', error);
             }
         });

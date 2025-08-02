@@ -5,7 +5,9 @@
 // Terminal interface class - Claude Code style with Elliot
 class Terminal {
     constructor() {
+        console.log('🔧 DEBUG: Terminal constructor called');
         this.output = document.getElementById('terminalOutput');
+        console.log('🔍 DEBUG: Terminal constructor - output element found:', !!this.output);
         this.input = null; // Will be created dynamically
         this.isProcessing = false;
         this.conversationHistory = [];
@@ -562,7 +564,13 @@ class ElliotGenerator {
         const backToTraits = document.getElementById('backToTraits');
         
         if (terminalModeBtn) {
-            terminalModeBtn.addEventListener('click', () => this.enterTerminalMode());
+            console.log('🔧 DEBUG: Attaching enterTerminalMode handler to terminalModeBtn');
+            terminalModeBtn.addEventListener('click', () => {
+                console.log('🎯 DEBUG: TraitSelector terminalModeBtn clicked - calling enterTerminalMode');
+                this.enterTerminalMode();
+            });
+        } else {
+            console.log('❌ DEBUG: terminalModeBtn not found for TraitSelector handler');
         }
         if (backToTraits) {
             backToTraits.addEventListener('click', () => this.exitTerminalMode());
@@ -619,20 +627,33 @@ class ElliotGenerator {
     }
 
     enterTerminalMode() {
+        console.log('🔧 DEBUG: enterTerminalMode() called');
         const panel = document.getElementById('traitPanel');
+        console.log('🔍 DEBUG: traitPanel element found:', !!panel);
         if (panel) {
             panel.classList.add('flipped');
             
             setTimeout(() => {
+                console.log('🔧 DEBUG: setTimeout executed for terminal initialization');
+                console.log('🔍 DEBUG: this.terminal exists:', !!this.terminal);
+                
                 // Initialize terminal if not already done
                 if (!this.terminal) {
+                    console.log('🔧 DEBUG: Creating new Terminal instance...');
                     this.terminal = new Terminal();
+                    console.log('✅ DEBUG: Terminal instance created:', !!this.terminal);
+                } else {
+                    console.log('ℹ️ DEBUG: Terminal instance already exists');
                 }
                 
                 // Show welcome message if terminal output is empty
                 const terminalOutput = document.getElementById('terminalOutput');
+                console.log('🔍 DEBUG: Terminal output element found:', !!terminalOutput);
                 if (terminalOutput && terminalOutput.children.length === 0) {
+                    console.log('🔧 DEBUG: Showing welcome message...');
                     this.terminal.showWelcomeMessage();
+                } else {
+                    console.log('ℹ️ DEBUG: Terminal output not empty or element not found');
                 }
                 
                 // Focus will be handled by addPrompt() method
@@ -2619,8 +2640,10 @@ function initializeTerminalMode() {
     
     if (terminalModeBtn && terminalContainer && traitSelectorCard) {
         terminalDebugger.success('Setting Up Terminal Event Handlers');
+        console.log('🔧 DEBUG: Attaching TerminalIntelligence handler to terminalModeBtn (SECOND handler)');
         // Enter terminal mode
         terminalModeBtn.addEventListener('click', () => {
+            console.log('🎯 DEBUG: Global terminalModeBtn clicked - creating TerminalIntelligence');
             terminalDebugger.debug('Terminal Mode Button Clicked', {
                 timestamp: Date.now()
             });

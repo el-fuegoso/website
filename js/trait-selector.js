@@ -2661,6 +2661,24 @@ function initializeTerminalMode() {
                     constructorName: globalTerminalIntelligence?.constructor?.name
                 });
                 
+                // Also create Terminal class for Enter key handling
+                console.log('🔧 DEBUG: About to create Terminal class...');
+                if (!window.globalTerminal) {
+                    window.globalTerminal = new Terminal();
+                    console.log('✅ DEBUG: Terminal class created successfully:', {
+                        instance: !!window.globalTerminal,
+                        type: typeof window.globalTerminal,
+                        hasAddPrompt: typeof window.globalTerminal?.addPrompt === 'function'
+                    });
+                    
+                    // Set up the Enter key handler
+                    console.log('🔧 DEBUG: Calling addPrompt() to set up Enter key handler...');
+                    window.globalTerminal.addPrompt();
+                    console.log('✅ DEBUG: addPrompt() called - Enter key handler should be active');
+                } else {
+                    console.log('ℹ️ DEBUG: Terminal class already exists');
+                }
+                
                 terminalDebugger.success('TerminalIntelligence Created', {
                     instance: !!globalTerminalIntelligence,
                     type: typeof globalTerminalIntelligence

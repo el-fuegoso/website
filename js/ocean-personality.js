@@ -367,8 +367,8 @@ class OceanPersonalitySystem {
                     imageContainer.innerHTML = `
                         <div class="avatar-container">
                             ${avatarData.imageUrl ? 
-                                `<img src="${avatarData.imageUrl}" alt="${match.character.name} Avatar" class="generated-avatar" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />` : 
-                                `<div class="placeholder-avatar" style="background: linear-gradient(45deg, #004225, #0066ff); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; border-radius: 8px;">${match.character.name.charAt(0)}</div>`
+                                `<img src="${avatarData.imageUrl}" alt="${match.character.name} Avatar" class="generated-avatar" style="width: 100%; height: 100%; object-fit: contain;" />` : 
+                                `<div class="placeholder-avatar" style="background: linear-gradient(45deg, #004225, #0066ff); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">${match.character.name.charAt(0)}</div>`
                             }
                         </div>
                     `;

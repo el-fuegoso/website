@@ -655,9 +655,24 @@
         height: auto; /* Allow flexible height on mobile */
     }
 
+    /* Fix card order - BUILD card first, CHARACTER card second */
+    .trait-panel {
+        order: 1;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .avatar-display {
+        order: 2;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .trait-selector-card, .avatar-card {
         height: auto; /* Allow flexible height on mobile */
         min-height: 500px; /* Minimum height for mobile usability */
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .trait-grid {

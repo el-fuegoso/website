@@ -398,8 +398,8 @@ class WaterASCII {
     constructor() {
         this.frame = 0;
         this.characters = '~≈≋⋿⊰⊱◟◝';
-        this.rows = 30;
-        this.cols = 60;
+        this.rows = 20;
+        this.cols = 40;
         this.centerPos = { x: 0.5, y: 0.5 };
         this.charactersLength = this.characters.length;
         this.charLengthDivide4 = this.charactersLength / 4;
@@ -411,8 +411,26 @@ class WaterASCII {
     }
 
     init() {
-        this.container = document.getElementById('asciiContent');
+        this.container = document.querySelector('.image-container');
         if (this.container) {
+            // Set up container styling for water ASCII
+            this.container.style.cssText = `
+                width: 100%;
+                height: 100%;
+                font-family: 'Courier New', monospace;
+                font-size: 8px;
+                line-height: 0.9;
+                color: #000000;
+                background: #F0EEE6;
+                padding: 10px;
+                box-sizing: border-box;
+                overflow: hidden;
+                white-space: pre;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            `;
             this.startAnimation();
         }
     }
@@ -481,9 +499,11 @@ class WaterASCII {
             rowsArray.push({ text: rowString, opacity: rowOpacity });
         }
 
-        this.container.innerHTML = rowsArray.map(row => 
+        const asciiContent = rowsArray.map(row => 
             `<div style="opacity: ${row.opacity}; margin: 0; line-height: 1;">${row.text}</div>`
         ).join('');
+        
+        this.container.innerHTML = `<div style="display: inline-block; text-align: left;">${asciiContent}</div>`;
     }
 }
 
@@ -1672,90 +1692,6 @@ class ElliotGenerator {
         this.drawRadarChart('characterRadarChart', emptyScores, '#ccc');
     }
 
-    restoreWaterAnimation() {
-        // Restore the water ASCII animation
-        const waterAsciiContainer = document.getElementById('avatarCard');
-        if (!waterAsciiContainer) return;
-
-        // Show the matrix label and generation path
-        const matrixLabel = document.querySelector('.matrix-label');
-        const generationPath = document.getElementById('generationPath');
-        const avatarLabel = document.querySelector('.avatar-label');
-        
-        if (matrixLabel) matrixLabel.style.display = 'block';
-        if (generationPath) generationPath.style.display = 'block';
-        if (avatarLabel) avatarLabel.style.display = 'block';
-
-        // Restore complete original structure
-        waterAsciiContainer.className = 'avatar-card';
-        waterAsciiContainer.innerHTML = `
-            <div class="blue-accent"></div>
-            <div class="hover-effect"></div>
-            <div class="blue-accent"></div>
-            <div class="hover-effect"></div>
-            
-            <!-- Avatar Card Header -->
-            <div class="avatar-card-header">
-                <div class="toggle-header">
-                    <span class="toggle-title">Digital Persona</span>
-                    <span class="trait-counter" id="displayTraitCounter">0/18</span>
-                </div>
-            </div>
-            
-            <div class="card-header">
-                <div class="image-container">
-                    <!-- Binary flow animation will be inserted here -->
-                </div>
-                
-                <div class="header-radars">
-                    <div class="header-radar-section">
-                        <h4 class="header-chart-title">YOUR PROFILE</h4>
-                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
-                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
-                                <line x1="60" y1="60" x2="60" y2="10" />
-                                <line x1="60" y1="60" x2="95" y2="35" />
-                                <line x1="60" y1="60" x2="85" y2="75" />
-                                <line x1="60" y1="60" x2="35" y2="75" />
-                                <line x1="60" y1="60" x2="25" y2="35" />
-                            </g>
-                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
-                                <text x="60" y="8">O</text>
-                                <text x="98" y="38">C</text>
-                                <text x="88" y="78">E</text>
-                                <text x="32" y="78">A</text>
-                                <text x="22" y="38">N</text>
-                            </g>
-                        </svg>
-                    </div>
-                    
-                    <div class="header-radar-section">
-                        <h4 class="header-chart-title">CHARACTER</h4>
-                        <svg class="header-radar-chart" viewBox="0 0 120 120" width="60" height="60">
-                            <g stroke="rgba(51, 51, 51, 0.2)" stroke-width="0.5" opacity="0.5">
-                                <line x1="60" y1="60" x2="60" y2="10" />
-                                <line x1="60" y1="60" x2="95" y2="35" />
-                                <line x1="60" y1="60" x2="85" y2="75" />
-                                <line x1="60" y1="60" x2="35" y2="75" />
-                                <line x1="60" y1="60" x2="25" y2="35" />
-                            </g>
-                            <g font-size="8" font-weight="600" text-anchor="middle" fill="#333">
-                                <text x="60" y="8">O</text>
-                                <text x="98" y="38">C</text>
-                                <text x="88" y="78">E</text>
-                                <text x="32" y="78">A</text>
-                                <text x="22" y="38">N</text>
-                            </g>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Restart the water animation
-        if (this.waterAscii) {
-            this.waterAscii = new WaterASCII();
-        }
-    }
 
     showError() {
         console.error('Generation failed');
@@ -1843,8 +1779,6 @@ class ElliotGenerator {
         if (energyBar) energyBar.classList.add('active');
         if (collabBar) collabBar.classList.add('active');
         
-        // Restore water animation
-        this.restoreWaterAnimation();
         
         this.updateTraitDisplay();
     }

@@ -72,208 +72,12 @@ class OceanPersonalitySystem {
         const imageContainer = document.querySelector('.image-container');
         if (!imageContainer) return;
 
-        // Create ASCII container for binary flow animation
-        const asciiContainer = document.createElement('div');
-        asciiContainer.style.cssText = `
-            width: 100%;
-            height: 100%;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 0.85;
-            color: #000000;
-            background: #ddd;
-            padding: 8px;
-            box-sizing: border-box;
-            overflow: hidden;
-            white-space: pre;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        `;
-        
-        imageContainer.innerHTML = '';
-        imageContainer.appendChild(asciiContainer);
-
-        // Animation variables
-        let width = 25; // Square format like header artifact
-        let height = 25;
-        let grid = [];
-        let time = 0;
-        let animationFrameId;
-        let showingLoading = false; // Default to binary flow, not loading
-        let loadingFlashTime = 0;
-
-        // Store references for external access
-        this.asciiContainer = asciiContainer;
-        this.binaryFlowState = {
-            get showingLoading() { return showingLoading; },
-            set showingLoading(value) { showingLoading = value; },
-            get loadingFlashTime() { return loadingFlashTime; },
-            set loadingFlashTime(value) { loadingFlashTime = value; },
-            width,
-            height,
-            grid,
-            time
-        };
-
-        // LOADING ASCII art - compact version for 25x25 grid
-        const loadingText = [
-            "                         ",
-            "                         ",
-            "                         ",
-            "    ▓▓    ▓▓▓▓  ▓▓▓      ",
-            "    ▓     ▓  ▓ ▓   ▓     ",
-            "    ▓     ▓  ▓ ▓▓▓▓▓     ",
-            "    ▓     ▓  ▓ ▓   ▓     ",
-            "    ▓▓▓▓  ▓▓▓▓ ▓   ▓     ",
-            "                         ",
-            "   ▓▓▓▓  ▓ ▓▓  ▓▓ ▓▓▓▓   ",
-            "   ▓   ▓ ▓ ▓▓▓ ▓▓ ▓      ",
-            "   ▓   ▓ ▓ ▓ ▓▓▓▓ ▓▓▓    ",
-            "   ▓   ▓ ▓ ▓  ▓▓▓ ▓  ▓   ",
-            "   ▓▓▓▓  ▓ ▓   ▓▓ ▓▓▓▓   ",
-            "                         ",
-            "          ░░░░░          ",
-            "                         ",
-            "                         ",
-            "                         ",
-            "                         ",
-            "                         ",
-            "                         ",
-            "                         ",
-            "                         ",
-            "                         "
-        ];
-
-        function initGrid() {
-            grid = [];
-            for (let y = 0; y < height; y++) {
-                let row = [];
-                for (let x = 0; x < width; x++) {
-                    row.push(' ');
-                }
-                grid.push(row);
-            }
+        // Initialize WaterASCII animation instead of binary flow
+        if (typeof WaterASCII !== 'undefined') {
+            this.waterAscii = new WaterASCII();
+        } else {
+            console.warn('WaterASCII class not found');
         }
-
-        function renderLoading() {
-            const flash = Math.sin(loadingFlashTime * 0.2) > 0;
-            if (flash) {
-                let centered = [];
-                const startY = Math.floor((height - loadingText.length) / 2);
-                
-                for (let i = 0; i < height; i++) {
-                    if (i >= startY && i < startY + loadingText.length) {
-                        const textLine = loadingText[i - startY];
-                        const startX = Math.floor((width - Math.min(textLine.length, width)) / 2);
-                        let line = ' '.repeat(width);
-                        const visibleText = textLine.substring(0, width);
-                        line = line.substring(0, startX) + visibleText + line.substring(startX + visibleText.length);
-                        centered.push(line);
-                    } else {
-                        centered.push(' '.repeat(width));
-                    }
-                }
-                asciiContainer.innerHTML = centered.join('\n');
-            } else {
-                asciiContainer.innerHTML = ' '.repeat(width * height).replace(new RegExp(`.{${width}}`, 'g'), '$&\n');
-            }
-        }
-
-        function renderBinaryFlow() {
-            let html = '';
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    html += grid[y][x];
-                }
-                html += '\n';
-            }
-            asciiContainer.innerHTML = html;
-        }
-
-        function updateBinaryFlow() {
-            initGrid();
-            
-            const blockSize = Math.floor(width * 0.5);
-            const blockX = Math.floor(width / 2 - blockSize / 2);
-            const blockY = Math.floor(height / 2 - blockSize / 2);
-            const t = time * 0.008;
-            
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    if (x >= blockX && x < blockX + blockSize && 
-                        y >= blockY && y < blockY + blockSize) {
-                        const innerDist = Math.min(
-                            x - blockX, 
-                            blockX + blockSize - x,
-                            y - blockY,
-                            blockY + blockSize - y
-                        );
-                        
-                        const erosion = time * 0.01;
-                        if (innerDist > erosion) {
-                            grid[y][x] = '█';
-                        } else {
-                            grid[y][x] = Math.random() > 0.7 ? '█' : '▓';
-                        }
-                    } else {
-                        const dx = x - width / 2;
-                        const dy = y - height / 2;
-                        const angle = Math.atan2(dy, dx);
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        
-                        const wave = Math.sin(dist * 0.3 - t + angle * 1.8);
-                        const flow = Math.sin(x * 0.15 + y * 0.08 + t * 0.6);
-                        
-                        if (flow + wave > 0.5) {
-                            grid[y][x] = '▓';
-                        } else if (flow + wave < -0.3) {
-                            grid[y][x] = '░';
-                        }
-                    }
-                }
-            }
-            
-            // Add flowing effects
-            for (let i = 0; i < 3; i++) {
-                const flowX = blockX + Math.floor(Math.random() * blockSize);
-                const flowY = blockY + Math.floor(Math.random() * blockSize);
-                const length = Math.floor(Math.random() * 6) + 3;
-                let fx = Math.floor(flowX);
-                let fy = Math.floor(flowY);
-                
-                for (let j = 0; j < length; j++) {
-                    if (fx >= 0 && fx < width && fy >= 0 && fy < height) {
-                        grid[fy][fx] = '▒';
-                    }
-                    fx += Math.floor(Math.random() * 3) - 1;
-                    fy += Math.floor(Math.random() * 3) - 1;
-                }
-            }
-        }
-
-        const animate = () => {
-            if (!this.helixAnimation) return;
-
-            if (showingLoading) {
-                loadingFlashTime++;
-                renderLoading();
-                
-                // Show loading for 2 seconds, then switch to binary flow
-                if (loadingFlashTime > 120) {
-                    showingLoading = false;
-                }
-            } else {
-                updateBinaryFlow();
-                renderBinaryFlow();
-                time++;
-            }
-
-            this.helixAnimation = requestAnimationFrame(animate);
-        };
-
-        // Start animation
-        this.helixAnimation = requestAnimationFrame(animate);
     }
 
     stopHelixAnimation() {
@@ -281,14 +85,15 @@ class OceanPersonalitySystem {
             cancelAnimationFrame(this.helixAnimation);
             this.helixAnimation = null;
         }
+        // Stop WaterASCII animation if it exists
+        if (this.waterAscii && typeof this.waterAscii.stopAnimation === 'function') {
+            this.waterAscii.stopAnimation();
+        }
     }
 
     triggerLoadingAnimation() {
-        // Trigger loading animation if binary flow is currently running
-        if (this.binaryFlowState && this.helixAnimation) {
-            this.binaryFlowState.showingLoading = true;
-            this.binaryFlowState.loadingFlashTime = 0;
-        }
+        // No loading animation needed for WaterASCII - it flows continuously
+        // This method is kept for compatibility but does nothing
     }
 
     // Trait weight mapping removed - using direct OCEAN slider values

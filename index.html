@@ -84,7 +84,7 @@
             </h1>
             
             <div class="spark-magic" 
-                 onclick="changeEverything()"
+                 onclick="handleClickMe()"
                  onkeydown="handleKeyPress(event)"
                  role="button"
                  tabindex="0"
@@ -111,7 +111,7 @@
                         <!-- Trait Card Header -->
                         <div class="trait-card-header">
                             <div class="toggle-header">
-                                <span class="toggle-title">Build your character</span>
+                                <span class="toggle-title">BUILD</span>
                             </div>
                         </div>
                         
@@ -299,7 +299,7 @@
                     <!-- Avatar Card Header -->
                     <div class="avatar-card-header">
                         <div class="toggle-header">
-                            <span class="toggle-title">Digital Persona</span>
+                            <span class="toggle-title">CHARACTER</span>
                         </div>
                     </div>
                     
@@ -1010,6 +1010,15 @@
         }
 
         // Accessibility: Keyboard event handler
+        // Mobile-aware click handler for spark-magic button
+        function handleClickMe() {
+            // Check if device is mobile - if so, skip as touch handler will manage it
+            if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+                return;
+            }
+            changeEverything();
+        }
+
         function handleKeyPress(event) {
             if (event.key === ' ' || event.key === 'Enter') {
                 event.preventDefault();
@@ -2123,8 +2132,6 @@
                             pointer-events: none;
                             animation: fadeInOut 4s ease-in-out infinite;
                         ">
-                            ← Swipe to explore →<br>
-                            <span style="font-size: 0.7rem;">Tap title to cycle</span>
                         </div>
                     `;
                     document.querySelector('.hero-content').insertAdjacentHTML('beforeend', hintsHTML);

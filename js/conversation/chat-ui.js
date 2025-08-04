@@ -464,7 +464,7 @@ class ChatUI {
             return this.currentAvatar.conversationStarters[0];
         }
         // Fallback to generic message
-        return "Hi! I'm Claude, an AI assistant. I can help answer questions about Elliot's work and projects. What would you like to know?";
+        return "I am the default claude chat. Build your own El for a personalised experience";
     }
     
     getAvatarHTML() {

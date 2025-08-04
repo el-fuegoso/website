@@ -422,7 +422,6 @@ class WaterASCII {
                 line-height: 0.9;
                 color: #000000;
                 background: #F0EEE6;
-                padding: 10px;
                 box-sizing: border-box;
                 overflow: hidden;
                 white-space: pre;

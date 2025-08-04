@@ -364,13 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('⚠️ DEBUG: Failed to initialize performance manager:', error.message);
     }
     
-    // Initialize accessibility features (optional)
+    // Initialize accessibility features (mobile only)
     try {
-        if (typeof MobileAccessibilityManager === 'function') {
+        if (typeof MobileAccessibilityManager === 'function' && 
+            (window.innerWidth <= 768 || 'ontouchstart' in window)) {
             window.a11yManager = new MobileAccessibilityManager();
-            console.log('✅ DEBUG: Accessibility manager initialized');
+            console.log('✅ DEBUG: Mobile accessibility manager initialized');
         } else {
-            console.log('ℹ️ DEBUG: MobileAccessibilityManager not available - skipping');
+            console.log('ℹ️ DEBUG: MobileAccessibilityManager skipped - desktop or not available');
         }
     } catch (error) {
         console.warn('⚠️ DEBUG: Failed to initialize accessibility manager:', error.message);

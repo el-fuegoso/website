@@ -1902,8 +1902,9 @@
             initializeArtifacts();
             
             
-            // Initialize enhanced mobile accessibility
-            if (typeof MobileAccessibilityManager !== 'undefined') {
+            // Initialize enhanced mobile accessibility (mobile only)
+            if (typeof MobileAccessibilityManager !== 'undefined' && 
+                (window.innerWidth <= 768 || 'ontouchstart' in window)) {
                 window.accessibilityManager = new MobileAccessibilityManager();
             }
 

@@ -363,6 +363,11 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     }
 
     async generateTerminalAvatar(analysisData, userText = null) {
+        // Show loading overlay
+        if (window.loadingManager) {
+            window.loadingManager.showLoadingOverlay();
+        }
+        
         try {
             // Follow the exact same pattern as trait selector
             if (analysisData && analysisData.status === 'success' && analysisData.matched_character) {
@@ -384,6 +389,11 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             }
         } catch (error) {
             console.error('Terminal avatar generation failed:', error);
+        } finally {
+            // Hide loading overlay
+            if (window.loadingManager) {
+                window.loadingManager.hideLoadingOverlay();
+            }
         }
     }
     
@@ -550,6 +560,8 @@ class ElliotGenerator {
 
         if (generateBtn) generateBtn.addEventListener('click', () => {
             console.log('🎯 Trait selector GENERATE button clicked');
+            console.log('🔍 window.loadingManager exists:', !!window.loadingManager);
+            console.log('🔍 generateElliot method exists:', typeof this.generateElliot);
             this.triggerSoundbarPulse();
             this.generateElliot();
         });
@@ -834,6 +846,15 @@ class ElliotGenerator {
         this.isGenerating = true;
         console.log('🔍 Checking if avatarGenerator is available:', !!window.avatarGenerator);
         this.showGeneratingState();
+        
+        // Show loading overlay
+        console.log('🔍 About to show loading overlay - window.loadingManager:', !!window.loadingManager);
+        if (window.loadingManager) {
+            console.log('✅ Calling showLoadingOverlay() from generateElliot');
+            window.loadingManager.showLoadingOverlay();
+        } else {
+            console.error('❌ window.loadingManager not found in generateElliot!');
+        }
 
         try {
             // Option A: Integrate with backend trait analysis
@@ -915,6 +936,11 @@ class ElliotGenerator {
         } finally {
             this.isGenerating = false;
             this.hideGeneratingState();
+            
+            // Hide loading overlay
+            if (window.loadingManager) {
+                window.loadingManager.hideLoadingOverlay();
+            }
         }
     }
 
@@ -3015,11 +3041,306 @@ function initializeTraitSelector() {
     initializeTerminalMode();
 }
 
+// Loading Overlay Management Functions
+class LoadingOverlayManager {
+    constructor() {
+        this.overlay = null;
+        this.statusText = null;
+        this.timer = null;
+        this.tokenCount = null;
+        this.startTime = null;
+        this.timerInterval = null;
+        this.statusMessages = [
+            "Processing image...",
+            "Enhancing pixels...",
+            "Applying AI magic...",
+            "Consulting the algorithms...",
+            "Reticulating splines...",
+            "Caffeinating neural networks...",
+            "Teaching pixels to dance...",
+            "Optimizing visual cortex...",
+            "Summoning digital spirits...",
+            "Calibrating artistic vision..."
+        ];
+        this.currentMessageIndex = 0;
+        this.messageInterval = null;
+        this.init();
+    }
+
+    init() {
+        console.log('🔧 LoadingOverlayManager.init() called');
+        this.overlay = document.getElementById('loadingOverlay');
+        this.statusText = document.getElementById('statusText');
+        this.timer = document.getElementById('timer');
+        this.tokenCount = document.getElementById('tokenCount');
+        
+        console.log('🔍 DOM Elements found:', {
+            overlay: !!this.overlay,
+            statusText: !!this.statusText,
+            timer: !!this.timer,
+            tokenCount: !!this.tokenCount
+        });
+        
+        if (this.overlay) {
+            console.log('📍 Overlay element details:', {
+                id: this.overlay.id,
+                classes: this.overlay.className,
+                style: this.overlay.style.cssText,
+                computed: window.getComputedStyle(this.overlay).display
+            });
+        } else {
+            console.error('❌ loadingOverlay element not found in DOM!');
+        }
+    }
+
+    showLoadingOverlay() {
+        console.log('🚀 LoadingOverlayManager.showLoadingOverlay() called');
+        
+        if (!this.overlay) {
+            console.log('🔄 Overlay not found, calling init()');
+            this.init();
+        }
+        
+        if (!this.overlay) {
+            console.error('❌ Still no overlay after init - aborting show');
+            return;
+        }
+        
+        console.log('✅ Showing loading overlay');
+        this.startTime = Date.now();
+        this.currentMessageIndex = 0;
+        
+        // Show overlay
+        console.log('🎨 Adding "active" class to overlay');
+        this.overlay.classList.add('active');
+        
+        // Debug: Check if class was added
+        console.log('🔍 Overlay classes after adding active:', this.overlay.className);
+        console.log('🔍 Overlay computed styles:', {
+            display: window.getComputedStyle(this.overlay).display,
+            opacity: window.getComputedStyle(this.overlay).opacity,
+            visibility: window.getComputedStyle(this.overlay).visibility,
+            zIndex: window.getComputedStyle(this.overlay).zIndex
+        });
+        
+        // Start timer
+        this.updateTimer();
+        this.timerInterval = setInterval(() => this.updateTimer(), 1000);
+        
+        // Start rotating messages
+        this.updateStatusMessage();
+        this.messageInterval = setInterval(() => this.updateStatusMessage(), 2000);
+        
+        // Reset token count
+        this.updateTokenCount(0);
+        
+        console.log('🎯 Loading overlay setup complete');
+    }
+
+    hideLoadingOverlay() {
+        console.log('🛑 LoadingOverlayManager.hideLoadingOverlay() called');
+        
+        if (!this.overlay) {
+            console.log('⚠️ No overlay to hide');
+            return;
+        }
+        
+        console.log('🔄 Hiding loading overlay');
+        
+        // Hide overlay
+        this.overlay.classList.remove('active');
+        console.log('🎨 Removed "active" class from overlay');
+        
+        // Clear intervals
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+        
+        if (this.messageInterval) {
+            clearInterval(this.messageInterval);
+            this.messageInterval = null;
+        }
+    }
+
+    updateStatusMessage() {
+        if (!this.statusText) return;
+        
+        this.statusText.textContent = this.statusMessages[this.currentMessageIndex];
+        this.currentMessageIndex = (this.currentMessageIndex + 1) % this.statusMessages.length;
+    }
+
+    updateTimer() {
+        if (!this.timer || !this.startTime) return;
+        
+        const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+        this.timer.textContent = `${elapsed}s`;
+    }
+
+    updateTokenCount(count) {
+        if (!this.tokenCount) return;
+        this.tokenCount.textContent = count.toString();
+    }
+
+    updateLoadingStatus(message) {
+        if (!this.statusText) return;
+        this.statusText.textContent = message;
+    }
+}
+
+// DOM Debug Validation Function
+function debugDOMElements() {
+    console.log('🔧 DEBUG: Validating DOM elements for loading overlay');
+    
+    const elements = {
+        loadingOverlay: document.getElementById('loadingOverlay'),
+        statusText: document.getElementById('statusText'),
+        timer: document.getElementById('timer'),
+        tokenCount: document.getElementById('tokenCount'),
+        generateBtn: document.getElementById('generateBtn'),
+        imageContainer: document.querySelector('.image-container')
+    };
+    
+    console.log('🔍 DOM Elements found:', elements);
+    
+    Object.entries(elements).forEach(([name, element]) => {
+        if (element) {
+            console.log(`✅ ${name}:`, {
+                exists: true,
+                id: element.id,
+                classes: element.className,
+                parent: element.parentElement?.tagName,
+                computed: element.tagName === 'DIV' ? {
+                    display: window.getComputedStyle(element).display,
+                    position: window.getComputedStyle(element).position,
+                    zIndex: window.getComputedStyle(element).zIndex
+                } : 'N/A'
+            });
+        } else {
+            console.error(`❌ ${name}: NOT FOUND`);
+        }
+    });
+    
+    // Check if loading overlay is inside image container
+    const imageContainer = elements.imageContainer;
+    const loadingOverlay = elements.loadingOverlay;
+    
+    if (imageContainer && loadingOverlay) {
+        const isChild = imageContainer.contains(loadingOverlay);
+        console.log('🔍 Loading overlay is child of image container:', isChild);
+        
+        if (!isChild) {
+            console.error('❌ Loading overlay is NOT inside image container!');
+        }
+    }
+}
+
+// Create global loading manager instance
+window.loadingManager = new LoadingOverlayManager();
+
+// Add DOM debug validation
+window.debugDOMElements = debugDOMElements;
+
+// Browser Console Debug Helpers
+window.debugOverlay = {
+    show: () => {
+        console.log('🔧 Debug: Showing overlay via console helper');
+        if (window.loadingManager) {
+            window.loadingManager.showLoadingOverlay();
+        } else {
+            console.error('❌ loadingManager not available');
+        }
+    },
+    hide: () => {
+        console.log('🔧 Debug: Hiding overlay via console helper');
+        if (window.loadingManager) {
+            window.loadingManager.hideLoadingOverlay();
+        } else {
+            console.error('❌ loadingManager not available');
+        }
+    },
+    check: () => {
+        console.log('🔧 Debug: Checking overlay state');
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            console.log('✅ Overlay found:', {
+                element: overlay,
+                classes: overlay.className,
+                styles: {
+                    display: window.getComputedStyle(overlay).display,
+                    opacity: window.getComputedStyle(overlay).opacity,
+                    visibility: window.getComputedStyle(overlay).visibility,
+                    position: window.getComputedStyle(overlay).position,
+                    zIndex: window.getComputedStyle(overlay).zIndex,
+                    bottom: window.getComputedStyle(overlay).bottom,
+                    right: window.getComputedStyle(overlay).right
+                }
+            });
+        } else {
+            console.error('❌ Overlay not found');
+        }
+    },
+    test: () => {
+        console.log('🔧 Debug: Running full test');
+        window.debugOverlay.check();
+        console.log('🔧 Debug: Showing overlay for 3 seconds...');
+        window.debugOverlay.show();
+        setTimeout(() => {
+            console.log('🔧 Debug: Hiding overlay after 3 seconds');
+            window.debugOverlay.hide();
+        }, 3000);
+    }
+};
+
+// Add debug button event handlers
+function setupDebugButtons() {
+    console.log('🔧 Setting up debug buttons');
+    
+    const showBtn = document.getElementById('debugShowOverlay');
+    const hideBtn = document.getElementById('debugHideOverlay');
+    const domBtn = document.getElementById('debugDOMCheck');
+    
+    if (showBtn) {
+        showBtn.addEventListener('click', () => {
+            console.log('🔴 DEBUG: Manual show overlay clicked');
+            if (window.loadingManager) {
+                window.loadingManager.showLoadingOverlay();
+            } else {
+                console.error('❌ loadingManager not found');
+            }
+        });
+    }
+    
+    if (hideBtn) {
+        hideBtn.addEventListener('click', () => {
+            console.log('🔴 DEBUG: Manual hide overlay clicked');
+            if (window.loadingManager) {
+                window.loadingManager.hideLoadingOverlay();
+            } else {
+                console.error('❌ loadingManager not found');
+            }
+        });
+    }
+    
+    if (domBtn) {
+        domBtn.addEventListener('click', () => {
+            console.log('🔴 DEBUG: Manual DOM check clicked');
+            debugDOMElements();
+        });
+    }
+}
+
 // Initialize trait selector - DOM is already ready since script loads at bottom of HTML
 // But add both immediate execution and DOMContentLoaded fallback for safety
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeTraitSelector);
+    document.addEventListener('DOMContentLoaded', () => {
+        debugDOMElements(); // Run debug validation first
+        setupDebugButtons(); // Setup debug button handlers
+        initializeTraitSelector();
+    });
 } else {
+    debugDOMElements(); // Run debug validation first
+    setupDebugButtons(); // Setup debug button handlers
     initializeTraitSelector();
 }
 

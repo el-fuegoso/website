@@ -39,6 +39,13 @@ class AvatarGenerator {
 
         this.isGenerating = true;
 
+        // Optional loading overlay hook - only show if not already shown
+        let shouldHideOverlay = false;
+        if (window.loadingManager && !window.loadingManager.overlay?.classList.contains('active')) {
+            window.loadingManager.showLoadingOverlay();
+            shouldHideOverlay = true;
+        }
+
         try {
             // Get the complete prompt for the character from global avatar prompts
             const prompt = window.getAvatarPrompt ? 
@@ -74,6 +81,11 @@ class AvatarGenerator {
             return this.createErrorAvatar(matchedCharacterName);
         } finally {
             this.isGenerating = false;
+            
+            // Hide loading overlay if we showed it
+            if (shouldHideOverlay && window.loadingManager) {
+                window.loadingManager.hideLoadingOverlay();
+            }
         }
     }
 

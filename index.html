@@ -23,7 +23,7 @@
     <script src="js/conversation/conversation-manager.js?v=4&t=202508020931"></script>
     <link rel="stylesheet" href="css/main.css?t=202508020931">
     <link rel="stylesheet" href="css/trait-selector.css?v=2.0&t=202508020931">
-    <link rel="stylesheet" href="css/avatar-cards.css?v=2.1&t=202508020931">
+    <link rel="stylesheet" href="css/avatar-cards.css?v=2.2&t=202508041544">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 </head>
@@ -306,6 +306,26 @@
                     <div class="card-header">
                         <div class="image-container">
                             <!-- Binary flow animation will be inserted here -->
+                            
+                            <!-- Loading Overlay -->
+                            <div class="loading-overlay" id="loadingOverlay">
+                                <div class="loading-content">
+                                    <div class="status-line">
+                                        <div class="spinner"></div>
+                                        <span class="status-text" id="statusText">Processing...</span>
+                                    </div>
+                                    <div class="meta-info">
+                                        (<span id="timer">0s</span> • ↑ <span id="tokenCount">0</span> tokens)
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- DEBUG: Manual trigger buttons -->
+                            <div style="position: absolute; top: 10px; left: 10px; z-index: 999; background: white; padding: 10px; border: 2px solid red;">
+                                <button id="debugShowOverlay" style="background: green; color: white; padding: 5px;">Show Overlay</button>
+                                <button id="debugHideOverlay" style="background: red; color: white; padding: 5px;">Hide Overlay</button>
+                                <button id="debugDOMCheck" style="background: blue; color: white; padding: 5px;">Check DOM</button>
+                            </div>
                         </div>
                         
                         <!-- Radar charts moved above sliders -->

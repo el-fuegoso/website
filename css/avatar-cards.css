@@ -673,4 +673,9 @@
         padding: 12px;
         font-size: 12px;
     }
+
+    /* Hide advanced section on mobile for cleaner UX */
+    .advanced-section {
+        display: none;
+    }
 }

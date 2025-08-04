@@ -13,9 +13,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/el-fuegoso/website/issues"
   },
-  "homepage": "https://github.com/el-fuegoso/website#readme"
+  "homepage": "https://github.com/el-fuegoso/website#readme",
+  "devDependencies": {
+    "@gradio/client": "^1.15.7"
+  }
 }

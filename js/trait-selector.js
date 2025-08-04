@@ -2919,6 +2919,11 @@ function initializeTerminalMode() {
                                 
                                 console.log('🎯 DEBUG: Character match result:', match);
                                 
+                                // Stop the character name shuffling animation
+                                if (window.oceanSystem) {
+                                    window.oceanSystem.isGenerating = true;
+                                }
+                                
                                 if (match.character && window.avatarGenerator) {
                                     // Generate avatar for the matched character
                                     console.log('🎯 DEBUG: About to call generateAvatar for:', match.character.name);

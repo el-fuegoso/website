@@ -653,6 +653,8 @@
         grid-template-columns: 1fr;
         gap: 20px;
         height: auto; /* Allow flexible height on mobile */
+        width: 100%;
+        max-width: 100%;
     }
 
     /* Fix card order - BUILD card first, CHARACTER card second */
@@ -671,8 +673,10 @@
     .trait-selector-card, .avatar-card {
         height: auto; /* Allow flexible height on mobile */
         min-height: 500px; /* Minimum height for mobile usability */
-        width: 100%;
+        width: 100% !important; /* Force consistent width */
+        max-width: 100% !important; /* Prevent overflow */
         box-sizing: border-box;
+        flex-shrink: 0; /* Prevent cards from shrinking differently */
     }
 
     .trait-grid {

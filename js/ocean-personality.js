@@ -75,9 +75,8 @@ class OceanPersonalitySystem {
         // Initialize WaterASCII animation instead of binary flow
         if (typeof WaterASCII !== 'undefined') {
             this.waterAscii = new WaterASCII();
-        } else {
-            console.warn('WaterASCII class not found');
         }
+        // Silent fallback if WaterASCII not available
     }
 
     stopHelixAnimation() {
@@ -374,12 +373,11 @@ class OceanPersonalitySystem {
                     `;
                 }
             } catch (error) {
-                console.error('❌ Avatar generation failed:', error);
+                console.error('Avatar generation failed:', error);
                 // Keep the text fallback
             }
-        } else {
-            console.error('❌ Avatar generator not available - window.avatarGenerator is undefined');
         }
+        // Silent fallback if avatar generator not available
     }
 
     async scrambleText(element, finalText) {

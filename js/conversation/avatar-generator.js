@@ -28,7 +28,6 @@ class AvatarGenerator {
     async generateAvatar(matchedCharacterName = "TheBuilder", options = {}) {
         
         if (this.isGenerating) {
-            console.log('⚠️ Avatar generation already in progress, skipping');
             return null;
         }
 
@@ -264,102 +263,64 @@ class AvatarGenerator {
     }
 
     startChatWithCharacter(characterName) {
-        console.log(`🚀 DEBUG: startChatWithCharacter called with: ${characterName}`);
-        console.log('🔍 DEBUG: Current avatar generator instance:', this);
-        console.log('🔍 DEBUG: Available window objects:');
         console.log('  - window.ChatUI:', typeof window.ChatUI);
         console.log('  - window.ConversationManager:', typeof window.ConversationManager);
         console.log('  - window.chatUI:', !!window.chatUI);
         
         // Get character data for context
-        console.log('🔧 DEBUG: Getting character data...');
         const characterData = this.getCharacterDataForChat(characterName);
-        console.log(`📋 DEBUG: Character data loaded:`, { 
-            name: characterName, 
-            title: characterData?.title,
-            hasDescription: !!characterData?.description,
-            fullData: characterData
-        });
         
         // Initialize chat UI if not already done
         if (typeof window.ChatUI !== 'undefined') {
-            console.log('🎯 DEBUG: ChatUI class is available, proceeding with initialization...');
             
             if (!window.chatUI) {
-                console.log('🔧 DEBUG: Creating new ChatUI instance');
                 try {
                     window.chatUI = new window.ChatUI();
-                    console.log('✅ DEBUG: ChatUI instance created successfully');
                 } catch (error) {
-                    console.error('❌ DEBUG: Error creating ChatUI instance:', error);
-                    console.error('❌ DEBUG: Error stack:', error.stack);
                     return;
                 }
             } else {
-                console.log('🔍 DEBUG: Existing ChatUI instance found:', window.chatUI);
             }
             
             try {
-                console.log('⚡ DEBUG: Calling initializeChatWithCharacter...');
-                console.log('🔍 DEBUG: ChatUI methods available:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.chatUI)));
                 
                 // Check if the method exists
                 if (typeof window.chatUI.initializeChatWithCharacter !== 'function') {
-                    console.error('❌ DEBUG: initializeChatWithCharacter method not found on ChatUI instance');
-                    console.log('🔍 DEBUG: Available methods:', Object.getOwnPropertyNames(window.chatUI));
                     alert('Chat system error: initialization method not found');
                     return;
                 }
                 
                 // Initialize chat with character
                 window.chatUI.initializeChatWithCharacter(characterName, characterData);
-                console.log('✅ DEBUG: initializeChatWithCharacter completed');
                 
-                console.log('👁️ DEBUG: Showing chat modal...');
                 if (typeof window.chatUI.show !== 'function') {
-                    console.error('❌ DEBUG: show method not found on ChatUI instance');
                     alert('Chat system error: show method not found');
                     return;
                 }
                 
                 window.chatUI.show();
-                console.log('✅ DEBUG: Chat modal show() called - should be visible now');
                 
             } catch (error) {
-                console.error('❌ DEBUG: Error in ChatUI initialization/display:', error);
-                console.error('❌ DEBUG: Error stack:', error.stack);
-                console.error('❌ DEBUG: Character data used:', characterData);
                 alert(`Failed to start chat with ${characterName}. Error: ${error.message}`);
             }
         } else if (typeof window.ConversationManager !== 'undefined') {
-            console.log('🎯 DEBUG: ChatUI not available, using ConversationManager fallback...');
-            console.log('🔍 DEBUG: ConversationManager type:', typeof window.ConversationManager);
             
             try {
                 // Alternative: use conversation manager
                 const conversationManager = new window.ConversationManager();
-                console.log('🔧 DEBUG: ConversationManager instance created');
                 
                 if (typeof conversationManager.startCharacterChat === 'function') {
                     conversationManager.startCharacterChat(characterName, characterData);
-                    console.log('✅ DEBUG: ConversationManager startCharacterChat called');
                 } else {
-                    console.error('❌ DEBUG: startCharacterChat method not found on ConversationManager');
                     alert('Chat system error: ConversationManager method not found');
                 }
             } catch (error) {
-                console.error('❌ DEBUG: Error with ConversationManager fallback:', error);
-                console.error('❌ DEBUG: Error stack:', error.stack);
                 alert(`Failed to start chat with ConversationManager. Error: ${error.message}`);
             }
         } else {
-            console.error('❌ DEBUG: No chat system classes available!');
-            console.log('🔍 DEBUG: Available window properties:', Object.keys(window).filter(key => key.includes('Chat') || key.includes('Conversation')));
-            console.warn('⚠️ DEBUG: Using alert fallback because no chat system found');
             
             // Fallback: simple alert with character info
             alert(`Chat with ${characterName}\n\n${characterData?.title || 'Unknown Character'}\n\n${characterData?.description || 'No description available'}\n\nChat system not loaded - please refresh the page.`);
-            console.warn('❌ DEBUG: Chat system not found. Make sure chat-ui.js and conversation-manager.js are loaded.');
         }
     }
 
@@ -380,7 +341,6 @@ class AvatarGenerator {
         
         // Map the character name to proper format
         const mappedName = nameMapping[characterName] || characterName;
-        console.log(`🔄 DEBUG: Character name mapping: "${characterName}" → "${mappedName}"`);
         
         // Character descriptions for chat context
         const characterData = {
@@ -444,7 +404,6 @@ class AvatarGenerator {
         
         if (!character) {
             console.error(`❌ No character data found for mapped name: ${mappedName} (original: ${characterName})`);
-            console.log('📋 Available characters:', Object.keys(characterData));
             // Return a generic fallback instead of TheBuilder
             return {
                 title: "Unknown Character",
@@ -454,7 +413,6 @@ class AvatarGenerator {
             };
         }
         
-        console.log(`✅ DEBUG: Found character data for "${mappedName}":`, character.title);
         return character;
     }
 
@@ -558,4 +516,3 @@ class AvatarGenerator {
 }
 
 window.AvatarGenerator = AvatarGenerator;
-console.log('✅ DEBUG: AvatarGenerator class loaded and assigned to window.AvatarGenerator');

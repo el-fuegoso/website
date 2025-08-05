@@ -3,10 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elliot Lee - Portfolio</title>
+    <title>Elliot Lee - Interactive Portfolio</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23004225'/><text x='16' y='20' text-anchor='middle' fill='white' font-family='monospace' font-size='12' font-weight='bold'>El</text></svg>">
     <!-- Cache bust: 2025-08-02 -->
-    <meta name="description" content="Interactive portfolio showcasing generative art and creative coding">
+    <meta name="description" content="Interactive AI Portfolio - Meet your ideal El! Discover which of 12 unique programming characters matches your personality through AI-powered analysis and generative art experiences.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://el-fuegoso.github.io/website/">
+    <meta property="og:title" content="Elliot Lee - Interactive Portfolio">
+    <meta property="og:description" content="Interactive AI Portfolio - Meet your ideal El! Discover which of 12 unique programming characters matches your personality through AI-powered analysis and generative art experiences.">
+    <meta property="og:image" content="https://el-fuegoso.github.io/website/images/og-preview.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://el-fuegoso.github.io/website/">
+    <meta property="twitter:title" content="Elliot Lee - Interactive Portfolio">
+    <meta property="twitter:description" content="Interactive AI Portfolio - Meet your ideal El! Discover which of 12 unique programming characters matches your personality through AI-powered analysis and generative art experiences.">
+    <meta property="twitter:image" content="https://el-fuegoso.github.io/website/images/og-preview.png">
+    
+    <!-- Additional SEO -->
+    <meta name="keywords" content="AI portfolio, personality analysis, interactive art, generative art, programming characters, Claude AI, Three.js, JavaScript, web development, Elliot Lee">
+    <meta name="author" content="Elliot Lee">
+    <link rel="canonical" href="https://el-fuegoso.github.io/website/">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Flip.min.js"></script>
@@ -317,12 +336,6 @@
                         <div class="image-container">
                             <!-- Binary flow animation will be inserted here -->
                             
-                            <!-- DEBUG: Manual trigger buttons -->
-                            <div style="position: absolute; top: 10px; left: 10px; z-index: 999; background: white; padding: 10px; border: 2px solid red;">
-                                <button id="debugShowOverlay" style="background: green; color: white; padding: 5px;">Show Overlay</button>
-                                <button id="debugHideOverlay" style="background: red; color: white; padding: 5px;">Hide Overlay</button>
-                                <button id="debugDOMCheck" style="background: blue; color: white; padding: 5px;">Check DOM</button>
-                            </div>
                         </div>
                         
                         <!-- Radar charts moved above sliders -->
@@ -2387,15 +2400,9 @@
         // Cache busting and debugging
         
         // Debug function to check if system is working
-        window.debugOcean = function() {
-            
-            if (window.oceanSystem) {
-            }
-        };
         
         // Auto-run debug after 2 seconds
         setTimeout(() => {
-            window.debugOcean();
             // Add visible confirmation
             const generateBtn = document.getElementById('generateBtn');
             if (generateBtn && window.oceanSystem) {

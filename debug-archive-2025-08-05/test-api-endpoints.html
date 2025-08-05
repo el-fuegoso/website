@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HF API Endpoint Discovery Test</title>
+</head>
+<body>
+    <h1>Testing HF API Endpoints</h1>
+    <div id="output"></div>
+    
+    <script type="module">
+        // Import Gradio client same as main app
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.js";
+        
+        async function testAPIEndpoints() {
+            const output = document.getElementById('output');
+            
+            try {
+                output.innerHTML += '<p>🔗 Connecting to HF Space...</p>';
+                console.log('🔗 Connecting to HF Space...');
+                
+                const client = await Client.connect("jrjrhan/personality_classification_OCEAN_en");
+                
+                output.innerHTML += '<p>✅ Successfully connected!</p>';
+                console.log('✅ Successfully connected!');
+                
+                // Try to view API structure
+                output.innerHTML += '<p>🔍 Checking available API endpoints...</p>';
+                console.log('🔍 Checking available API endpoints...');
+                
+                // Check if view_api method exists and call it
+                if (typeof client.view_api === 'function') {
+                    const apiInfo = await client.view_api();
+                    output.innerHTML += '<p>📋 API Info:</p>';
+                    output.innerHTML += '<pre>' + JSON.stringify(apiInfo, null, 2) + '</pre>';
+                    console.log('📋 API Info:', apiInfo);
+                } else {
+                    output.innerHTML += '<p>⚠️ view_api method not available</p>';
+                    console.log('⚠️ view_api method not available');
+                }
+                
+                // Try to inspect the client object
+                output.innerHTML += '<p>🔍 Client object properties:</p>';
+                const clientProps = Object.getOwnPropertyNames(client);
+                output.innerHTML += '<pre>' + JSON.stringify(clientProps, null, 2) + '</pre>';
+                console.log('🔍 Client object properties:', clientProps);
+                
+                // Try some common endpoint names
+                const commonEndpoints = ['/predict', '/classify', '/analyze', '/process', '/run'];
+                
+                for (const endpoint of commonEndpoints) {
+                    try {
+                        output.innerHTML += `<p>🧪 Testing endpoint: ${endpoint}</p>`;
+                        console.log(`🧪 Testing endpoint: ${endpoint}`);
+                        
+                        const result = await client.predict(endpoint, {
+                            inputs: "test input"
+                        });
+                        
+                        output.innerHTML += `<p>✅ ${endpoint} works! Result:</p>`;
+                        output.innerHTML += '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                        console.log(`✅ ${endpoint} works!`, result);
+                        break; // Found working endpoint
+                        
+                    } catch (error) {
+                        output.innerHTML += `<p>❌ ${endpoint} failed: ${error.message}</p>`;
+                        console.log(`❌ ${endpoint} failed:`, error.message);
+                    }
+                }
+                
+            } catch (error) {
+                output.innerHTML += `<p>💥 Connection failed: ${error.message}</p>`;
+                console.error('💥 Connection failed:', error);
+            }
+        }
+        
+        // Run the test when page loads
+        testAPIEndpoints();
+    </script>
+</body>
+</html>

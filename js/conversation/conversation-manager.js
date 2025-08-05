@@ -174,4 +174,3 @@ class ConversationManager {
 }
 
 window.ConversationManager = ConversationManager;
-console.log('✅ DEBUG: ConversationManager class loaded and assigned to window.ConversationManager');

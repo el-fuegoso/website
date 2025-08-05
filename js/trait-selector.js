@@ -5,9 +5,7 @@
 // Terminal interface class - Claude Code style with Elliot
 class Terminal {
     constructor() {
-        console.log('🔧 DEBUG: Terminal constructor called');
         this.output = document.getElementById('terminalOutput');
-        console.log('🔍 DEBUG: Terminal constructor - output element found:', !!this.output);
         this.input = null; // Will be created dynamically
         this.isProcessing = false;
         this.conversationHistory = [];
@@ -283,14 +281,8 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
             // Using native browser caret with custom styling - no initialization needed
             
             // Add Enter key handler after cursor is initialized
-            console.log('🔧 DEBUG: Setting up terminal Enter key handler:', {
-                inputElement: !!this.input,
-                inputId: this.input?.id,
-                handleKeyDownMethod: typeof this.handleKeyDown
-            });
             this.input.removeEventListener('keydown', this.handleKeyDown);
             this.input.addEventListener('keydown', this.handleKeyDown.bind(this));
-            console.log('✅ DEBUG: Terminal Enter key handler attached');
         }
         
         // Scroll output to bottom
@@ -300,27 +292,13 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     }
 
     async handleKeyDown(event) {
-        console.log('🔑 DEBUG: Terminal.handleKeyDown called:', {
-            key: event.key,
-            inputValue: this.input.value,
-            hasGlobalTerminalIntelligence: !!globalTerminalIntelligence,
-            globalTerminalIntelligenceType: typeof globalTerminalIntelligence
-        });
         
         if (event.key === 'Enter') {
             event.preventDefault();
             
             const value = this.input.value.trim();
-            console.log('🎯 DEBUG: Terminal Enter key pressed:', {
-                rawValue: this.input.value,
-                trimmedValue: value,
-                valueLength: value.length,
-                hasValue: !!value,
-                hasGlobalTerminalIntelligence: !!globalTerminalIntelligence
-            });
             
             if (value && globalTerminalIntelligence) {
-                console.log('✅ DEBUG: Processing terminal input - conditions met');
                 try {
                     // Clear input immediately
                     this.input.value = '';
@@ -338,16 +316,8 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
                         await this.processTerminalInput(value);
                     }
                 } catch (error) {
-                    console.error('❌ DEBUG: Terminal input processing failed:', error);
                     this.addToOutput(`<span style="color: #ff4444;">Error: ${error.message}</span>`);
                 }
-            } else {
-                console.log('❌ DEBUG: Terminal input NOT processed:', {
-                    hasValue: !!value,
-                    value: value,
-                    hasGlobalTerminalIntelligence: !!globalTerminalIntelligence,
-                    globalTerminalIntelligenceStatus: globalTerminalIntelligence ? 'exists' : 'null/undefined'
-                });
             }
         }
     }
@@ -559,9 +529,6 @@ class ElliotGenerator {
         const saveBtn = document.getElementById('saveBtn');
 
         if (generateBtn) generateBtn.addEventListener('click', () => {
-            console.log('🎯 Trait selector GENERATE button clicked');
-            console.log('🔍 window.loadingManager exists:', !!window.loadingManager);
-            console.log('🔍 generateElliot method exists:', typeof this.generateElliot);
             this.triggerSoundbarPulse();
             this.generateElliot();
         });
@@ -595,13 +562,10 @@ class ElliotGenerator {
         const backToTraits = document.getElementById('backToTraits');
         
         if (terminalModeBtn) {
-            console.log('🔧 DEBUG: Attaching enterTerminalMode handler to terminalModeBtn');
             terminalModeBtn.addEventListener('click', () => {
-                console.log('🎯 DEBUG: TraitSelector terminalModeBtn clicked - calling enterTerminalMode');
                 this.enterTerminalMode();
             });
         } else {
-            console.log('❌ DEBUG: terminalModeBtn not found for TraitSelector handler');
         }
         if (backToTraits) {
             backToTraits.addEventListener('click', () => this.exitTerminalMode());
@@ -658,33 +622,23 @@ class ElliotGenerator {
     }
 
     enterTerminalMode() {
-        console.log('🔧 DEBUG: enterTerminalMode() called');
         const panel = document.getElementById('traitPanel');
-        console.log('🔍 DEBUG: traitPanel element found:', !!panel);
         if (panel) {
             panel.classList.add('flipped');
             
             setTimeout(() => {
-                console.log('🔧 DEBUG: setTimeout executed for terminal initialization');
-                console.log('🔍 DEBUG: this.terminal exists:', !!this.terminal);
                 
                 // Initialize terminal if not already done
                 if (!this.terminal) {
-                    console.log('🔧 DEBUG: Creating new Terminal instance...');
                     this.terminal = new Terminal();
-                    console.log('✅ DEBUG: Terminal instance created:', !!this.terminal);
                 } else {
-                    console.log('ℹ️ DEBUG: Terminal instance already exists');
                 }
                 
                 // Show welcome message if terminal output is empty
                 const terminalOutput = document.getElementById('terminalOutput');
-                console.log('🔍 DEBUG: Terminal output element found:', !!terminalOutput);
                 if (terminalOutput && terminalOutput.children.length === 0) {
-                    console.log('🔧 DEBUG: Showing welcome message...');
                     this.terminal.showWelcomeMessage();
                 } else {
-                    console.log('ℹ️ DEBUG: Terminal output not empty or element not found');
                 }
                 
                 // Focus will be handled by addPrompt() method
@@ -839,12 +793,10 @@ class ElliotGenerator {
 
     async generateElliot() {
         if (this.isGenerating) {
-            console.log('⚠️ Generation already in progress, skipping');
             return;
         }
 
         this.isGenerating = true;
-        console.log('🔍 Checking if avatarGenerator is available:', !!window.avatarGenerator);
         this.showGeneratingState();
         
         // Show loading overlay
@@ -1327,15 +1279,8 @@ class ElliotGenerator {
         waterAsciiContainer.className = 'avatar-display-container';
 
         // Render the avatar component
-        console.log('🎯 DEBUG: showAvatarResults called with elliotData:', elliotData);
-        console.log('🎯 DEBUG: elliotData.avatarData:', elliotData.avatarData);
-        console.log('🎯 DEBUG: window.avatarGenerator:', window.avatarGenerator);
-        console.log('🎯 DEBUG: Condition check - elliotData.avatarData exists:', !!elliotData.avatarData);
-        console.log('🎯 DEBUG: Condition check - window.avatarGenerator exists:', !!window.avatarGenerator);
-        console.log('🎯 DEBUG: Overall condition result:', !!(elliotData.avatarData && window.avatarGenerator));
         
         if (elliotData.avatarData && window.avatarGenerator) {
-            console.log('🎯 DEBUG: Entering avatar rendering block');
             window.avatarGenerator.renderAvatarComponent(
                 waterAsciiContainer, 
                 elliotData.avatarData, 
@@ -1354,68 +1299,41 @@ class ElliotGenerator {
             this.enableChatButton(elliotData);
             
         } else {
-            console.log('❌ DEBUG: Avatar rendering condition failed!');
-            console.log('❌ DEBUG: Missing avatarData:', !elliotData.avatarData);
-            console.log('❌ DEBUG: Missing avatarGenerator:', !window.avatarGenerator);
             if (!elliotData.avatarData) {
-                console.log('❌ DEBUG: elliotData.avatarData is:', elliotData.avatarData);
             }
             if (!window.avatarGenerator) {
-                console.log('❌ DEBUG: window.avatarGenerator is:', window.avatarGenerator);
             }
         }
     }
 
     enableChatButton(elliotData) {
-        console.log('🔧 DEBUG: enableChatButton called with elliotData:', elliotData);
         
         // Find the static chat button
         const chatBtn = document.getElementById('chatNowBtn');
-        console.log('🔍 DEBUG: Chat button found in enableChatButton:', !!chatBtn);
-        console.log('🔍 DEBUG: Chat button element details:', chatBtn);
         
         if (!chatBtn) {
-            console.error('❌ DEBUG: Chat button not found in HTML - ID chatNowBtn missing!');
             // Let's check what elements DO exist
             const allButtons = document.querySelectorAll('button');
             const avatarCard = document.querySelector('.avatar-card');
-            console.log('🔍 DEBUG: All buttons found:', allButtons.length, allButtons);
-            console.log('🔍 DEBUG: Avatar card found:', !!avatarCard);
-            console.log('🔍 DEBUG: Document ready state:', document.readyState);
             return;
         }
         
         // Check parent container
         const parentContainer = chatBtn.parentElement;
-        console.log('🔍 DEBUG: Button parent container:', parentContainer);
         
         // Log button state before changes
-        console.log('🔍 DEBUG: Button state before enabling:');
-        console.log('  - disabled:', chatBtn.disabled);
-        console.log('  - opacity:', chatBtn.style.opacity);
-        console.log('  - display:', chatBtn.style.display);
-        console.log('  - existing onclick:', !!chatBtn.onclick);
         
         // Enable the button and make it fully visible
         chatBtn.disabled = false;
         chatBtn.style.opacity = '1';
         
-        console.log('🔍 DEBUG: Button state after enabling:');
-        console.log('  - disabled:', chatBtn.disabled);
-        console.log('  - opacity:', chatBtn.style.opacity);
         
         // Add click handler
         chatBtn.onclick = () => {
-            console.log('🎯 DEBUG: enableChatButton click handler triggered');
-            console.log('🔍 DEBUG: elliotData in click handler:', elliotData);
             
             try {
-                console.log('🚀 DEBUG: Calling openChatWithCharacter');
                 this.openChatWithCharacter(elliotData);
-                console.log('✅ DEBUG: openChatWithCharacter call completed');
             } catch (error) {
-                console.error('❌ DEBUG: Error in enableChatButton click handler:', error);
-                console.error('❌ DEBUG: Error stack:', error.stack);
                 alert('Error opening chat: ' + error.message);
             }
         };
@@ -1579,7 +1497,6 @@ class ElliotGenerator {
             this.drawRadarChart('userRadarChart', userBigFive, '#004225');
             this.drawRadarChart('characterRadarChart', characterBigFive, '#CC7A00');
             
-            console.log('📊 Updated radar charts with OCEAN scores:', oceanScores);
         } else {
             // Fallback to old trait mapping system if no OCEAN scores
             const selectedTraitsObj = {};
@@ -2109,7 +2026,6 @@ Conversation context: ${data.classification?.type || 'general discussion'}`;
             N: oceanScores.Neuroticism || 0
         };
 
-        console.log('🔍 User OCEAN scores for matching:', userScores);
 
         // Get character database from elliotGenerator
         const characters = window.elliotGenerator ? window.elliotGenerator.getCharacterData() : {};
@@ -2130,7 +2046,6 @@ Conversation context: ${data.classification?.type || 'general discussion'}`;
             const maxDistance = Math.sqrt(5 * Math.pow(4, 2)); // Max possible distance
             const similarity = 1 - (distance / maxDistance);
 
-            console.log(`📊 ${charName}: distance=${distance.toFixed(2)}, similarity=${similarity.toFixed(3)}`);
 
             if (similarity > bestSimilarity) {
                 bestSimilarity = similarity;
@@ -2142,7 +2057,6 @@ Conversation context: ${data.classification?.type || 'general discussion'}`;
             }
         }
 
-        console.log('🎯 Best character match:', bestMatch);
         return bestMatch;
     }
     
@@ -2261,8 +2175,6 @@ function runTerminalAnimation() {
 
 // Hugging Face API Integration - Direct Client Calls
 async function callPersonalityAPI(text, mode = 'general', context = {}) {
-    console.log('🤗 Calling Hugging Face API directly');
-    console.log('📝 Request payload:', { text: text.substring(0, 100) + '...', mode, context });
     
     try {
         const startTime = performance.now();
@@ -2276,15 +2188,9 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         });
         
         const endTime = performance.now();
-        console.log(`⏱️ HF API call took: ${Math.round(endTime - startTime)}ms`);
-        console.log('✅ HF API Response raw:', result);
-        console.log('📊 HF API Response data:', result.data);
-        console.log('🔍 HF API Response data[0]:', result.data[0]);
-        console.log('🔍 HF API Response data[0] type:', typeof result.data[0]);
         
         // Handle the response - it's already an object, not a JSON string
         const oceanScores = result.data[0];
-        console.log('🧠 OCEAN Scores:', oceanScores);
         
         // Transform HF response to match expected format
         const transformedResult = {
@@ -2296,7 +2202,6 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
             success: true
         };
         
-        console.log('🔄 Transformed result:', transformedResult);
         return transformedResult;
         
     } catch (error) {
@@ -2409,7 +2314,6 @@ function removeTypingIndicator() {
 }
 
 function updateAvatarCard(analysisResult) {
-    console.log('🎭 Updating avatar card with analysis result:', analysisResult);
     
     // Update avatar card with analysis results from Flask backend
     if (analysisResult && (analysisResult.avatar_data || analysisResult.explanation)) {
@@ -2424,36 +2328,27 @@ function updateAvatarCard(analysisResult) {
         let characterDescription = analysisResult.explanation || 'Analysis complete';
         
         if (analysisResult.avatar_data) {
-            console.log('📊 Processing avatar_data:', analysisResult.avatar_data);
             // Handle different avatar_data formats
             if (typeof analysisResult.avatar_data === 'string') {
-                console.log('🔍 Parsing string avatar_data:', analysisResult.avatar_data);
                 // Parse "FREAKYEL avatar activating: Creative, unconventional thinker..."
                 const match = analysisResult.avatar_data.match(/(\w+)\s+avatar\s+activating:\s*(.+)/i);
                 if (match) {
                     characterName = match[1];
                     characterDescription = match[2];
                 } else {
-                    console.log('⚠️ String format did not match expected pattern');
                 }
             } else if (analysisResult.avatar_data.title) {
                 characterName = analysisResult.avatar_data.title;
                 characterTitle = analysisResult.avatar_data.archetype?.description || characterTitle;
             }
         } else {
-            console.log('⚠️ No avatar_data found in analysis result');
         }
         
         // Update the card elements
-        console.log('🔧 DEBUG: Updating persona name element');
-        console.log('🔍 DEBUG: personaName element exists:', !!personaName);
-        console.log('🔍 DEBUG: characterName to set:', characterName);
         
         if (personaName) {
             personaName.textContent = characterName;
-            console.log('✅ DEBUG: personaName updated to:', personaName.textContent);
         } else {
-            console.error('❌ DEBUG: personaName element not found when trying to update');
         }
         
         if (personaTitle) {
@@ -2466,7 +2361,6 @@ function updateAvatarCard(analysisResult) {
         
         // Generate avatar for the character
         if (window.avatarGenerator && characterName) {
-            console.log('🎨 Generating avatar for character:', characterName);
             const avatarOptions = {
                 personalityScores: analysisResult.personality_scores || {},
                 analysisData: analysisResult,
@@ -2596,43 +2490,24 @@ function initializeTerminalMode() {
     
     if (terminalModeBtn && terminalContainer && traitSelectorCard) {
         terminalDebugger.success('Setting Up Terminal Event Handlers');
-        console.log('🔧 DEBUG: Attaching TerminalIntelligence handler to terminalModeBtn (SECOND handler)');
         // Enter terminal mode
         terminalModeBtn.addEventListener('click', () => {
-            console.log('🎯 DEBUG: Global terminalModeBtn clicked - creating TerminalIntelligence');
             terminalDebugger.debug('Terminal Mode Button Clicked', {
                 timestamp: Date.now()
             });
             
             try {
-                console.log('🔧 DEBUG: About to create TerminalIntelligence...');
                 
                 // Initialize terminal intelligence
                 globalTerminalIntelligence = new TerminalIntelligence();
                 
-                console.log('✅ DEBUG: TerminalIntelligence created successfully:', {
-                    instance: !!globalTerminalIntelligence,
-                    type: typeof globalTerminalIntelligence,
-                    hasProcessInput: typeof globalTerminalIntelligence?.processInput === 'function',
-                    constructorName: globalTerminalIntelligence?.constructor?.name
-                });
-                
                 // Also create Terminal class for Enter key handling
-                console.log('🔧 DEBUG: About to create Terminal class...');
                 if (!window.globalTerminal) {
                     window.globalTerminal = new Terminal();
-                    console.log('✅ DEBUG: Terminal class created successfully:', {
-                        instance: !!window.globalTerminal,
-                        type: typeof window.globalTerminal,
-                        hasAddPrompt: typeof window.globalTerminal?.addPrompt === 'function'
-                    });
                     
                     // Set up the Enter key handler
-                    console.log('🔧 DEBUG: Calling addPrompt() to set up Enter key handler...');
                     window.globalTerminal.addPrompt();
-                    console.log('✅ DEBUG: addPrompt() called - Enter key handler should be active');
                 } else {
-                    console.log('ℹ️ DEBUG: Terminal class already exists');
                 }
                 
                 terminalDebugger.success('TerminalIntelligence Created', {
@@ -2662,11 +2537,6 @@ function initializeTerminalMode() {
                 }
                 
             } catch (error) {
-                console.error('❌ DEBUG: Terminal Mode Initialization Failed:', {
-                    error: error.message,
-                    stack: error.stack,
-                    globalTerminalIntelligenceAfterError: !!globalTerminalIntelligence
-                });
                 terminalDebugger.error('Terminal Mode Initialization Failed', error);
             }
         });
@@ -2712,15 +2582,10 @@ function initializeTerminalMode() {
                 terminalDebugger.debug('User Input Added to Display', { userInput });
                 
                 // Process input through intelligence layer (now async)
-                console.log('🎯 STEP 1: Calling TerminalIntelligence.processInput()');
-                console.log('📝 Input text:', userInput.substring(0, 100) + '...');
                 
                 terminalDebugger.debug('Calling processInput on TerminalIntelligence');
                 const result = await globalTerminalIntelligence.processInput(userInput);
                 
-                console.log('📊 Result action:', result.action);
-                console.log('📄 Result message:', result.message?.substring(0, 200) + '...');
-                console.log('🔍 Full result object:', result);
                 
                 terminalDebugger.success('Terminal Intelligence Process Complete', {
                     action: result.action,
@@ -2766,11 +2631,9 @@ function initializeTerminalMode() {
                     
                     // Check if the message contains character identification and trigger avatar generation
                     if (result.message && result.message.includes('avatar should appear')) {
-                        console.log('🎨 Request clarification contains avatar identification, extracting character...');
                         const avatarMatch = result.message.match(/\[(\w+)\s+avatar\s+should\s+appear/i);
                         if (avatarMatch) {
                             const characterName = avatarMatch[1];
-                            console.log('🎯 Extracted character name:', characterName);
                             
                             // Create analysis result object for avatar generation
                             const analysisResult = {
@@ -2780,22 +2643,18 @@ function initializeTerminalMode() {
                                 source: 'terminal_clarification'
                             };
                             
-                            console.log('🎭 Triggering avatar generation with:', analysisResult);
                             updateAvatarCard(analysisResult);
                         }
                     }
                     break;
                     
                 case 'analyze':
-                    console.log('🎯 STEP 3: Action is ANALYZE - aggregating conversation for HF API');
                     
                     // Aggregate entire conversation history for personality analysis
                     const conversationText = globalTerminalIntelligence.conversationHistory
                         .map(msg => `${msg.type === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
                         .join('\n\n');
                     
-                    console.log('📝 Conversation text to analyze:', conversationText.substring(0, 200) + '...');
-                    console.log('📊 Total conversation length:', conversationText.length);
                     
                     terminalDebugger.debug('Action: Analyze', {
                         conversationLength: conversationText.length,
@@ -2807,7 +2666,6 @@ function initializeTerminalMode() {
                     showTypingIndicator();
                     
                     try {
-                        console.log('🎯 STEP 4: Starting HF API call for personality analysis...');
                         terminalDebugger.debug('Calling HF Personality API', {
                             textLength: conversationText.length
                         });
@@ -2831,8 +2689,6 @@ function initializeTerminalMode() {
                         
                         // Process successful HF analysis
                         if (analysisResult.success) {
-                            console.log('🎯 STEP 6: Processing successful HF API response');
-                            console.log('🎉 HF analysis successful! Result:', analysisResult);
                             
                             // Display OCEAN scores in terminal
                             if (analysisResult.ocean_scores) {
@@ -2844,15 +2700,8 @@ function initializeTerminalMode() {
                             
                             addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">✅ Analysis complete! Generating your personalized avatar...</span>`);
                             
-                            console.log('🎯 STEP 7: Triggering full avatar generation...');
                             
                             // DEBUG: Check conditional requirements before avatar generation
-                            console.log('🔍 Pre-conditional debug:');
-                            console.log('🔍 window.elliotGenerator exists:', !!window.elliotGenerator);
-                            console.log('🔍 window.elliotGenerator value:', window.elliotGenerator);
-                            console.log('🔍 analysisResult.ocean_scores exists:', !!analysisResult.ocean_scores);
-                            console.log('🔍 analysisResult.ocean_scores value:', analysisResult.ocean_scores);
-                            console.log('🔍 Overall conditional result:', !!(window.elliotGenerator && analysisResult.ocean_scores));
                             
                             // Find best character match based on OCEAN scores
                             if (window.oceanSystem && analysisResult.ocean_scores) {
@@ -2865,7 +2714,6 @@ function initializeTerminalMode() {
                                     neuroticism: (analysisResult.ocean_scores.Neuroticism || 3) / 5
                                 };
                                 
-                                console.log('🎯 DEBUG: Converted OCEAN scores:', oceanScores);
                                 
                                 // Use Ocean system's character matching (same as trait selector)
                                 const originalScores = window.oceanSystem.userScores;
@@ -2873,7 +2721,6 @@ function initializeTerminalMode() {
                                 const match = window.oceanSystem.findBestCharacterMatch();
                                 window.oceanSystem.userScores = originalScores; // Restore original scores
                                 
-                                console.log('🎯 DEBUG: Character match result:', match);
                                 
                                 // Stop the character name shuffling animation
                                 if (window.oceanSystem) {
@@ -2882,18 +2729,11 @@ function initializeTerminalMode() {
                                 
                                 if (match.character && window.avatarGenerator) {
                                     // Generate avatar for the matched character
-                                    console.log('🎯 DEBUG: About to call generateAvatar for:', match.character.name);
-                                    console.log('🎯 DEBUG: window.avatarGenerator exists:', !!window.avatarGenerator);
                                     
                                     let avatarData;
                                     try {
                                         avatarData = await window.avatarGenerator.generateAvatar(match.character.name);
-                                        console.log('🎯 DEBUG: generateAvatar returned:', avatarData);
-                                        console.log('🎯 DEBUG: avatarData type:', typeof avatarData);
-                                        console.log('🎯 DEBUG: avatarData truthy:', !!avatarData);
                                     } catch (error) {
-                                        console.error('❌ DEBUG: generateAvatar failed with error:', error);
-                                        console.error('❌ DEBUG: Error stack:', error.stack);
                                         avatarData = null;
                                     }
                                     
@@ -2906,7 +2746,6 @@ function initializeTerminalMode() {
                                             avatarData: avatarData
                                         };
                                         
-                                        console.log('🎯 DEBUG: Calling Ocean system display method');
                                         await window.oceanSystem.displayCharacterWithScrambling(displayMatch);
                                         
                                         const matchPercentage = Math.round(match.similarity * 100);
@@ -2917,17 +2756,13 @@ function initializeTerminalMode() {
                                     addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">❌ Unable to find character match. Please try again.</span>`);
                                 }
                             } else {
-                                console.log('❌ CONDITIONAL FAILED: Avatar generation skipped');
                                 if (!window.oceanSystem) {
-                                    console.log('❌ Missing: window.oceanSystem is', typeof window.oceanSystem);
                                 }
                                 if (!analysisResult.ocean_scores) {
-                                    console.log('❌ Missing: analysisResult.ocean_scores is', analysisResult.ocean_scores);
                                 }
                                 addTerminalLine(`<span style="color: #61dafb;">elliot@terminal ~ %</span> <span style="color: #ffffff;">❌ Avatar generation failed - missing required components</span>`);
                             }
                             
-                            console.log('🎯 STEP 8: Character card and radar charts updated');
                             terminalDebugger.success('Avatar & Charts Updated', {
                                 hasOceanScores: !!analysisResult.ocean_scores,
                                 hasAvatarData: !!analysisResult.avatar_data,
@@ -3008,25 +2843,14 @@ function initializeTerminalMode() {
 
 // Initialize function
 function initializeTraitSelector() {
-    console.log('🔧 DEBUG: initializeTraitSelector() called');
-    console.log('🔍 DEBUG: window.AvatarGenerator type:', typeof window.AvatarGenerator);
-    console.log('🔍 DEBUG: window.avatarGenerator exists:', !!window.avatarGenerator);
     
     if (typeof window.AvatarGenerator !== 'undefined' && !window.avatarGenerator) {
-        console.log('🔧 DEBUG: Creating new AvatarGenerator instance...');
         try {
             window.avatarGenerator = new window.AvatarGenerator();
-            console.log('✅ DEBUG: AvatarGenerator initialized successfully');
-            console.log('🔍 DEBUG: AvatarGenerator methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.avatarGenerator)));
         } catch (error) {
-            console.error('❌ DEBUG: Failed to initialize avatar generator:', error);
-            console.error('❌ DEBUG: AvatarGenerator error stack:', error.stack);
         }
     } else if (typeof window.AvatarGenerator === 'undefined') {
-        console.error('❌ DEBUG: AvatarGenerator class not loaded - check script imports');
-        console.log('🔍 DEBUG: Available window objects with Avatar:', Object.keys(window).filter(key => key.includes('Avatar')));
     } else {
-        console.log('ℹ️ Avatar generator already initialized');
     }
 
     // Only initialize if trait selector elements exist
@@ -3079,12 +2903,6 @@ class LoadingOverlayManager {
         
         
         if (this.overlay) {
-            console.log('📍 Overlay element details:', {
-                id: this.overlay.id,
-                classes: this.overlay.className,
-                style: this.overlay.style.cssText,
-                computed: window.getComputedStyle(this.overlay).display
-            });
             
             // Set default "Waiting..." status
             if (this.statusText) {
@@ -3192,158 +3010,23 @@ class LoadingOverlayManager {
 }
 
 // DOM Debug Validation Function
-function debugDOMElements() {
-    console.log('🔧 DEBUG: Validating DOM elements for loading overlay');
-    
-    const elements = {
-        loadingOverlay: document.getElementById('loadingOverlay'),
-        statusText: document.getElementById('statusText'),
-        timer: document.getElementById('timer'),
-        tokenCount: document.getElementById('tokenCount'),
-        generateBtn: document.getElementById('generateBtn'),
-        imageContainer: document.querySelector('.image-container')
-    };
-    
-    console.log('🔍 DOM Elements found:', elements);
-    
-    Object.entries(elements).forEach(([name, element]) => {
-        if (element) {
-            console.log(`✅ ${name}:`, {
-                exists: true,
-                id: element.id,
-                classes: element.className,
-                parent: element.parentElement?.tagName,
-                computed: element.tagName === 'DIV' ? {
-                    display: window.getComputedStyle(element).display,
-                    position: window.getComputedStyle(element).position,
-                    zIndex: window.getComputedStyle(element).zIndex
-                } : 'N/A'
-            });
-        } else {
-            console.error(`❌ ${name}: NOT FOUND`);
-        }
-    });
-    
-    // Check if loading overlay is inside image container
-    const imageContainer = elements.imageContainer;
-    const loadingOverlay = elements.loadingOverlay;
-    
-    if (imageContainer && loadingOverlay) {
-        const isChild = imageContainer.contains(loadingOverlay);
-        console.log('🔍 Loading overlay is child of image container:', isChild);
-        
-        if (!isChild) {
-            console.error('❌ Loading overlay is NOT inside image container!');
-        }
-    }
-}
 
 // Create global loading manager instance
 window.loadingManager = new LoadingOverlayManager();
 
 // Add DOM debug validation
-window.debugDOMElements = debugDOMElements;
 
 // Browser Console Debug Helpers
-window.debugOverlay = {
-    show: () => {
-        console.log('🔧 Debug: Showing overlay via console helper');
-        if (window.loadingManager) {
-            window.loadingManager.startGeneration();
-        } else {
-            console.error('❌ loadingManager not available');
-        }
-    },
-    hide: () => {
-        console.log('🔧 Debug: Hiding overlay via console helper');
-        if (window.loadingManager) {
-            window.loadingManager.stopGeneration();
-        } else {
-            console.error('❌ loadingManager not available');
-        }
-    },
-    check: () => {
-        console.log('🔧 Debug: Checking overlay state');
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-            console.log('✅ Overlay found:', {
-                element: overlay,
-                classes: overlay.className,
-                styles: {
-                    display: window.getComputedStyle(overlay).display,
-                    opacity: window.getComputedStyle(overlay).opacity,
-                    visibility: window.getComputedStyle(overlay).visibility,
-                    position: window.getComputedStyle(overlay).position,
-                    zIndex: window.getComputedStyle(overlay).zIndex,
-                    bottom: window.getComputedStyle(overlay).bottom,
-                    right: window.getComputedStyle(overlay).right
-                }
-            });
-        } else {
-            console.error('❌ Overlay not found');
-        }
-    },
-    test: () => {
-        console.log('🔧 Debug: Running full test');
-        window.debugOverlay.check();
-        console.log('🔧 Debug: Showing overlay for 3 seconds...');
-        window.debugOverlay.show();
-        setTimeout(() => {
-            console.log('🔧 Debug: Hiding overlay after 3 seconds');
-            window.debugOverlay.hide();
-        }, 3000);
-    }
-};
 
 // Add debug button event handlers
-function setupDebugButtons() {
-    console.log('🔧 Setting up debug buttons');
-    
-    const showBtn = document.getElementById('debugShowOverlay');
-    const hideBtn = document.getElementById('debugHideOverlay');
-    const domBtn = document.getElementById('debugDOMCheck');
-    
-    if (showBtn) {
-        showBtn.addEventListener('click', () => {
-            console.log('🔴 DEBUG: Manual show overlay clicked');
-            if (window.loadingManager) {
-                window.loadingManager.startGeneration();
-            } else {
-                console.error('❌ loadingManager not found');
-            }
-        });
-    }
-    
-    if (hideBtn) {
-        hideBtn.addEventListener('click', () => {
-            console.log('🔴 DEBUG: Manual hide overlay clicked');
-            if (window.loadingManager) {
-                window.loadingManager.stopGeneration();
-            } else {
-                console.error('❌ loadingManager not found');
-            }
-        });
-    }
-    
-    if (domBtn) {
-        domBtn.addEventListener('click', () => {
-            console.log('🔴 DEBUG: Manual DOM check clicked');
-            debugDOMElements();
-        });
-    }
-}
 
 // Initialize trait selector - DOM is already ready since script loads at bottom of HTML
 // But add both immediate execution and DOMContentLoaded fallback for safety
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        debugDOMElements(); // Run debug validation first
-        setupDebugButtons(); // Setup debug button handlers
         initializeTraitSelector();
     });
 } else {
-    debugDOMElements(); // Run debug validation first
-    setupDebugButtons(); // Setup debug button handlers
     initializeTraitSelector();
 }
 

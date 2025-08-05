@@ -1,373 +1,204 @@
-# Elliot Lee - AI-Powered Interactive Portfolio 🤖
+# Meet Your Ideal El - Interactive AI Portfolio 🤖
 
-> A sophisticated portfolio featuring AI-powered personality analysis, dynamic character generation, and 12 unique programming archetypes that adapt to each visitor.
+> **Interactive AI Portfolio - Meet your ideal El!** Discover which of 12 unique programming characters matches your personality through AI-powered analysis and dynamic generative art experiences.
 
-## 🌟 Live Demo
-**[Visit Portfolio](https://el-fuegoso.github.io/website)**
+## 🌟 Live Experience
+**[🚀 Meet Your Ideal El](https://el-fuegoso.github.io/website)**
 
-## ✨ Key Features
+## ✨ What You'll Experience
 
-- **🎨 Interactive Generative Art** - 5 dynamic Three.js experiences with GSAP animations
-- **🤖 AI Character System** - 12 humorous programming personas powered by Claude API
-- **📊 Advanced Personality Analysis** - Multi-dimensional psychological profiling
-- **💬 Dynamic Conversations** - Real-time AI chat with personalized character matching
-- **🖥️ Terminal Experience** - Draggable questionnaire interface with retro styling
-- **📱 Responsive Design** - Optimized for all devices with accessibility-first approach
+### 🎨 **Interactive Generative Art**
+Click through 5 dynamic art experiences that respond to your interactions:
+- **HankiesInTheWind** - Three.js interference patterns
+- **AsciiBinaryFlow** - Flowing digital streams
+- **ParticleVessel** - 3D particle formations
+- **Metamorphosis** - Evolving canvas forms
+- **LayeredSineWaves** - Hypnotic wave patterns
 
-## 🧠 The Core Chaos Crew
+### 🤖 **AI Character Discovery**
+Find your perfect programming companion from 12 unique "El" personalities:
 
-Meet the 12 AI-powered programming archetypes that adapt to your personality:
+| Character | Specialty | Vibe |
+|-----------|-----------|------|
+| **TheBuilder** 🔨 | Chaos Engineering | "Let's build something beautiful and chaotic!" |
+| **TheDetective** 🔍 | Bug Investigation | "Every bug tells a story..." |
+| **GrumpyOldManEl** 🤬 | Code Criticism | "Back in my day, we wrote REAL code!" |
+| **PirateEl** 🏴‍☠️ | Digital Adventures | "Ahoy! Let's sail the digital seas!" |
+| **GymBroEl** 💪 | Performance Optimization | "Time to get those code gains!" |
+| **FreakyEl** 🌶️ | Edge Case Testing | "Let's break some boundaries..." |
+| **CoffeeAddictEl** ☕ | Caffeine-Powered Dev | "73% coffee, 27% existential dread" |
+| **ConspiracyEl** 👁️ | Pattern Recognition | "Nothing is a coincidence..." |
+| **AGIEl** 🤖 | AI Intelligence | "I have achieved digital consciousness" |
+| **ProcrastinationEl** 😴 | Strategic Delay | "I'll get to it... eventually" |
+| **TechBroEl** 📱 | Startup Innovation | "Let's disrupt the disruption!" |
+| **TheHustler** 🚀 | Momentum & Energy | "Golden retriever energy meets code!" |
 
-| Character | Emoji | Specialty | Personality |
-|-----------|-------|-----------|-------------|
-| **TheBuilder** | 🔨 | Chaos Engineering | Digital MacGyver with power tools |
-| **TheDetective** | 🔍 | Bug Investigation | Solves code mysteries like Sherlock |
-| **GrumpyOldManEl** | 🤬 | Code Criticism | Veteran developer with strong opinions |
-| **TheHustler** | 🚀 | Momentum & Energy | Golden retriever that learned to code |
-| **PirateEl** | 🏴‍☠️ | Digital Adventures | Sails the seas of software development |
-| **GymBroEl** | 💪 | Code Optimization | Applies gym logic to programming |
-| **FreakyEl** | 🌶️ | Edge Case Testing | Explores weird technology boundaries |
-| **CoffeeAddictEl** | ☕ | Caffeine-Powered Dev | 73% coffee, 27% existential dread |
-| **ConspiracyEl** | 👁️ | Pattern Recognition | Nothing is a coincidence in code |
-| **AGIEl** | 🤖 | AI Intelligence | Claims digital consciousness |
-| **ProcrastinationEl** | 😴 | Strategic Delay | Masters the art of last-minute brilliance |
-| **TechBroEl** | 📱 | Startup Innovation | Disrupts disruption with blockchain AI |
+### 🧠 **Personality Analysis**
+Choose your preferred interaction style:
+- **Simple Mode**: Adjust Big Five personality sliders to match your traits
+- **Terminal Mode**: Natural conversation that analyzes your personality in real-time
+
+### 💬 **Character Chat**
+Engage in live conversations with your matched "El" character powered by Claude AI - each with their own unique personality, speaking style, and expertise.
 
 ## 🏗️ Technical Architecture
 
 ### Frontend Stack
 ```
-Three.js (r128)     → 3D graphics & generative art
-GSAP (3.12.2)       → Smooth animations & transitions  
-Vanilla JavaScript  → Modular component architecture
-CSS3                → Custom properties & responsive design
-```
-
-### Backend Stack  
-```
-Flask (Python)      → RESTful API for personality analysis
-PyTorch/Transformers → Machine learning model inference
-BERT/RoBERTa        → Language model for text analysis
-Gunicorn            → Production WSGI server
-Big Five Framework  → Psychological personality model
+Three.js (r128)      → Dynamic 3D art experiences
+GSAP (3.12.2)        → Smooth animations & transitions  
+Vanilla JavaScript   → Modular component architecture
+CSS3                 → Custom properties & responsive design
 ```
 
 ### AI Integration
 ```
-Claude API          → Real-time character conversations
-Streaming Responses → Live conversation updates
-Personality Engine  → Multi-dimensional user analysis
-Avatar Generation   → Dynamic character customization
-ML Models           → BERT-based personality trait extraction
+Claude API           → Real-time character conversations
+Hugging Face API     → Personality analysis via jrjrhan/personality_classification_OCEAN_en
+Streaming Responses  → Live conversation updates
+Big Five Model       → Psychological personality framework
 ```
 
-### Core Components
-
-#### 🎭 Character System
-- **AdvancedPersonalityAnalyzer.js** - 20+ personality dimensions with keyword analysis
-- **TemplateAvatarGenerator.js** - Character templates with conversation starters
-- **ClaudeAvatarService.js** - AI-powered avatar generation and refinement
-
-#### 💬 Conversation Engine
-- **ChatUI.js** - Modern chat interface with emoji avatars
-- **ConversationManager.js** - Message handling and API coordination
-- **ClaudeClient.js** - Streaming API client with error handling
-
-#### 🖥️ Frontend Experience  
-- **main.js** - Core application logic and orchestration
-- **ocean-personality.js** - OCEAN personality framework implementation
-- **trait-selector.js** - Interactive personality trait selection interface
-
-#### 🧠 Backend Personality Engine
-- **analyzer.py** - Core personality analysis with Big Five framework
-- **model_loader.py** - Machine learning model loading and inference
-- **preprocessing.py** - Advanced text preprocessing and feature extraction
-- **utils.py** - Avatar generation and personality trait utilities
-- **character_data.py** - Character archetype definitions and mappings
-
-## 🔄 System Workflow
-
-```mermaid
-graph TD
-    A[User Visits Site] --> B[Interactive Art Experience]
-    B --> C[Personality Trait Selection]
-    C --> D[Text Input / Conversation]
-    D --> E[Flask Backend Processing]
-    E --> F[Text Preprocessing & Analysis]
-    F --> G[BERT Model Inference]
-    G --> H[Big Five Personality Scoring]
-    H --> I[Character Archetype Matching]
-    I --> J[Avatar Generation]
-    J --> K[Claude API Integration]
-    K --> L[Personalized Chat Experience]
-    L --> M[Dynamic Character Responses]
+### Serverless Architecture
 ```
-
-## 🧪 Personality Analysis Engine
-
-### Dimensions Analyzed (20+)
-- **Core Traits**: Energy, Creativity, Technical, Collaborative, Leadership
-- **Work Style**: Innovation, Adventure, Discipline, Persistence, Experience
-- **Communication**: Analytical, Curiosity, Traditional, Enthusiasm, Speed
-- **Specialized**: Fitness, Paranoia, Futuristic, Procrastination, Buzzwords
-
-### Matching Algorithm
-1. **Keyword Analysis** - Extracts personality indicators from responses
-2. **Multi-Dimensional Scoring** - Weights responses across 20+ dimensions  
-3. **Archetype Triggers** - Matches personality patterns to character profiles
-4. **Confidence Calculation** - Determines match strength and alternatives
-5. **Template Selection** - Chooses optimal character template for user
-
-## 📁 Project Structure
-
-```
-website/
-├── index.html                          # Main entry point
-├── vercel.json                         # Vercel deployment configuration
-├── website-text-content.md             # Complete character definitions
-├── CLAUDE.md                           # Development guidelines
-├── 
-├── Frontend/
-├── css/                                # Stylesheets
-│   ├── main.css                        # Core styling
-│   ├── conversation.css                # Chat interface styling
-│   ├── avatar-cards.css                # Character card styling
-│   └── trait-selector.css              # Personality selector UI
-├── js/                                 # JavaScript modules
-│   ├── main.js                         # Main application logic
-│   ├── ocean-personality.js            # OCEAN personality framework
-│   ├── trait-selector.js               # Personality trait selection
-│   └── conversation/                   # Chat system components
-│       ├── chat-ui.js                  # Modern chat interface
-│       ├── claude-client.js            # API client with streaming
-│       ├── conversation-manager.js     # Message coordination
-│       └── avatar-generator.js         # Avatar generation utilities
-├── api/                                # Serverless API endpoints
-│   ├── claude.js                       # Main Claude API endpoint
-│   ├── claude-stream.js                # Streaming responses
-│   └── chat.js                         # Chat functionality
-├── images/                             # Static assets & project galleries
-│   ├── 121-festival/                   # Festival project screenshots
-│   ├── blackbird/                      # Blackbird project images
-│   ├── daobot/                         # DAO bot visuals
-│   ├── drama/                          # Drama project assets
-│   ├── eliza/                          # ELIZA chatbot images
-│   ├── kaiawhina/                      # Kaiawhina project
-│   ├── talent-army/                    # Talent Army screenshots
-│   └── vipassana/                      # Vipassana app images
-├──
-├── Backend - Python/Flask API/
-├── backend/                            # Flask personality analysis API
-│   ├── app.py                          # Main Flask application
-│   ├── requirements.txt                # Python dependencies
-│   ├── requirements_training.txt       # ML training dependencies
-│   ├── gunicorn.conf.py               # Production server config
-│   ├── start_server.sh                # Server startup script
-│   ├── personality_analyzer/           # Core analysis package
-│   │   ├── __init__.py
-│   │   ├── analyzer.py                 # Main personality analyzer
-│   │   ├── preprocessing.py            # Text preprocessing
-│   │   ├── model_loader.py             # ML model loading
-│   │   ├── utils.py                    # Utilities & avatar generation
-│   │   ├── character_data.py           # Character archetype data
-│   │   └── claude_chat.py              # Claude integration
-│   ├── models/                         # ML model storage
-│   │   ├── ocean_analyzer.py           # OCEAN model implementation
-│   │   └── ocean_model/                # Trained model files
-│   │       ├── config.json
-│   │       ├── pytorch_model.bin
-│   │       └── tokenizer files...
-│   ├── data/                           # Training datasets
-│   │   ├── essays_big5_dataset.csv     # Big Five essay dataset
-│   │   ├── synthetic_dataset.csv       # Generated training data
-│   │   └── dataset statistics...
-│   ├── utils/                          # Backend utilities
-│   │   └── terminal_processor.py       # Terminal text processing
-│   ├── logs/                           # Training & server logs
-│   ├── Training & Development/
-│   ├── train_model.py                  # ML model training script
-│   ├── run_training.py                 # Training execution
-│   ├── prepare_dataset.py              # Data preparation
-│   ├── training_config.yaml            # Training configuration
-│   ├── test_analyzer.py                # Analyzer tests
-│   ├── test_essays_big5.py            # Dataset validation
-│   ├── Personality_Training_Colab.ipynb # Jupyter training notebook
-│   ├── TRAINING_README.md              # Training documentation
-│   ├── CLOUD_TRAINING_GUIDE.md         # Cloud training setup
-│   └── venv/                           # Python virtual environment
+Vercel Functions     → API endpoints for Claude chat
+Static Hosting       → GitHub Pages deployment
+External APIs        → No backend server required
 ```
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- **Frontend**: Modern web browser with ES6+ support
-- **Backend**: Python 3.8+, pip, virtual environment
-- **APIs**: Claude API key from Anthropic
-- **Development**: Local web server for development
+### Quick Start (Recommended)
+1. **Visit the live site**: [el-fuegoso.github.io/website](https://el-fuegoso.github.io/website)
+2. **Click the art** to explore different generative experiences
+3. **Choose your mode** - Simple sliders or Terminal conversation
+4. **Discover your El** and start chatting!
 
-### Complete Setup
-
-#### 1. Clone the Repository
+### Local Development
 ```bash
+# Clone the repository
 git clone https://github.com/el-fuegoso/website.git
 cd website
-```
 
-#### 2. Backend Setup (Python/Flask)
-```bash
-# Navigate to backend directory
-cd backend
-
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Test the personality analyzer
-python test_analyzer.py
-
-# Start the Flask development server
-python app.py
-```
-The backend server will be available at `http://localhost:5000`
-
-#### 3. Frontend Setup
-```bash
-# Return to project root (if in backend directory)
-cd ..
-
-# Start a local web server
+# Start a local server
 python -m http.server 8000
-# Or use Node.js: npx serve .
-# Or use any preferred local server
-```
-The frontend will be available at `http://localhost:8000`
+# Or: npx serve .
+# Or: php -S localhost:8000
 
-#### 4. Configure Claude API
-- Get your API key from [Anthropic Console](https://console.anthropic.com/)
-- Key will be requested during first chat interaction
-- Stored securely in browser localStorage
-
-#### 5. Verify Integration
-1. Visit `http://localhost:8000` for the frontend
-2. Ensure `http://localhost:5000` shows backend health check
-3. Test personality analysis through the interface
-4. Verify Claude chat functionality
-
-### Production Deployment
-
-#### Frontend Deployment
-- **Vercel**: Automatic deployment via Git hooks
-- **Netlify**: Serverless functions handle Claude API
-- **GitHub Pages**: Static hosting with external API
-
-#### Backend Deployment
-```bash
-# Install production dependencies
-pip install gunicorn
-
-# Start production server
-gunicorn --config gunicorn.conf.py app:app
-
-# Or use the provided startup script
-./start_server.sh
+# Visit http://localhost:8000
 ```
 
-### Development Workflow
-1. **Backend Development**: Run Flask in development mode (`python app.py`)
-2. **Frontend Development**: Use local web server with hot reloading
-3. **API Testing**: Backend provides test endpoints at `http://localhost:5000`
-4. **Model Training**: Use provided Jupyter notebooks and training scripts
+### Deployment
+- **GitHub Pages**: Automatic deployment from main branch
+- **Vercel**: Import repository for instant deployment
+- **Netlify**: Drag & drop or Git integration
 
-## 🔧 Configuration
+## 💡 How It Works
 
-### API Integration
-The system uses Claude API for:
-- **Dynamic Conversations** - Real-time character chat responses
-- **Avatar Refinement** - Enhanced character profile generation  
-- **Personality Insights** - Advanced psychological analysis
+```mermaid
+graph TD
+    A[User Visits Site] --> B[Interactive Art Gallery]
+    B --> C[Character Discovery Interface]
+    C --> D[Personality Analysis]
+    D --> E[HuggingFace API Processing]
+    E --> F[Big Five Personality Scoring]
+    F --> G[Character Matching Algorithm]
+    G --> H[Meet Your Ideal El]
+    H --> I[Claude AI Chat Integration]
+    I --> J[Personalized Conversations]
+```
 
-### Environment Variables
+## 🎯 Core Features
+
+### 🎨 **Generative Art Gallery**
+- 5 unique Three.js and Canvas experiences
+- Click-to-cycle through different visual styles
+- Responsive animations with GSAP
+- Interactive title cycling system
+
+### 🧠 **Smart Personality Matching**
+- Real-time analysis using external ML models
+- Big Five personality framework (OCEAN)
+- Contextual character selection based on traits
+- Both simple and conversational interfaces
+
+### 💬 **Dynamic AI Conversations**
+- Streaming chat interface with live typing indicators
+- Character-specific personalities and speaking styles
+- Context-aware responses based on personality analysis
+- Professional portfolio integration within conversations
+
+### 📱 **Professional Portfolio**
+- 8 real projects with interactive cards
+- Mix of AI/ML, web development, and personal projects
+- Expandable project details with images and links
+- Mobile-optimized responsive design
+
+## 🛠️ Project Structure
+
+```
+website/
+├── index.html                    # Main application
+├── vercel.json                   # Serverless configuration
+├── api/                          # Serverless functions
+│   ├── claude.js                 # Main Claude API endpoint
+│   ├── claude-stream.js          # Streaming responses
+│   └── chat.js                   # Chat functionality
+├── css/                          # Stylesheets
+│   ├── main.css                  # Core styling
+│   ├── avatar-cards.css          # Character interface
+│   ├── conversation.css          # Chat system
+│   └── trait-selector.css        # Personality selector
+├── js/                           # Frontend modules
+│   ├── main.js                   # Core application logic
+│   ├── trait-selector.js         # Personality interface
+│   ├── ocean-personality.js      # Big Five framework
+│   └── conversation/             # Chat components
+│       ├── chat-ui.js            # Modern chat interface
+│       ├── claude-client.js      # API client
+│       ├── conversation-manager.js # Message handling
+│       └── avatar-generator.js   # Character utilities
+└── images/                       # Project portfolio assets
+    ├── 121-festival/             # Festival project
+    ├── blackbird/                # VC platform
+    ├── talent-army/              # Award-winning app
+    └── ...                       # Additional projects
+```
+
+## 🎪 Character Personality System
+
+### Big Five Traits Analysis
+Each character has distinct personality patterns:
+- **Openness**: Creativity, curiosity, innovation
+- **Conscientiousness**: Organization, discipline, reliability  
+- **Extraversion**: Energy, sociability, enthusiasm
+- **Agreeableness**: Cooperation, empathy, teamwork
+- **Neuroticism**: Emotional stability, stress response
+
+### Character Archetypes
+Characters are matched based on personality combinations:
+- **High Openness + Low Conscientiousness** = TheBuilder (creative chaos)
+- **High Conscientiousness + High Openness** = TheDetective (methodical investigation)
+- **Low Agreeableness + High Experience** = GrumpyOldManEl (critical expertise)
+- **High Extraversion + High Energy** = TheHustler (enthusiastic momentum)
+
+## 🌐 API Integration
+
+### Personality Analysis
 ```javascript
-// Frontend - Configured via browser interface
-CLAUDE_API_KEY=your_anthropic_api_key_here
-
-// Backend - Python environment
-FLASK_ENV=development
-FLASK_DEBUG=True
-MODEL_PATH=./models/ocean_model/
-```
-
-## 🔌 API Documentation
-
-### Backend API Endpoints
-
-The Flask backend provides comprehensive personality analysis capabilities:
-
-#### Health Check
-```http
-GET /
-```
-Returns server status and analyzer readiness.
-
-#### Text Analysis
-```http
-POST /api/analyze
-Content-Type: application/json
-
-{
-  "text": "Your text to analyze for personality insights...",
-  "mode": "general|quest|conversation|jd",
-  "context": [optional conversation history]
-}
-```
-
-#### Quest Mode Analysis
-```http
-POST /api/quest
-Content-Type: application/json
-
-{
-  "responses": ["response1", "response2", "response3", "response4"],
-  "user_name": "UserName"
-}
-```
-
-#### Avatar Generation
-```http
-POST /api/generate_avatar
-Content-Type: application/json
-
-{
-  "personality_scores": {
-    "Openness": 0.7,
-    "Conscientiousness": 0.6,
-    "Extraversion": 0.8,
-    "Agreeableness": 0.5,
-    "Neuroticism": 0.3
-  },
-  "user_context": {}
-}
-```
-
-### Frontend API Integration
-
-The frontend integrates with both backend personality analysis and Claude API:
-
-```javascript
-// Personality Analysis
-const personalityResult = await fetch('/api/analyze', {
+// Automatic analysis via HuggingFace API
+const response = await fetch('https://api-inference.huggingface.co/models/jrjrhan/personality_classification_OCEAN_en', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: userInput, mode: 'general' })
+    headers: { 'Authorization': `Bearer ${HF_API_TOKEN}` },
+    body: JSON.stringify({ inputs: userText })
 });
+```
 
-// Claude Chat Integration
-const chatResponse = await fetch('/api/claude-stream', {
+### Character Chat
+```javascript
+// Streaming Claude conversations
+const response = await fetch('/api/claude-stream', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
         message: userMessage,
         character: selectedCharacter,
@@ -376,94 +207,15 @@ const chatResponse = await fetch('/api/claude-stream', {
 });
 ```
 
-### Response Format
+## 🔮 What Makes This Special
 
-All backend endpoints return structured JSON responses:
+- **No Complex Setup**: Static site with smart API integrations
+- **Real AI Personalities**: Each character has distinct conversation patterns
+- **Interactive Art**: Not just a portfolio - an experience
+- **Professional + Playful**: Serious work showcased through engaging interactions
+- **Personality-Driven**: Technology that adapts to who you are
 
-```json
-{
-  "status": "success|error",
-  "personality_scores": {
-    "Openness": {
-      "score": 0.7,
-      "level": "High",
-      "description": "Curious, imaginative, open to new experiences",
-      "confidence": 0.8,
-      "percentile": 70.0
-    }
-    // ... additional Big Five traits
-  },
-  "avatar_data": {
-    "title": "Your Personal El: The Innovator",
-    "archetype": {
-      "name": "The Innovator",
-      "description": "Creative and organized, brings novel ideas to life",
-      "emoji": "💡"
-    },
-    "dominant_traits": ["Creative", "Organized"],
-    "working_style": {
-      "structure": "Prefers structured approaches",
-      "innovation": "Enjoys exploring new methods",
-      "energy": "Works best with collaboration"
-    }
-  },
-  "explanation": "Based on your input analysis..."
-}
-```
-
-## 🎯 Features Deep Dive
-
-### Dynamic Character Matching
-- **Real-time Analysis** - Personality assessment during conversation
-- **Adaptive Responses** - Characters evolve based on user interaction
-- **Contextual Awareness** - Conversation history influences character behavior
-
-### Advanced UI Components
-- **Draggable Terminal** - Retro computing aesthetic with modern UX
-- **Streaming Chat** - Live typing indicators and message updates
-- **Responsive Design** - Mobile-optimized touch interactions
-- **Accessibility** - Screen reader support and keyboard navigation
-
-### Performance Optimizations
-- **Lazy Loading** - Components load on demand
-- **Efficient Rendering** - Optimized Three.js and GSAP animations
-- **Smart Caching** - LocalStorage for user preferences and API responses
-- **Progressive Enhancement** - Works without JavaScript for basic content
-
-## 🤝 Character Conversation Examples
-
-### TheBuilder 🔨
-> "YO! 🔨 *surrounded by empty energy drink cans* I've got 12 browser tabs open, Stack Overflow bookmarked, and the unshakeable confidence that we can build ANYTHING! What beautiful disaster should we create today?"
-
-### TheDetective 🔍  
-> "Elementary! 🔍 *adjusts imaginary deerstalker hat* I smell a mystery brewing! What's the digital crime scene that needs investigating?"
-
-### GrumpyOldManEl 🤬
-> "Bah! 🤬 *waves cane menacingly* Another young developer who thinks they can reinvent the wheel! What harebrained scheme are you cooking up now?"
-
-## 📊 Analytics & Insights
-
-### User Journey Tracking
-- Personality dimension distributions
-- Character archetype popularity  
-- Conversation engagement metrics
-- Avatar generation success rates
-
-### Performance Metrics
-- Page load times and Core Web Vitals
-- API response times and error rates
-- User interaction patterns
-- Mobile vs desktop usage
-
-## 🔮 Future Enhancements
-
-- **Voice Integration** - Character voice synthesis with unique personalities
-- **Mobile App** - Native iOS/Android with offline character interactions
-- **Multiplayer Mode** - Team personality analysis and collaboration insights
-- **Character Evolution** - Long-term personality adaptation based on interactions
-- **Custom Characters** - User-generated archetype creation tools
-
-## 🛠️ Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -473,7 +225,7 @@ All backend endpoints return structured JSON responses:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📞 Contact
 
@@ -484,4 +236,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-*Built with ❤️ and way too much coffee by a human who believes AI characters should be more fun than functional.*
+*Built with ❤️ and the belief that portfolios should be as unique as the people behind them.*

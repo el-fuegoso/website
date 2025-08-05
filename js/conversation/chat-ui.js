@@ -562,4 +562,3 @@ class ChatUI {
 }
 
 window.ChatUI = ChatUI;
-console.log('✅ DEBUG: ChatUI class loaded and assigned to window.ChatUI');

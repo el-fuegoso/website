@@ -116,13 +116,11 @@ export default async function handler(req, res) {
         // Response received from Imagen API
         
         // Log response headers for additional debugging
-        console.log(`📋 Response headers:`);
         for (const [key, value] of imageGenResponse.headers.entries()) {
             console.log(`  ${key}: ${value}`);
         }
         
         if (!imageGenResponse.ok) {
-            console.error('❌ Google Imagen API error details:');
             console.error('  Status:', imageGenResponse.status, imageGenResponse.statusText);
             console.error('  Response body:', responseText);
             
@@ -162,8 +160,6 @@ export default async function handler(req, res) {
         }
 
         const data = JSON.parse(responseText);
-        console.log(`📊 Parsed API response structure:`, Object.keys(data));
-        console.log(`📊 Full response data:`, JSON.stringify(data, null, 2).substring(0, 1000) + '...');
         
         // Extract the generated image from Imagen API response format
         // Try multiple possible response structures
@@ -172,7 +168,6 @@ export default async function handler(req, res) {
         // Check for predictions array (typical for predict endpoint)
         if (data.predictions && data.predictions.length > 0) {
             const prediction = data.predictions[0];
-            console.log(`📊 Prediction structure:`, Object.keys(prediction));
             
             // Look for base64 encoded image data
             if (prediction.imageBytes) {
@@ -188,8 +183,6 @@ export default async function handler(req, res) {
         }
 
         if (!imageUrl) {
-            console.error('❌ No image data returned from Google Imagen API');
-            console.log('📋 API response structure:', JSON.stringify(data, null, 2).substring(0, 500));
             return res.status(500).json({
                 status: 'error',
                 error: 'Image generation completed but no image data received',
@@ -197,8 +190,6 @@ export default async function handler(req, res) {
             });
         }
 
-        console.log(`✅ Successfully generated image for ${characterName}`);
-        console.log(`📏 Image URL length: ${imageUrl.length} characters`);
 
         // Return successful response
         return res.status(200).json({

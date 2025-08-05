@@ -3045,10 +3045,13 @@ class LoadingOverlayManager {
         this.statusText = null;
         this.timer = null;
         this.tokenCount = null;
+        this.spinner = null;
         this.startTime = null;
         this.timerInterval = null;
         this.messageInterval = null;
+        this.tokenInterval = null;
         this.isGenerating = false;
+        this.currentTokens = 0;
         this.statusMessages = [
             "Processing image...",
             "Enhancing pixels...",
@@ -3061,7 +3064,8 @@ class LoadingOverlayManager {
             "Summoning digital spirits...",
             "Calibrating artistic vision..."
         ];
-        this.currentMessageIndex = 0;
+        this.completionMessages = ["Done", "Complete", "Finished", "Ready"];
+        this.lastMessageIndex = -1;
         this.messageInterval = null;
         this.init();
     }
@@ -3071,6 +3075,7 @@ class LoadingOverlayManager {
         this.statusText = document.getElementById('statusText');
         this.timer = document.getElementById('timer');
         this.tokenCount = document.getElementById('tokenCount');
+        this.spinner = document.querySelector('.spinner');
         
         
         if (this.overlay) {
@@ -3099,8 +3104,14 @@ class LoadingOverlayManager {
         }
         
         this.startTime = Date.now();
-        this.currentMessageIndex = 0;
+        this.lastMessageIndex = -1;
         this.isGenerating = true;
+        this.currentTokens = 0;
+        
+        // Start spinner animation
+        if (this.spinner) {
+            this.spinner.classList.add('active');
+        }
         
         // Start timer
         this.updateTimer();
@@ -3110,12 +3121,21 @@ class LoadingOverlayManager {
         this.updateStatusMessage();
         this.messageInterval = setInterval(() => this.updateStatusMessage(), 2000);
         
-        // Reset token count
+        // Start random token counting
         this.updateTokenCount(0);
+        this.tokenInterval = setInterval(() => {
+            this.currentTokens += Math.floor(Math.random() * 5) + 1;
+            this.updateTokenCount(this.currentTokens);
+        }, 300 + Math.random() * 400); // Random interval between 300-700ms
     }
 
     stopGeneration() {
         this.isGenerating = false;
+        
+        // Stop spinner animation
+        if (this.spinner) {
+            this.spinner.classList.remove('active');
+        }
         
         // Clear intervals
         if (this.timerInterval) {
@@ -3128,17 +3148,29 @@ class LoadingOverlayManager {
             this.messageInterval = null;
         }
         
-        // Reset to waiting state
+        if (this.tokenInterval) {
+            clearInterval(this.tokenInterval);
+            this.tokenInterval = null;
+        }
+        
+        // Show completion message and stay there
         if (this.statusText) {
-            this.statusText.textContent = "Waiting...";
+            const completionMessage = this.completionMessages[Math.floor(Math.random() * this.completionMessages.length)];
+            this.statusText.textContent = completionMessage;
         }
     }
 
     updateStatusMessage() {
         if (!this.statusText) return;
         
-        this.statusText.textContent = this.statusMessages[this.currentMessageIndex];
-        this.currentMessageIndex = (this.currentMessageIndex + 1) % this.statusMessages.length;
+        // Random message selection, avoiding consecutive duplicates
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * this.statusMessages.length);
+        } while (randomIndex === this.lastMessageIndex && this.statusMessages.length > 1);
+        
+        this.statusText.textContent = this.statusMessages[randomIndex];
+        this.lastMessageIndex = randomIndex;
     }
 
     updateTimer() {

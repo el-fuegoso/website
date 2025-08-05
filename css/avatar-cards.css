@@ -732,6 +732,9 @@
     border: 1px solid #ccc;
     border-top: 1px solid #ff6b35;
     border-radius: 50%;
+}
+
+.spinner.active {
     animation: spin 1s linear infinite;
 }
 

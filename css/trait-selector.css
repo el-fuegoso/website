@@ -1480,49 +1480,53 @@
         font-size: 12px;
     }
     
-    /* Mobile OCEAN Traits Layout - Stack labels above sliders */
+    /* Mobile OCEAN Traits Layout - Label+Value on top, Slider below */
     .trait-row {
         flex-direction: column;
         align-items: stretch;
-        gap: 8px;
-        margin-bottom: 16px;
         padding: 0 4px;
-        position: static; /* Remove positioning issues */
+        position: relative; /* Changed to relative for absolute positioning children */
+        margin-bottom: 8px;
     }
     
+    /* Create a flex container for the first line using CSS Grid or Flexbox wrapper */
+    .trait-row::before {
+        content: '';
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        order: -2; /* Ensure this appears first */
+    }
+    
+    /* Label appears on first line - left side */
     .trait-label {
-        min-width: auto;
         font-size: 14px;
         font-weight: 600;
-        justify-content: flex-start;
-        margin-bottom: 6px; /* Clear space above slider */
-        position: static;
+        position: absolute;
+        top: 0;
+        left: 4px;
     }
     
-    /* Remove the ::after pseudo element that was causing issues */
-    .trait-row::after {
-        display: none;
-    }
-    
-    .trait-slider {
-        width: calc(100% - 50px);
-        height: 6px; /* Larger for better touch targets */
-        position: static; /* Remove absolute positioning */
-        display: inline-block;
-        vertical-align: middle;
-    }
-    
+    /* Value appears on first line - right side */
     .trait-value {
-        min-width: 40px;
         font-size: 14px;
-        text-align: center;
-        position: static; /* Remove absolute positioning */
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 8px;
+        text-align: right;
+        position: absolute;
+        top: 0;
+        right: 4px;
+        min-width: 40px;
         padding: 2px 6px;
         background: rgba(240, 238, 230, 0.9);
         border-radius: 3px;
+    }
+    
+    /* Second line: slider full width with top margin for label/value space */
+    .trait-slider {
+        width: 100%;
+        height: 6px; /* Larger for better touch targets */
+        margin-top: 24px; /* Space for label/value line above */
+        position: static;
+        display: block;
     }
     
     .trait-slider::-webkit-slider-thumb {

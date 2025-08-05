@@ -245,7 +245,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2px 0;
 }
 
 .trait-label {
@@ -673,7 +672,7 @@
     }
 
     .trait-selector-card, .avatar-card {
-        height: auto; /* Allow flexible height on mobile */
+        height: auto !important; /* Keep auto height as requested */
         min-height: 500px; /* Minimum height for mobile usability */
         width: calc(100vw - 40px) !important; /* Viewport-based width */
         max-width: calc(100vw - 40px) !important;

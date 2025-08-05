@@ -12,6 +12,7 @@ class ChatUI {
         this.apiKeyModal = null;
         this.isInitialized = false;
         this.currentAvatar = null;
+        this.mobileOverlay = null;
         
         this.onSendMessage = null;
         this.onApiKeySet = null;
@@ -141,7 +142,20 @@ class ChatUI {
         
         
         if (this.container) {
-            this.container.classList.remove('hidden');
+            // Check if mobile view
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Create overlay for mobile
+                this.createMobileOverlay();
+                // Use active class for mobile
+                this.container.classList.remove('hidden');
+                this.container.classList.add('active');
+            } else {
+                // Desktop behavior
+                this.container.classList.remove('hidden');
+            }
+            
             this.isVisible = true;
         } else {
             console.error('❌ CRITICAL: Container not found in show()');
@@ -157,7 +171,17 @@ class ChatUI {
     }
 
     hide() {
-        this.container.classList.add('hidden');
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            this.container.classList.remove('active');
+            this.container.classList.add('hidden');
+            // Remove mobile overlay
+            this.removeMobileOverlay();
+        } else {
+            this.container.classList.add('hidden');
+        }
+        
         this.isVisible = false;
     }
 
@@ -558,6 +582,32 @@ class ChatUI {
         };
         
         return styles[characterName] || "Balanced and helpful, adapts communication style to user needs";
+    }
+
+    createMobileOverlay() {
+        // Remove existing overlay if any
+        this.removeMobileOverlay();
+        
+        // Create overlay element
+        this.mobileOverlay = document.createElement('div');
+        this.mobileOverlay.className = 'chat-overlay active';
+        
+        // Add click handler to close chat when clicking overlay
+        this.mobileOverlay.addEventListener('click', (e) => {
+            if (e.target === this.mobileOverlay) {
+                this.hide();
+            }
+        });
+        
+        // Insert overlay before the chat interface
+        document.body.appendChild(this.mobileOverlay);
+    }
+
+    removeMobileOverlay() {
+        if (this.mobileOverlay) {
+            this.mobileOverlay.remove();
+            this.mobileOverlay = null;
+        }
     }
 }
 

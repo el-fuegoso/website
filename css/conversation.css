@@ -426,7 +426,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .chat-interface {
-        position: absolute;
+        position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
@@ -438,10 +438,17 @@
         transform: translateY(100%);
         transition: transform 0.3s ease-out;
         max-height: none;
+        z-index: 16000;
     }
     
     .chat-interface.active {
         transform: translateY(0);
+    }
+    
+    .chat-interface.hidden {
+        transform: translateY(100%);
+        opacity: 1;
+        pointer-events: none;
     }
     
     .chat-header {
@@ -578,6 +585,19 @@
         left: 0;
         right: 0;
         bottom: 0;
+        border-radius: 0;
+        border: none;
+        z-index: 16000;
+    }
+    
+    .chat-interface.hidden {
+        transform: translateY(100%);
+        opacity: 1;
+        pointer-events: none;
+    }
+    
+    .chat-interface.active {
+        transform: translateY(0);
     }
     
     .modal-content {

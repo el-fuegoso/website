@@ -1484,10 +1484,10 @@
     .trait-row {
         flex-direction: column;
         align-items: stretch;
-        gap: 6px;
+        gap: 8px;
         margin-bottom: 16px;
         padding: 0 4px;
-        position: relative;
+        position: static; /* Remove positioning issues */
     }
     
     .trait-label {
@@ -1495,32 +1495,31 @@
         font-size: 14px;
         font-weight: 600;
         justify-content: flex-start;
-        margin-bottom: 2px;
+        margin-bottom: 6px; /* Clear space above slider */
+        position: static;
     }
     
-    /* Container for slider and value - positioned as flex row */
+    /* Remove the ::after pseudo element that was causing issues */
     .trait-row::after {
-        content: '';
-        display: block;
-        position: relative;
-        height: 30px;
+        display: none;
     }
     
     .trait-slider {
         width: calc(100% - 50px);
         height: 6px; /* Larger for better touch targets */
-        position: absolute;
-        top: 0;
-        left: 0;
+        position: static; /* Remove absolute positioning */
+        display: inline-block;
+        vertical-align: middle;
     }
     
     .trait-value {
         min-width: 40px;
         font-size: 14px;
         text-align: center;
-        position: absolute;
-        top: -2px;
-        right: 0;
+        position: static; /* Remove absolute positioning */
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 8px;
         padding: 2px 6px;
         background: rgba(240, 238, 230, 0.9);
         border-radius: 3px;

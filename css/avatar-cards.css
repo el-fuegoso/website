@@ -653,8 +653,10 @@
         grid-template-columns: 1fr;
         gap: 20px;
         height: auto; /* Allow flexible height on mobile */
-        width: 100%;
-        max-width: 100%;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding: 0 20px;
+        box-sizing: border-box;
     }
 
     /* Fix card order - BUILD card first, CHARACTER card second */
@@ -673,10 +675,18 @@
     .trait-selector-card, .avatar-card {
         height: auto; /* Allow flexible height on mobile */
         min-height: 500px; /* Minimum height for mobile usability */
-        width: 100% !important; /* Force consistent width */
-        max-width: 100% !important; /* Prevent overflow */
+        width: calc(100vw - 40px) !important; /* Viewport-based width */
+        max-width: calc(100vw - 40px) !important;
+        min-width: calc(100vw - 40px) !important;
+        margin: 0 auto;
+        padding: 0 !important; /* Reset any padding differences */
         box-sizing: border-box;
         flex-shrink: 0; /* Prevent cards from shrinking differently */
+    }
+    
+    /* Add padding back to card content */
+    .trait-card-content, .card-content {
+        padding: 15px !important;
     }
 
     .trait-grid {

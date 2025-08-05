@@ -107,7 +107,7 @@
     width: calc(100% - 50px); /* Responsive width with 25px padding on each side */
     aspect-ratio: 16/9; /* Maintain 16:9 cinematic aspect ratio */
     max-width: calc(100% - 50px); /* Ensure it doesn't exceed card width on mobile */
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to allow loading overlay to show */
     background: #333;
     display: flex;
     align-items: center;
@@ -696,59 +696,41 @@
 }
 
 /* Loading Overlay Styles */
-.image-container {
-    position: relative;
-}
 
 .loading-overlay {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 10;
-    pointer-events: none;
-    /* DEBUG: High contrast for visibility testing */
-    border: 3px solid red !important;
-    background: yellow !important;
-}
-
-.loading-overlay.active {
+    display: inline-block;
     opacity: 1;
     visibility: visible;
-    /* DEBUG: Force visibility for testing */
-    display: block !important;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
 }
 
+
 .loading-content {
-    background-color: rgba(26, 26, 26, 0.95);
-    color: #e0e0e0;
+    background-color: transparent;
+    color: #333;
     font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-    border: 1px solid #404040;
-    padding: 16px 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    backdrop-filter: blur(8px);
-    min-width: 280px;
-    border-radius: 4px;
-    /* DEBUG: High contrast for visibility testing */
-    background: magenta !important;
-    color: white !important;
-    border: 2px solid lime !important;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    min-width: auto;
+    border-radius: 0;
 }
 
 .status-line {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 0;
 }
 
 .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #404040;
-    border-top: 2px solid #ff6b35;
+    width: 12px;
+    height: 12px;
+    border: 1px solid #ccc;
+    border-top: 1px solid #ff6b35;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -761,12 +743,13 @@
 .status-text {
     color: #ff6b35;
     font-weight: bold;
-    min-width: 180px;
+    font-size: 12px;
+    min-width: auto;
 }
 
 .meta-info {
     color: #888;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 /* Mobile adjustments for loading overlay */

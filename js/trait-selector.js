@@ -365,7 +365,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
     async generateTerminalAvatar(analysisData, userText = null) {
         // Show loading overlay
         if (window.loadingManager) {
-            window.loadingManager.showLoadingOverlay();
+            window.loadingManager.startGeneration();
         }
         
         try {
@@ -392,7 +392,7 @@ Your personality profile shows: ${data.personality_summary || 'Balanced traits a
         } finally {
             // Hide loading overlay
             if (window.loadingManager) {
-                window.loadingManager.hideLoadingOverlay();
+                window.loadingManager.stopGeneration();
             }
         }
     }
@@ -848,12 +848,9 @@ class ElliotGenerator {
         this.showGeneratingState();
         
         // Show loading overlay
-        console.log('🔍 About to show loading overlay - window.loadingManager:', !!window.loadingManager);
         if (window.loadingManager) {
-            console.log('✅ Calling showLoadingOverlay() from generateElliot');
-            window.loadingManager.showLoadingOverlay();
+            window.loadingManager.startGeneration();
         } else {
-            console.error('❌ window.loadingManager not found in generateElliot!');
         }
 
         try {
@@ -939,7 +936,7 @@ class ElliotGenerator {
             
             // Hide loading overlay
             if (window.loadingManager) {
-                window.loadingManager.hideLoadingOverlay();
+                window.loadingManager.stopGeneration();
             }
         }
     }
@@ -3050,6 +3047,8 @@ class LoadingOverlayManager {
         this.tokenCount = null;
         this.startTime = null;
         this.timerInterval = null;
+        this.messageInterval = null;
+        this.isGenerating = false;
         this.statusMessages = [
             "Processing image...",
             "Enhancing pixels...",
@@ -3068,18 +3067,11 @@ class LoadingOverlayManager {
     }
 
     init() {
-        console.log('🔧 LoadingOverlayManager.init() called');
         this.overlay = document.getElementById('loadingOverlay');
         this.statusText = document.getElementById('statusText');
         this.timer = document.getElementById('timer');
         this.tokenCount = document.getElementById('tokenCount');
         
-        console.log('🔍 DOM Elements found:', {
-            overlay: !!this.overlay,
-            statusText: !!this.statusText,
-            timer: !!this.timer,
-            tokenCount: !!this.tokenCount
-        });
         
         if (this.overlay) {
             console.log('📍 Overlay element details:', {
@@ -3088,40 +3080,27 @@ class LoadingOverlayManager {
                 style: this.overlay.style.cssText,
                 computed: window.getComputedStyle(this.overlay).display
             });
+            
+            // Set default "Waiting..." status
+            if (this.statusText) {
+                this.statusText.textContent = "Waiting...";
+            }
         } else {
-            console.error('❌ loadingOverlay element not found in DOM!');
         }
     }
 
-    showLoadingOverlay() {
-        console.log('🚀 LoadingOverlayManager.showLoadingOverlay() called');
-        
+    startGeneration() {
         if (!this.overlay) {
-            console.log('🔄 Overlay not found, calling init()');
             this.init();
         }
         
         if (!this.overlay) {
-            console.error('❌ Still no overlay after init - aborting show');
             return;
         }
         
-        console.log('✅ Showing loading overlay');
         this.startTime = Date.now();
         this.currentMessageIndex = 0;
-        
-        // Show overlay
-        console.log('🎨 Adding "active" class to overlay');
-        this.overlay.classList.add('active');
-        
-        // Debug: Check if class was added
-        console.log('🔍 Overlay classes after adding active:', this.overlay.className);
-        console.log('🔍 Overlay computed styles:', {
-            display: window.getComputedStyle(this.overlay).display,
-            opacity: window.getComputedStyle(this.overlay).opacity,
-            visibility: window.getComputedStyle(this.overlay).visibility,
-            zIndex: window.getComputedStyle(this.overlay).zIndex
-        });
+        this.isGenerating = true;
         
         // Start timer
         this.updateTimer();
@@ -3133,23 +3112,10 @@ class LoadingOverlayManager {
         
         // Reset token count
         this.updateTokenCount(0);
-        
-        console.log('🎯 Loading overlay setup complete');
     }
 
-    hideLoadingOverlay() {
-        console.log('🛑 LoadingOverlayManager.hideLoadingOverlay() called');
-        
-        if (!this.overlay) {
-            console.log('⚠️ No overlay to hide');
-            return;
-        }
-        
-        console.log('🔄 Hiding loading overlay');
-        
-        // Hide overlay
-        this.overlay.classList.remove('active');
-        console.log('🎨 Removed "active" class from overlay');
+    stopGeneration() {
+        this.isGenerating = false;
         
         // Clear intervals
         if (this.timerInterval) {
@@ -3160,6 +3126,11 @@ class LoadingOverlayManager {
         if (this.messageInterval) {
             clearInterval(this.messageInterval);
             this.messageInterval = null;
+        }
+        
+        // Reset to waiting state
+        if (this.statusText) {
+            this.statusText.textContent = "Waiting...";
         }
     }
 
@@ -3246,7 +3217,7 @@ window.debugOverlay = {
     show: () => {
         console.log('🔧 Debug: Showing overlay via console helper');
         if (window.loadingManager) {
-            window.loadingManager.showLoadingOverlay();
+            window.loadingManager.startGeneration();
         } else {
             console.error('❌ loadingManager not available');
         }
@@ -3254,7 +3225,7 @@ window.debugOverlay = {
     hide: () => {
         console.log('🔧 Debug: Hiding overlay via console helper');
         if (window.loadingManager) {
-            window.loadingManager.hideLoadingOverlay();
+            window.loadingManager.stopGeneration();
         } else {
             console.error('❌ loadingManager not available');
         }
@@ -3304,7 +3275,7 @@ function setupDebugButtons() {
         showBtn.addEventListener('click', () => {
             console.log('🔴 DEBUG: Manual show overlay clicked');
             if (window.loadingManager) {
-                window.loadingManager.showLoadingOverlay();
+                window.loadingManager.startGeneration();
             } else {
                 console.error('❌ loadingManager not found');
             }
@@ -3315,7 +3286,7 @@ function setupDebugButtons() {
         hideBtn.addEventListener('click', () => {
             console.log('🔴 DEBUG: Manual hide overlay clicked');
             if (window.loadingManager) {
-                window.loadingManager.hideLoadingOverlay();
+                window.loadingManager.stopGeneration();
             } else {
                 console.error('❌ loadingManager not found');
             }

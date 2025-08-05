@@ -42,7 +42,7 @@ class AvatarGenerator {
         // Optional loading overlay hook - only show if not already shown
         let shouldHideOverlay = false;
         if (window.loadingManager && !window.loadingManager.overlay?.classList.contains('active')) {
-            window.loadingManager.showLoadingOverlay();
+            window.loadingManager.startGeneration();
             shouldHideOverlay = true;
         }
 
@@ -84,7 +84,7 @@ class AvatarGenerator {
             
             // Hide loading overlay if we showed it
             if (shouldHideOverlay && window.loadingManager) {
-                window.loadingManager.hideLoadingOverlay();
+                window.loadingManager.stopGeneration();
             }
         }
     }

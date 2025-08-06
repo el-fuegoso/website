@@ -371,32 +371,6 @@
         <ul class="projects-list">
             <li class="project-item" onclick="toggleProject(this)">
                 <div class="project-header">
-                    <span class="project-title">The Daoist Sage AI Agent <span class="project-status status-case-study">Case Study</span></span>
-                    <span class="project-year">2025</span>
-                </div>
-                <div class="project-details">
-                    <div class="project-content">
-                        <div class="project-grid">
-                            <div class="project-description">
-                                <h3>AI Development & RAG</h3>
-                                <p>This was my second AI development. Had huge challenges in hallucination and unreliable memory in the last trading bot. Constant confident generation of incorrect information.</p>
-                                <p>My concept was simple - A Daoist Sage. An Agent using RAG as its foundational memory and accuracy mechanism. Specifically I tasked it with drawing from the Dao de Ching and referencing the specific piece of information it uses in its response.</p>
-                                <p>It is easy to see the utility of such a tool and was more a proof of concept than anything else. It was my last Eliza agent, I have now moved to the more user friendly Claude.</p>
-                                <p><a href="https://github.com/el-fuegoso/daobot" class="project-link" target="_blank" rel="noopener noreferrer">▶ View Code</a></p>
-                            </div>
-                            <div class="project-gallery">
-                                <div class="project-image" style="background-image: url('./images/daobot/agent-interface.jpg')">Agent Interface</div>
-                                <div class="project-image" style="background-image: url('./images/daobot/rag-architecture.jpg')">RAG Architecture</div>
-                                <div class="project-image" style="background-image: url('./images/daobot/memory-system.jpg')">Memory System</div>
-                                <div class="project-image" style="background-image: url('./images/daobot/testing-results.jpg')">Testing Results</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-
-            <li class="project-item" onclick="toggleProject(this)">
-                <div class="project-header">
                     <span class="project-title">A New Portfolio <span class="project-status status-case-study">Case Study</span></span>
                     <span class="project-year">2025</span>
                 </div>
@@ -411,16 +385,31 @@
                                 <p>A big goal was to develop my Claude Code skills and techniques. Managing context. Clear instructions. Little by little took me about 4 weeks while living and working alongside. Hope you like It!</p>
                                 <p><a href="#" class="project-link">▶ Experience the Portfolio</a></p>
                             </div>
-                            <div class="project-gallery">
-                                <div class="project-image" style="background-image: url('./images/ideal-el/generative-art-gallery.jpg')">Generative Art Gallery</div>
-                                <div class="project-image" style="background-image: url('./images/ideal-el/personality-assessment.jpg')">Personality Assessment</div>
-                                <div class="project-image" style="background-image: url('./images/ideal-el/character-matching.jpg')">Character Matching</div>
-                                <div class="project-image" style="background-image: url('./images/ideal-el/live-chat-interface.jpg')">Live Chat Interface</div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="project-item" onclick="toggleProject(this)">
+                <div class="project-header">
+                    <span class="project-title">The Daoist Sage AI Agent <span class="project-status status-case-study">Case Study</span></span>
+                    <span class="project-year">2025</span>
+                </div>
+                <div class="project-details">
+                    <div class="project-content">
+                        <div class="project-grid">
+                            <div class="project-description">
+                                <h3>AI Development & RAG</h3>
+                                <p>This was my second AI development. Had huge challenges in hallucination and unreliable memory in the last trading bot. Constant confident generation of incorrect information.</p>
+                                <p>My concept was simple - A Daoist Sage. An Agent using RAG as its foundational memory and accuracy mechanism. Specifically I tasked it with drawing from the Dao de Ching and referencing the specific piece of information it uses in its response.</p>
+                                <p>It is easy to see the utility of such a tool and was more a proof of concept than anything else. It was my last Eliza agent, I have now moved to the more user friendly Claude.</p>
+                                <p><a href="https://github.com/el-fuegoso/daobot" class="project-link" target="_blank" rel="noopener noreferrer">▶ View Code</a></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </li>
+
 
             <li class="project-item" onclick="toggleProject(this)">
                 <div class="project-header">
@@ -437,12 +426,6 @@
                                 <p>Training an LLM head on Pump.fun launch patterns. Connecting this to 3Commas for signals and trading. That was as far as I got. I could not get any reliable results all paper trading leading to losses. Hallucinating random signals that threw everything off.</p>
                                 <p>A great experience in Eliza and agent development. This kind of project needs a real goat.</p>
                                 <p><em>Project documentation available upon request</em></p>
-                            </div>
-                            <div class="project-gallery">
-                                <div class="project-image" style="background-image: url('./images/eliza/eliza-banner.jpg')">Eliza Banner</div>
-                                <div class="project-image" style="background-image: url('./images/eliza/trading-interface.jpg')">Trading Interface</div>
-                                <div class="project-image" style="background-image: url('./images/eliza/performance-metrics.jpg')">Performance Metrics</div>
-                                <div class="project-image" style="background-image: url('./images/eliza/lessons-learned.jpg')">Lessons Learned</div>
                             </div>
                         </div>
                     </div>
@@ -2507,7 +2490,110 @@
         // Initialize the application after DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             window.initialize();
+            initializeLightbox();
         });
+
+        // Lightbox functionality
+        function initializeLightbox() {
+            // Create lightbox HTML
+            const lightbox = document.createElement('div');
+            lightbox.id = 'lightbox';
+            lightbox.innerHTML = `
+                <div class="lightbox-content">
+                    <span class="lightbox-close">&times;</span>
+                    <img class="lightbox-image" src="" alt="">
+                </div>
+            `;
+            document.body.appendChild(lightbox);
+
+            // Add lightbox CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                #lightbox {
+                    display: none;
+                    position: fixed;
+                    z-index: 9999;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.8);
+                    backdrop-filter: blur(5px);
+                }
+                .lightbox-content {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                    padding: 60px 20px 20px;
+                }
+                .lightbox-image {
+                    max-width: 90%;
+                    max-height: 90%;
+                    object-fit: contain;
+                    border-radius: 0;
+                }
+                .lightbox-close {
+                    position: absolute;
+                    top: 20px;
+                    right: 30px;
+                    color: white;
+                    font-size: 40px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    z-index: 10000;
+                    line-height: 1;
+                    transition: opacity 0.2s ease;
+                }
+                .lightbox-close:hover {
+                    opacity: 0.7;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Add click listeners to project images
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('project-image')) {
+                    const bgImage = e.target.style.backgroundImage;
+                    const imageUrl = bgImage.slice(4, -1).replace(/"/g, "");
+                    
+                    if (imageUrl && imageUrl !== '') {
+                        showLightbox(imageUrl);
+                    }
+                }
+            });
+
+            // Close lightbox functionality
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+                    hideLightbox();
+                }
+            });
+
+            // ESC key to close lightbox
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideLightbox();
+                }
+            });
+        }
+
+        function showLightbox(imageUrl) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = lightbox.querySelector('.lightbox-image');
+            
+            lightboxImage.src = imageUrl;
+            lightbox.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
     </script>
 </body>
 </html>

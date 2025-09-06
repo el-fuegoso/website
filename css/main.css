@@ -464,8 +464,8 @@ body {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 8px;
-    max-width: 300px;
-    max-height: 300px;
+    max-width: 408px;
+    max-height: 408px;
     align-self: flex-start;
 }
 
@@ -485,6 +485,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     cursor: pointer;
+    color: transparent;
 }
 
 .project-image:hover {

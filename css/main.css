@@ -462,6 +462,16 @@ body {
 .project-gallery {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    max-width: 608px;
+    max-height: 608px;
+    align-self: flex-start;
+}
+
+.project-gallery-large {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr;
     gap: 8px;
     max-width: 608px;

@@ -465,6 +465,8 @@ body {
     grid-template-rows: 1fr 1fr;
     gap: 8px;
     max-width: 300px;
+    max-height: 300px;
+    align-self: flex-start;
 }
 
 .project-image {
@@ -486,8 +488,7 @@ body {
 }
 
 .project-image:hover {
-    background: rgba(51, 51, 51, 0.2);
-    transform: translateY(-2px);
+    opacity: 1;
 }
 
 /* When images are loaded, hide the text */

@@ -527,6 +527,11 @@ body {
     color: #ff8c00;
 }
 
+.status-photography {
+    background: rgba(147, 51, 234, 0.2);
+    color: #7c3aed;
+}
+
 /* Contact Section */
 .contact-section {
     min-height: 50vh;

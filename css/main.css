@@ -464,7 +464,7 @@ body {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 8px;
-    max-width: 300px;
+    max-width: 200px;
 }
 
 .project-image {

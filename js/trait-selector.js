@@ -2209,7 +2209,7 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         // Try direct HTTP API call first (bypass Gradio client issues)
         console.log('🔄 Trying direct HTTP API call...');
         try {
-            const response = await fetch('https://thoucentric-big-five-personality-traits-detection.hf.space/predict', {
+            const response = await fetch('https://thoucentric-big-five-personality-traits-detection.hf.space/api/predict', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2278,46 +2278,41 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
             console.log('⚠️ Could not get endpoints:', endpointError);
         }
         
-        // Call the prediction endpoint - try the most basic Gradio format first
+        // Call the prediction endpoint - use the correct format based on API info
         let result;
         try {
-            // Most basic Gradio format - just pass the text directly as an array
-            console.log('🔄 Trying basic Gradio format [text]...');
-            result = await client.predict("/predict", [text]);
-            console.log('✅ Success with basic Gradio format');
+            // Based on API info, use the unnamed endpoint (index 0) with model_input parameter
+            console.log('🔄 Trying unnamed endpoint with model_input...');
+            result = await client.predict(0, {
+                model_input: text
+            });
+            console.log('✅ Success with unnamed endpoint');
         } catch (error) {
-            console.log('❌ Basic Gradio format failed:', error.message);
+            console.log('❌ Unnamed endpoint failed:', error.message);
             try {
-                // Try with object format using the exact parameter name from the function
-                console.log('🔄 Trying object format with model_input...');
+                // Try with /predict endpoint and model_input parameter
+                console.log('🔄 Trying /predict endpoint with model_input...');
                 result = await client.predict("/predict", {
                     model_input: text
                 });
-                console.log('✅ Success with object format');
+                console.log('✅ Success with /predict endpoint');
             } catch (error2) {
-                console.log('❌ Object format failed:', error2.message);
+                console.log('❌ /predict endpoint failed:', error2.message);
                 try {
-                    // Try with different parameter names
-                    console.log('🔄 Trying with "text" parameter...');
-                    result = await client.predict("/predict", {
-                        text: text
-                    });
-                    console.log('✅ Success with "text" parameter');
+                    // Try with array format for unnamed endpoint
+                    console.log('🔄 Trying unnamed endpoint with array format...');
+                    result = await client.predict(0, [text]);
+                    console.log('✅ Success with array format');
                 } catch (error3) {
-                    console.log('❌ "text" parameter failed:', error3.message);
+                    console.log('❌ Array format failed:', error3.message);
                     try {
-                        // Try with "inputs" parameter
-                        console.log('🔄 Trying with "inputs" parameter...');
-                        result = await client.predict("/predict", {
-                            inputs: text
-                        });
-                        console.log('✅ Success with "inputs" parameter');
+                        // Try with /predict endpoint and array format
+                        console.log('🔄 Trying /predict endpoint with array format...');
+                        result = await client.predict("/predict", [text]);
+                        console.log('✅ Success with /predict array format');
                     } catch (error4) {
-                        console.log('❌ "inputs" parameter failed:', error4.message);
-                        // Try different endpoint
-                        console.log('🔄 Trying with "/" endpoint...');
-                        result = await client.predict("/", [text]);
-                        console.log('✅ Success with "/" endpoint');
+                        console.log('❌ All Gradio client methods failed:', error4.message);
+                        throw new Error('All API methods failed');
                     }
                 }
             }

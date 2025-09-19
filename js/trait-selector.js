@@ -2179,6 +2179,33 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
     try {
         const startTime = performance.now();
         
+        // Validate input text (space requires at least 20 characters)
+        if (!text || text.length < 20) {
+            console.log('⚠️ Text too short for analysis (minimum 20 characters required)');
+            return {
+                ocean_scores: {
+                    Openness: 0,
+                    Conscientiousness: 0,
+                    Extraversion: 0,
+                    Agreeableness: 0,
+                    Neuroticism: 0
+                },
+                avatar_data: generateAvatarFromScores({
+                    Openness: 0,
+                    Conscientiousness: 0,
+                    Extraversion: 0,
+                    Agreeableness: 0,
+                    Neuroticism: 0
+                }),
+                explanation: "Text too short for personality analysis (minimum 20 characters required)",
+                mode: mode,
+                context: context,
+                success: false
+            };
+        }
+        
+        console.log('📝 Text length:', text.length, 'characters');
+        
         // Connect to the HF Space
         const client = await window.GradioClient.connect("thoucentric/Big-Five-Personality-Traits-Detection");
         
@@ -2187,16 +2214,25 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         let info;
         try {
             info = await client.view_api();
-            console.log('📋 API Info:', info);
+            console.log('📋 API Info:', JSON.stringify(info, null, 2));
         } catch (apiError) {
             console.log('⚠️ Could not get API info:', apiError);
         }
         
-        // Call the prediction endpoint - use correct parameter name from the space code
+        // Debug: Check what endpoints are available
+        console.log('🔍 Checking available endpoints...');
+        try {
+            const endpoints = await client.view_endpoints();
+            console.log('📋 Available endpoints:', JSON.stringify(endpoints, null, 2));
+        } catch (endpointError) {
+            console.log('⚠️ Could not get endpoints:', endpointError);
+        }
+        
+        // Call the prediction endpoint - based on gr.Interface structure
         let result;
         try {
-            // Based on the space code, the parameter should be 'model_input'
-            console.log('🔄 Trying with "model_input" parameter...');
+            // For gr.Interface, the parameter should match the function parameter name
+            console.log('🔄 Trying with "model_input" parameter (gr.Interface format)...');
             result = await client.predict("/predict", {
                 model_input: text
             });
@@ -2204,37 +2240,55 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         } catch (error) {
             console.log('❌ "model_input" parameter failed:', error.message);
             try {
-                // Try with 'text' parameter as fallback
-                console.log('🔄 Trying with "text" parameter...');
-                result = await client.predict("/predict", {
-                    text: text
-                });
-                console.log('✅ Success with "text" parameter');
+                // Try with array format (some Gradio versions expect this)
+                console.log('🔄 Trying with array format...');
+                result = await client.predict("/predict", [text]);
+                console.log('✅ Success with array format');
             } catch (error2) {
-                console.log('❌ "text" parameter failed:', error2.message);
+                console.log('❌ Array format failed:', error2.message);
                 try {
-                    // Try with 'inputs' parameter (original)
-                    console.log('🔄 Trying with "inputs" parameter...');
-                    result = await client.predict("/predict", {
-                        inputs: text
-                    });
-                    console.log('✅ Success with "inputs" parameter');
+                    // Try with direct text (no parameter name)
+                    console.log('🔄 Trying with direct text...');
+                    result = await client.predict("/predict", text);
+                    console.log('✅ Success with direct text');
                 } catch (error3) {
-                    console.log('❌ "inputs" parameter failed:', error3.message);
-                    // Try different endpoint
-                    console.log('🔄 Trying with "/" endpoint...');
-                    result = await client.predict("/", {
-                        model_input: text
-                    });
-                    console.log('✅ Success with "/" endpoint');
+                    console.log('❌ Direct text failed:', error3.message);
+                    try {
+                        // Try with 'text' parameter
+                        console.log('🔄 Trying with "text" parameter...');
+                        result = await client.predict("/predict", {
+                            text: text
+                        });
+                        console.log('✅ Success with "text" parameter');
+                    } catch (error4) {
+                        console.log('❌ "text" parameter failed:', error4.message);
+                        // Try different endpoint
+                        console.log('🔄 Trying with "/" endpoint...');
+                        result = await client.predict("/", {
+                            model_input: text
+                        });
+                        console.log('✅ Success with "/" endpoint');
+                    }
                 }
             }
         }
         
         const endTime = performance.now();
         
-        // Handle the response - it's already an object, not a JSON string
-        const rawScores = result.data[0];
+        // Handle the response - check different possible formats
+        console.log('📊 Full API response:', result);
+        
+        let rawScores;
+        if (result.data && result.data[0]) {
+            rawScores = result.data[0];
+        } else if (result.data) {
+            rawScores = result.data;
+        } else if (result) {
+            rawScores = result;
+        } else {
+            throw new Error('Unexpected response format from API');
+        }
+        
         console.log('📊 Raw scores from API:', rawScores);
         
         // Transform the response to match OCEAN format

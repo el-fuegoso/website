@@ -2184,36 +2184,71 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         
         // Debug: Check what parameters the API expects
         console.log('🔍 Checking API info...');
-        const info = await client.view_api();
-        console.log('📋 API Info:', info);
+        let info;
+        try {
+            info = await client.view_api();
+            console.log('📋 API Info:', info);
+        } catch (apiError) {
+            console.log('⚠️ Could not get API info:', apiError);
+        }
         
-        // Call the prediction endpoint - try different parameter names
+        // Call the prediction endpoint - use correct parameter name from the space code
         let result;
         try {
-            // Try with 'text' parameter first
+            // Based on the space code, the parameter should be 'model_input'
+            console.log('🔄 Trying with "model_input" parameter...');
             result = await client.predict("/predict", {
-                text: text
+                model_input: text
             });
+            console.log('✅ Success with "model_input" parameter');
         } catch (error) {
-            console.log('🔄 Trying with "inputs" parameter...');
+            console.log('❌ "model_input" parameter failed:', error.message);
             try {
-                // Try with 'inputs' parameter (original)
+                // Try with 'text' parameter as fallback
+                console.log('🔄 Trying with "text" parameter...');
                 result = await client.predict("/predict", {
-                    inputs: text
+                    text: text
                 });
+                console.log('✅ Success with "text" parameter');
             } catch (error2) {
-                console.log('🔄 Trying with "input_text" parameter...');
-                // Try with 'input_text' parameter
-                result = await client.predict("/predict", {
-                    input_text: text
-                });
+                console.log('❌ "text" parameter failed:', error2.message);
+                try {
+                    // Try with 'inputs' parameter (original)
+                    console.log('🔄 Trying with "inputs" parameter...');
+                    result = await client.predict("/predict", {
+                        inputs: text
+                    });
+                    console.log('✅ Success with "inputs" parameter');
+                } catch (error3) {
+                    console.log('❌ "inputs" parameter failed:', error3.message);
+                    // Try different endpoint
+                    console.log('🔄 Trying with "/" endpoint...');
+                    result = await client.predict("/", {
+                        model_input: text
+                    });
+                    console.log('✅ Success with "/" endpoint');
+                }
             }
         }
         
         const endTime = performance.now();
         
         // Handle the response - it's already an object, not a JSON string
-        const oceanScores = result.data[0];
+        const rawScores = result.data[0];
+        console.log('📊 Raw scores from API:', rawScores);
+        
+        // Transform the response to match OCEAN format
+        // The space returns: Extroversion, Neuroticism, Agreeableness, Conscientiousness, Openness
+        // We need: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism
+        const oceanScores = {
+            Openness: rawScores.Openness || 0,
+            Conscientiousness: rawScores.Conscientiousness || 0,
+            Extraversion: rawScores.Extroversion || 0, // Note: space uses "Extroversion"
+            Agreeableness: rawScores.Agreeableness || 0,
+            Neuroticism: rawScores.Neuroticism || 0
+        };
+        
+        console.log('🔄 Transformed OCEAN scores:', oceanScores);
         
         // Transform HF response to match expected format
         const transformedResult = {

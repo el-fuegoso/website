@@ -2182,10 +2182,33 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         // Connect to the HF Space
         const client = await window.GradioClient.connect("thoucentric/Big-Five-Personality-Traits-Detection");
         
-        // Call the prediction endpoint
-        const result = await client.predict("/predict", {
-            inputs: text
-        });
+        // Debug: Check what parameters the API expects
+        console.log('🔍 Checking API info...');
+        const info = await client.view_api();
+        console.log('📋 API Info:', info);
+        
+        // Call the prediction endpoint - try different parameter names
+        let result;
+        try {
+            // Try with 'text' parameter first
+            result = await client.predict("/predict", {
+                text: text
+            });
+        } catch (error) {
+            console.log('🔄 Trying with "inputs" parameter...');
+            try {
+                // Try with 'inputs' parameter (original)
+                result = await client.predict("/predict", {
+                    inputs: text
+                });
+            } catch (error2) {
+                console.log('🔄 Trying with "input_text" parameter...');
+                // Try with 'input_text' parameter
+                result = await client.predict("/predict", {
+                    input_text: text
+                });
+            }
+        }
         
         const endTime = performance.now();
         

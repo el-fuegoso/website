@@ -4,7 +4,7 @@ import { Client } from "@gradio/client";
 async function testHFAPI() {
     try {
         console.log("🔗 Attempting to connect to HF Space...");
-        const client = await Client.connect("jrjrhan/personality_classification_OCEAN_en");
+        const client = await Client.connect("thoucentric/Big-Five-Personality-Traits-Detection");
         console.log("✅ Successfully connected to HF Space");
         
         // Test a prediction

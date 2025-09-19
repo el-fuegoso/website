@@ -2180,7 +2180,7 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         const startTime = performance.now();
         
         // Connect to the HF Space
-        const client = await window.GradioClient.connect("jrjrhan/personality_classification_OCEAN_en");
+        const client = await window.GradioClient.connect("thoucentric/Big-Five-Personality-Traits-Detection");
         
         // Call the prediction endpoint
         const result = await client.predict("/predict", {

@@ -54,7 +54,7 @@ CSS3                 → Custom properties & responsive design
 ### AI Integration
 ```
 Claude API           → Real-time character conversations
-Hugging Face API     → Personality analysis via jrjrhan/personality_classification_OCEAN_en
+Hugging Face API     → Personality analysis via thoucentric/Big-Five-Personality-Traits-Detection
 Streaming Responses  → Live conversation updates
 Big Five Model       → Psychological personality framework
 ```
@@ -187,7 +187,7 @@ Characters are matched based on personality combinations:
 ### Personality Analysis
 ```javascript
 // Automatic analysis via HuggingFace API
-const response = await fetch('https://api-inference.huggingface.co/models/jrjrhan/personality_classification_OCEAN_en', {
+const response = await fetch('https://api-inference.huggingface.co/models/thoucentric/Big-Five-Personality-Traits-Detection', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${HF_API_TOKEN}` },
     body: JSON.stringify({ inputs: userText })

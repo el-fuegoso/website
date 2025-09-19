@@ -2227,14 +2227,42 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
                 const rawScores = result.data[0];
                 console.log('📊 Raw scores from direct API:', rawScores);
                 
-                // Transform the response to match OCEAN format
-                const oceanScores = {
-                    Openness: rawScores.Openness || 0,
-                    Conscientiousness: rawScores.Conscientiousness || 0,
-                    Extraversion: rawScores.Extroversion || 0,
-                    Agreeableness: rawScores.Agreeableness || 0,
-                    Neuroticism: rawScores.Neuroticism || 0
+                // The API returns {label: "Openness", confidences: [...]} format
+                // We need to extract the confidence scores for each trait
+                let oceanScores = {
+                    Openness: 0,
+                    Conscientiousness: 0,
+                    Extraversion: 0,
+                    Agreeableness: 0,
+                    Neuroticism: 0
                 };
+                
+                if (rawScores.confidences && Array.isArray(rawScores.confidences)) {
+                    console.log('📊 Confidences array:', rawScores.confidences);
+                    console.log('📊 First confidence item:', rawScores.confidences[0]);
+                    
+                    // Map the confidences array to OCEAN traits
+                    // Based on the space code: Extroversion, Neuroticism, Agreeableness, Conscientiousness, Openness
+                    const traitOrder = ['Extraversion', 'Neuroticism', 'Agreeableness', 'Conscientiousness', 'Openness'];
+                    
+                    rawScores.confidences.forEach((confidence, index) => {
+                        if (index < traitOrder.length) {
+                            const traitName = traitOrder[index];
+                            const score = confidence.confidence || confidence.score || confidence.value || confidence || 0;
+                            oceanScores[traitName] = score;
+                            console.log(`📊 ${traitName}: ${score} (from confidence:`, confidence, ')');
+                        }
+                    });
+                } else if (rawScores.Openness !== undefined) {
+                    // Fallback to direct property access
+                    oceanScores = {
+                        Openness: rawScores.Openness || 0,
+                        Conscientiousness: rawScores.Conscientiousness || 0,
+                        Extraversion: rawScores.Extroversion || 0,
+                        Agreeableness: rawScores.Agreeableness || 0,
+                        Neuroticism: rawScores.Neuroticism || 0
+                    };
+                }
                 
                 console.log('🔄 Transformed OCEAN scores:', oceanScores);
                 

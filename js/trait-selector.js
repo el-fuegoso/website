@@ -2206,7 +2206,57 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
         
         console.log('📝 Text length:', text.length, 'characters');
         
-        // Connect to the HF Space
+        // Try direct HTTP API call first (bypass Gradio client issues)
+        console.log('🔄 Trying direct HTTP API call...');
+        try {
+            const response = await fetch('https://thoucentric-big-five-personality-traits-detection.hf.space/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data: [text]
+                })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('✅ Direct HTTP API call successful:', result);
+                
+                // Handle the response
+                const rawScores = result.data[0];
+                console.log('📊 Raw scores from direct API:', rawScores);
+                
+                // Transform the response to match OCEAN format
+                const oceanScores = {
+                    Openness: rawScores.Openness || 0,
+                    Conscientiousness: rawScores.Conscientiousness || 0,
+                    Extraversion: rawScores.Extroversion || 0,
+                    Agreeableness: rawScores.Agreeableness || 0,
+                    Neuroticism: rawScores.Neuroticism || 0
+                };
+                
+                console.log('🔄 Transformed OCEAN scores:', oceanScores);
+                
+                const transformedResult = {
+                    ocean_scores: oceanScores,
+                    avatar_data: generateAvatarFromScores(oceanScores),
+                    explanation: generateExplanationFromScores(oceanScores),
+                    mode: mode,
+                    context: context,
+                    success: true
+                };
+                
+                return transformedResult;
+            } else {
+                console.log('❌ Direct HTTP API call failed:', response.status, response.statusText);
+            }
+        } catch (httpError) {
+            console.log('❌ Direct HTTP API call error:', httpError.message);
+        }
+        
+        // Fallback to Gradio client if direct API fails
+        console.log('🔄 Falling back to Gradio client...');
         const client = await window.GradioClient.connect("thoucentric/Big-Five-Personality-Traits-Detection");
         
         // Debug: Check what parameters the API expects
@@ -2228,45 +2278,45 @@ async function callPersonalityAPI(text, mode = 'general', context = {}) {
             console.log('⚠️ Could not get endpoints:', endpointError);
         }
         
-        // Call the prediction endpoint - based on gr.Interface structure
+        // Call the prediction endpoint - try the most basic Gradio format first
         let result;
         try {
-            // For gr.Interface, the parameter should match the function parameter name
-            console.log('🔄 Trying with "model_input" parameter (gr.Interface format)...');
-            result = await client.predict("/predict", {
-                model_input: text
-            });
-            console.log('✅ Success with "model_input" parameter');
+            // Most basic Gradio format - just pass the text directly as an array
+            console.log('🔄 Trying basic Gradio format [text]...');
+            result = await client.predict("/predict", [text]);
+            console.log('✅ Success with basic Gradio format');
         } catch (error) {
-            console.log('❌ "model_input" parameter failed:', error.message);
+            console.log('❌ Basic Gradio format failed:', error.message);
             try {
-                // Try with array format (some Gradio versions expect this)
-                console.log('🔄 Trying with array format...');
-                result = await client.predict("/predict", [text]);
-                console.log('✅ Success with array format');
+                // Try with object format using the exact parameter name from the function
+                console.log('🔄 Trying object format with model_input...');
+                result = await client.predict("/predict", {
+                    model_input: text
+                });
+                console.log('✅ Success with object format');
             } catch (error2) {
-                console.log('❌ Array format failed:', error2.message);
+                console.log('❌ Object format failed:', error2.message);
                 try {
-                    // Try with direct text (no parameter name)
-                    console.log('🔄 Trying with direct text...');
-                    result = await client.predict("/predict", text);
-                    console.log('✅ Success with direct text');
+                    // Try with different parameter names
+                    console.log('🔄 Trying with "text" parameter...');
+                    result = await client.predict("/predict", {
+                        text: text
+                    });
+                    console.log('✅ Success with "text" parameter');
                 } catch (error3) {
-                    console.log('❌ Direct text failed:', error3.message);
+                    console.log('❌ "text" parameter failed:', error3.message);
                     try {
-                        // Try with 'text' parameter
-                        console.log('🔄 Trying with "text" parameter...');
+                        // Try with "inputs" parameter
+                        console.log('🔄 Trying with "inputs" parameter...');
                         result = await client.predict("/predict", {
-                            text: text
+                            inputs: text
                         });
-                        console.log('✅ Success with "text" parameter');
+                        console.log('✅ Success with "inputs" parameter');
                     } catch (error4) {
-                        console.log('❌ "text" parameter failed:', error4.message);
+                        console.log('❌ "inputs" parameter failed:', error4.message);
                         // Try different endpoint
                         console.log('🔄 Trying with "/" endpoint...');
-                        result = await client.predict("/", {
-                            model_input: text
-                        });
+                        result = await client.predict("/", [text]);
                         console.log('✅ Success with "/" endpoint');
                     }
                 }

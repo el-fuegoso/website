@@ -128,7 +128,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **Elliot Lee**  
 - 💼 LinkedIn: [elliot-james-lee](https://www.linkedin.com/in/elliot-james-lee)
 - 📧 Email: elliotjameslee8@gmail.com
-- 🌐 Portfolio: [el-fuegoso.github.io/website](https://el-fuegoso.github.io/website)
+- 🌐 Portfolio: [elliot.earth](https://www.elliot.earth/)
 
 ---
 

@@ -1,42 +1,21 @@
-# Meet Your Ideal El - Interactive AI Portfolio 🤖
-
-> **Interactive AI Portfolio - Meet your ideal El!** Discover which of 12 unique programming characters matches your personality through AI-powered analysis and dynamic generative art experiences.
+# Elliot Lee Interactive Portfolio
 
 ## 🌟 Live Experience
-**[🚀 Meet Your Ideal El](https://el-fuegoso.github.io/website)**
+**[🚀 Meet Your Ideal El](https://elliot.earth)**
 
-## ✨ What You'll Experience
+## ✨ What is this?
 
 ### 🎨 **Interactive Generative Art**
-Click through 5 dynamic art experiences that respond to your interactions:
-- **HankiesInTheWind** - Three.js interference patterns
-- **AsciiBinaryFlow** - Flowing digital streams
-- **ParticleVessel** - 3D particle formations
-- **Metamorphosis** - Evolving canvas forms
-- **LayeredSineWaves** - Hypnotic wave patterns
+- Clean hero seciton based on https://www.thewayofcode.com/ from Rick Ruben and Anthropic
 
-### 🤖 **AI Character Discovery**
-Find your perfect programming companion from 12 unique "El" personalities:
+### 🤖 **Character Discovery**
+The only person that knows what is going to work for them is themselves. I built a system where users can either customise the traits they want directly, or speak to a terminal window that uses a custom LLM head to analyise thier personality. With a few API calls the system generates the perfect El for you! 
 
-| Character | Specialty | Vibe |
-|-----------|-----------|------|
-| **TheBuilder** 🔨 | Chaos Engineering | "Let's build something beautiful and chaotic!" |
-| **TheDetective** 🔍 | Bug Investigation | "Every bug tells a story..." |
-| **GrumpyOldManEl** 🤬 | Code Criticism | "Back in my day, we wrote REAL code!" |
-| **PirateEl** 🏴‍☠️ | Digital Adventures | "Ahoy! Let's sail the digital seas!" |
-| **GymBroEl** 💪 | Performance Optimization | "Time to get those code gains!" |
-| **FreakyEl** 🌶️ | Edge Case Testing | "Let's break some boundaries..." |
-| **CoffeeAddictEl** ☕ | Caffeine-Powered Dev | "73% coffee, 27% existential dread" |
-| **ConspiracyEl** 👁️ | Pattern Recognition | "Nothing is a coincidence..." |
-| **AGIEl** 🤖 | AI Intelligence | "I have achieved digital consciousness" |
-| **ProcrastinationEl** 😴 | Strategic Delay | "I'll get to it... eventually" |
-| **TechBroEl** 📱 | Startup Innovation | "Let's disrupt the disruption!" |
-| **TheHustler** 🚀 | Momentum & Energy | "Golden retriever energy meets code!" |
 
 ### 🧠 **Personality Analysis**
 Choose your preferred interaction style:
-- **Simple Mode**: Adjust Big Five personality sliders to match your traits
-- **Terminal Mode**: Natural conversation that analyzes your personality in real-time
+- **Simple Mode**: Adjust Big Five personality sliders to your desired traits
+- **Terminal Mode**: Natural conversation that analyzes your personality with a custom LLM head. 
 
 ### 💬 **Character Chat**
 Engage in live conversations with your matched "El" character powered by Claude AI - each with their own unique personality, speaking style, and expertise.
@@ -66,73 +45,6 @@ Static Hosting       → GitHub Pages deployment
 External APIs        → No backend server required
 ```
 
-## 🚀 Getting Started
-
-### Quick Start (Recommended)
-1. **Visit the live site**: [el-fuegoso.github.io/website](https://el-fuegoso.github.io/website)
-2. **Click the art** to explore different generative experiences
-3. **Choose your mode** - Simple sliders or Terminal conversation
-4. **Discover your El** and start chatting!
-
-### Local Development
-```bash
-# Clone the repository
-git clone https://github.com/el-fuegoso/website.git
-cd website
-
-# Start a local server
-python -m http.server 8000
-# Or: npx serve .
-# Or: php -S localhost:8000
-
-# Visit http://localhost:8000
-```
-
-### Deployment
-- **GitHub Pages**: Automatic deployment from main branch
-- **Vercel**: Import repository for instant deployment
-- **Netlify**: Drag & drop or Git integration
-
-## 💡 How It Works
-
-```mermaid
-graph TD
-    A[User Visits Site] --> B[Interactive Art Gallery]
-    B --> C[Character Discovery Interface]
-    C --> D[Personality Analysis]
-    D --> E[HuggingFace API Processing]
-    E --> F[Big Five Personality Scoring]
-    F --> G[Character Matching Algorithm]
-    G --> H[Meet Your Ideal El]
-    H --> I[Claude AI Chat Integration]
-    I --> J[Personalized Conversations]
-```
-
-## 🎯 Core Features
-
-### 🎨 **Generative Art Gallery**
-- 5 unique Three.js and Canvas experiences
-- Click-to-cycle through different visual styles
-- Responsive animations with GSAP
-- Interactive title cycling system
-
-### 🧠 **Smart Personality Matching**
-- Real-time analysis using external ML models
-- Big Five personality framework (OCEAN)
-- Contextual character selection based on traits
-- Both simple and conversational interfaces
-
-### 💬 **Dynamic AI Conversations**
-- Streaming chat interface with live typing indicators
-- Character-specific personalities and speaking styles
-- Context-aware responses based on personality analysis
-- Professional portfolio integration within conversations
-
-### 📱 **Professional Portfolio**
-- 8 real projects with interactive cards
-- Mix of AI/ML, web development, and personal projects
-- Expandable project details with images and links
-- Mobile-optimized responsive design
 
 ## 🛠️ Project Structure
 
@@ -175,13 +87,6 @@ Each character has distinct personality patterns:
 - **Agreeableness**: Cooperation, empathy, teamwork
 - **Neuroticism**: Emotional stability, stress response
 
-### Character Archetypes
-Characters are matched based on personality combinations:
-- **High Openness + Low Conscientiousness** = TheBuilder (creative chaos)
-- **High Conscientiousness + High Openness** = TheDetective (methodical investigation)
-- **Low Agreeableness + High Experience** = GrumpyOldManEl (critical expertise)
-- **High Extraversion + High Energy** = TheHustler (enthusiastic momentum)
-
 ## 🌐 API Integration
 
 ### Personality Analysis
@@ -215,15 +120,6 @@ const response = await fetch('/api/claude-stream', {
 - **Professional + Playful**: Serious work showcased through engaging interactions
 - **Personality-Driven**: Technology that adapts to who you are
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
